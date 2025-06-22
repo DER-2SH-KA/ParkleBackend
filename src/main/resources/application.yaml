@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: Parkle Project Jun 2025
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/start_page_test_db
+    username: cock
+    password: cockMaster
+
+  liquibase:
+    enabled: false
