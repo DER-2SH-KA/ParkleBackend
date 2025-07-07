@@ -1,84 +1,70 @@
 package ru.d2k.parkle.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.Objects;
-import java.util.Optional;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(of = {"id", "hexValue"})
 @Entity
 @Table(name="hex_color")
 public class HexColor {
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
+    @Column(name = "id")
     private Integer id;
 
-    @Getter
     @Column(
             name = "hex_value",
             unique = true,
             nullable = false,
-            columnDefinition = "varchar(7)"
+            length = 7
     )
     private String hexValue;
 
-    /**
-     * Set new ID for {@code HexColor} entity.
-     * @param newId new ID for {@code HexColor} entity.
-     * @return this {@code HexColor}.
-     * @throws IllegalArgumentException when {@code newId} is {@code null}
-     * @author DER-2SH-KA
-     * **/
-    public HexColor setId(Optional<Integer> newId) throws IllegalArgumentException {
-        if (newId.isPresent()) {
-            this.id = newId.get();
-        } else {
-            throw new IllegalArgumentException("New ID for HexColor is NULL");
-        }
+    public HexColor(String hexValue) {
+        this.setHexValue(hexValue);
+    }
 
-        return this;
+    HexColor(Integer id, String hexValue) {
+        this.id = id;
+        this.setHexValue(hexValue);
     }
 
     /**
-     * Set new name for {@code HexColor} entity.
-     * @param newHexValue new name for {@code HexColor} entity.
-     * @return this {@code HexColor}.
+     * Set new HEX value for {@code HexColor} entity.
+     * @param newHexValue new HEX value for {@code HexColor} entity.
      * @throws IllegalArgumentException when {@code newHexValue} is {@code null}
-     * @author DER-2SH-KA
      * **/
-    public HexColor setHexValue(Optional<String> newHexValue) throws IllegalArgumentException {
-        if (newHexValue.isPresent()) {
-            this.hexValue = newHexValue.get();
+    public void setHexValue(String newHexValue) throws IllegalArgumentException {
+        if (Objects.nonNull(newHexValue) && !newHexValue.isBlank()) {
+            this.hexValue = newHexValue;
         } else {
-            throw new IllegalArgumentException("New Name for HexColor is NULL or Empty");
+            throw new IllegalArgumentException("New HEX value for HexColor is NULL or Empty");
         }
-
-        return this;
     }
 
     @Override
-    public String toString() {
-        return String.format("ID: %d%n", this.id) +
-                String.format("HEX VALUE: %s%n", this.hexValue);
-    }
-
-    @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
 
         if (o == null || getClass() != o.getClass()) return false;
 
         HexColor oHexColor = (HexColor) o;
 
-        return Objects.equals(this.id, oHexColor.id) &&
-                Objects.equals(this.hexValue, oHexColor.hexValue);
+        return Objects.nonNull(this.id) &&
+                Objects.nonNull(oHexColor.id) &&
+                Objects.equals(this.id, oHexColor.id);
 
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(this.id, this.hexValue);
+    public final int hashCode() {
+        return this.id != null ? Objects.hashCode(this.id) : 31;
     }
 }
