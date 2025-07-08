@@ -3,13 +3,15 @@ package ru.d2k.parkle.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Objects;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "name", "priority"})
 @Entity
-@Table(name = "role")
+@Table(name = "roles")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +31,12 @@ public class Role {
             nullable = false
     )
     private Integer priority;
+
+    @OneToMany(
+            mappedBy = "role",
+            cascade = { CascadeType.PERSIST, CascadeType.MERGE }
+    )
+    private Set<User> users = new HashSet<User>();
 
     public Role(String name, Integer priority) {
         this.setName(name);
@@ -76,9 +84,7 @@ public class Role {
     public final boolean equals(Object o) {
         if (this == o) return true;
 
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Role oRole = (Role) o;
+        if (!(o instanceof Role oRole)) return false;
 
         return Objects.nonNull(this.id) &&
                 Objects.nonNull(oRole.id) &&
@@ -88,6 +94,7 @@ public class Role {
 
     @Override
     public final int hashCode() {
-        return this.id != null ? Objects.hashCode(this.id) : 31;
+        return this.id != null ?
+                Objects.hashCode(this.id) : 31;
     }
 }

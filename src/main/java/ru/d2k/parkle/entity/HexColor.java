@@ -6,13 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Objects;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "hexValue"})
 @Entity
-@Table(name="hex_color")
+@Table(name="hex_colors")
 public class HexColor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +28,12 @@ public class HexColor {
             length = 7
     )
     private String hexValue;
+
+    @OneToMany(
+            mappedBy = "hexColor",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+    )
+    private Set<Website> websites = new HashSet<>();
 
     public HexColor(String hexValue) {
         this.setHexValue(hexValue);
@@ -53,9 +61,7 @@ public class HexColor {
     public final boolean equals(Object o) {
         if (this == o) return true;
 
-        if (o == null || getClass() != o.getClass()) return false;
-
-        HexColor oHexColor = (HexColor) o;
+        if (!(o instanceof HexColor oHexColor)) return false;
 
         return Objects.nonNull(this.id) &&
                 Objects.nonNull(oHexColor.id) &&
