@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Objects;
 
+/** Entity for HEX color. **/
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "hexValue"})
@@ -45,8 +46,8 @@ public class HexColor {
     }
 
     /**
-     * Set new HEX value for {@code HexColor} entity.
-     * @param newHexValue new HEX value for {@code HexColor} entity.
+     * Set new HEX value for {@link HexColor} entity.
+     * @param newHexValue new HEX value for {@link HexColor} entity.
      * @throws IllegalArgumentException when {@code newHexValue} is {@code null}
      * **/
     public void setHexValue(String newHexValue) throws IllegalArgumentException {

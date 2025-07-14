@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
 
+/** Entity for role. **/
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "name", "priority"})
@@ -50,8 +51,8 @@ public class Role {
     }
 
     /**
-     * Set new name for {@code Role} entity.
-     * @param newName new name for {@code Role} entity.
+     * Set new name for {@link Role} entity.
+     * @param newName new name for {@link Role} entity.
      * @throws IllegalArgumentException when {@code newName} is {@code null}
      * **/
     public void setName(String newName) throws IllegalArgumentException {
@@ -63,8 +64,8 @@ public class Role {
     }
 
     /**
-     * Set new priority for {@code Role} entity.
-     * @param newPriority new priority for {@code Role} entity.
+     * Set new priority for {@link Role} entity.
+     * @param newPriority new priority for {@link Role} entity.
      * @throws IllegalArgumentException when {@code newPriority} is {@code null}
      * **/
     public void setPriority(Integer newPriority) throws IllegalArgumentException {

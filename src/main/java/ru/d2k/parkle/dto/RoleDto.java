@@ -1,9 +1,11 @@
 package ru.d2k.parkle.dto;
 
 import lombok.*;
+import ru.d2k.parkle.entity.Role;
 
 import java.util.Objects;
 
+/** DTO of {@link Role} **/
 @NoArgsConstructor
 @ToString(of = {"id", "name", "priority"})
 @Getter
@@ -19,7 +21,7 @@ public class RoleDto {
     }
 
     /**
-     * Set new ID for {@code RoleDto}.
+     * Set new ID for {@link RoleDto}.
      * @param id New ID.
      * **/
     public void setId(Integer id) {
@@ -32,7 +34,7 @@ public class RoleDto {
     }
 
     /**
-     * Set new name for {@code RoleDto}.
+     * Set new name for {@link RoleDto}.
      * @param name New name.
      * **/
     public void setName(String name) {
@@ -45,7 +47,7 @@ public class RoleDto {
     }
 
     /**
-     * Set new priority for {@code RoleDto}.
+     * Set new priority for {@link RoleDto}.
      * @param priority New priority.
      * **/
     public void setPriority(Integer priority) {

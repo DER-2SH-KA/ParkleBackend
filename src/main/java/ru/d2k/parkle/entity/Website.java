@@ -6,6 +6,7 @@ import lombok.*;
 import java.net.URI;
 import java.util.Objects;
 
+/** Entity for website. **/
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "user", "hexColor", "title", "description", "url"})
@@ -69,9 +70,9 @@ public class Website {
     }
 
     /**
-     * Set new user for {@code Website} entity.
-     * @param newUser new {@code User}.
-     * @throws IllegalArgumentException when {@code newUser} is NULL.
+     * Set new user for {@link Website} entity.
+     * @param newUser new {@link User}.
+     * @throws IllegalArgumentException when {@code newUser} is {@code null}.
      * **/
     public void setUser(User newUser) throws IllegalArgumentException {
         if (Objects.nonNull(newUser)) {
@@ -83,9 +84,9 @@ public class Website {
     }
 
     /**
-     * Set new hex color for {@code Website} entity.
-     * @param newHexColor new {@code HexColor}.
-     * @throws IllegalArgumentException when {@code newHexColor} is NULL.
+     * Set new hex color for {@link Website} entity.
+     * @param newHexColor new {@link HexColor}.
+     * @throws IllegalArgumentException when {@code newHexColor} is {@code null}.
      * **/
     public void setHexColor(HexColor newHexColor) throws IllegalArgumentException {
         if (Objects.nonNull(newHexColor)) {
@@ -97,9 +98,9 @@ public class Website {
     }
 
     /**
-     * Set new title for {@code Website} entity.
+     * Set new title for {@link Website} entity.
      * @param newTitle new title.
-     * @throws IllegalArgumentException when {@code newTitle} is NULL.
+     * @throws IllegalArgumentException when {@code newTitle} is {@code null}.
      * **/
     public void setTitle(String newTitle) throws IllegalArgumentException {
         if (Objects.nonNull(newTitle) && !newTitle.isBlank()) {
@@ -111,9 +112,9 @@ public class Website {
     }
 
     /**
-     * Set new uri for {@code Website} entity.
+     * Set new uri for {@link Website} entity.
      * @param newUri new uri.
-     * @throws IllegalArgumentException when {@code newUri} is NULL.
+     * @throws IllegalArgumentException when {@code newUri} is {@code null}.
      * **/
     public void setUrl(URI newUri) throws IllegalArgumentException {
         if (Objects.nonNull(newUri)) {

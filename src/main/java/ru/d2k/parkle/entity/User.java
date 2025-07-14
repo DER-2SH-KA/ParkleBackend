@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import java.util.*;
 
+/** Entity for user. **/
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "roleId", "login", "email"})
@@ -72,8 +73,8 @@ public class User {
     }
 
     /**
-     * Set new {@code Role} for {@code User} entity.
-     * @param newRole new {@code Role} for {@code User} entity.
+     * Set new {@link Role} for {@link User} entity.
+     * @param newRole new {@link Role} for {@link User} entity.
      * @throws IllegalArgumentException when {@code newRoleId} is {@code null}
      * **/
     public void setRole(Role newRole) throws IllegalArgumentException {
@@ -86,8 +87,8 @@ public class User {
     }
 
     /**
-     * Set new login for {@code User} entity.
-     * @param newLogin new login for {@code User} entity.
+     * Set new login for {@link User} entity.
+     * @param newLogin new login for {@link User} entity.
      * @throws IllegalArgumentException when {@code newLogin} is {@code null}
      * **/
     public void setLogin(String newLogin) throws IllegalArgumentException {
@@ -100,8 +101,8 @@ public class User {
     }
 
     /**
-     * Set new email for {@code User} entity.
-     * @param newEmail new email for {@code User} entity.
+     * Set new email for {@link User} entity.
+     * @param newEmail new email for {@link User} entity.
      * @throws IllegalArgumentException when {@code newEmail} is {@code null}
      * **/
     public void setEmail(String newEmail) throws IllegalArgumentException {
@@ -114,8 +115,8 @@ public class User {
     }
 
     /**
-     * Set new password for {@code User} entity.
-     * @param newPassword new password for {@code User} entity.
+     * Set new password for {@link User} entity.
+     * @param newPassword new password for {@link User} entity.
      * @throws IllegalArgumentException when {@code newPassword} is {@code null}
      * **/
     public void setPassword(String newPassword) throws IllegalArgumentException {
