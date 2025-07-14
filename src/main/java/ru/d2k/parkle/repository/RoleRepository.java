@@ -6,11 +6,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.d2k.parkle.entity.Role;
 
-import java.util.HashMap;
+import java.util.List;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
 
     @Query("SELECT r.id, r FROM Role r WHERE( r.name LIKE :roleName )")
-    HashMap<Integer, Role> findRolesByName(@Param("roleName") String roleName);
+    List<Role> findRolesByName(@Param("roleName") String roleName);
 }
