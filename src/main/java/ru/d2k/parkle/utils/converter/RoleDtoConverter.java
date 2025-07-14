@@ -1,6 +1,5 @@
-package ru.d2k.parkle.converter;
+package ru.d2k.parkle.utils.converter;
 
-import lombok.extern.slf4j.Slf4j;
 import ru.d2k.parkle.dto.RoleDto;
 import ru.d2k.parkle.entity.Role;
 

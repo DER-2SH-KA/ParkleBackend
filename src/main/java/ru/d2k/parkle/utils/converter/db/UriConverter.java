@@ -1,4 +1,4 @@
-package ru.d2k.parkle.utils;
+package ru.d2k.parkle.utils.converter.db;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
