@@ -3,8 +3,10 @@ package ru.d2k.parkle.service.rest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.d2k.parkle.dto.RoleDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.repository.RoleRepository;
+import ru.d2k.parkle.utils.converter.DtoConverter;
 
 import java.util.*;
 
@@ -13,6 +15,7 @@ import java.util.*;
 @Service
 public class RoleService {
     private final RoleRepository roleRepository;
+    private final DtoConverter<Role, RoleDto> roleDtoConverter;
 
     /**
      * Return all roles.

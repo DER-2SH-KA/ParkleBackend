@@ -1,6 +1,5 @@
 package ru.d2k.parkle.utils.converter;
 
-import lombok.Getter;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dto.RoleDto;
 import ru.d2k.parkle.entity.Role;
@@ -10,7 +9,7 @@ import java.util.Objects;
 /**
  * Utility class converter between {@link Role} entity and {@link RoleDto}.
  * **/
-// @Component(value = "roleDtoConverter")
+@Component(value = "roleDtoConverter")
 public final class RoleDtoConverter implements DtoConverter<Role, RoleDto> {
     private RoleDtoConverter() {}
 
