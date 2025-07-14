@@ -1,5 +1,7 @@
 package ru.d2k.parkle.utils.converter;
 
+import lombok.Getter;
+import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dto.RoleDto;
 import ru.d2k.parkle.entity.Role;
 
@@ -8,8 +10,8 @@ import java.util.Objects;
 /**
  * Utility class converter between {@link Role} entity and {@link RoleDto}.
  * **/
-public final class RoleDtoConverter {
-    // Hidden constructor.
+// @Component(value = "roleDtoConverter")
+public final class RoleDtoConverter implements DtoConverter<Role, RoleDto> {
     private RoleDtoConverter() {}
 
     /**
@@ -17,7 +19,8 @@ public final class RoleDtoConverter {
      * @param entity {@link Role} entity.
      * @return {@link RoleDto}.
      * **/
-    public static RoleDto toDto(Role entity) {
+    @Override
+    public RoleDto toDto(Role entity) {
         Objects.requireNonNull(entity, "Entity must be non null value!");
 
         return new RoleDto(entity.getId(), entity.getName(), entity.getPriority());
@@ -28,7 +31,8 @@ public final class RoleDtoConverter {
      * @param dto {@link RoleDto}.
      * @return {@link Role} entity with null ID.
      * **/
-    public static Role toNewEntity(RoleDto dto) {
+    @Override
+    public Role toNewEntity(RoleDto dto) {
         Objects.requireNonNull(dto, "DTO must be non null value!");
 
         return new Role(
@@ -43,7 +47,8 @@ public final class RoleDtoConverter {
      * @param dto {@link RoleDto}.
      * @return Edited {@link Role} entity.
      * **/
-    public static Role updateEntityByDto(Role entity, RoleDto dto) {
+    @Override
+    public Role updateEntityByDto(Role entity, RoleDto dto) {
         Objects.requireNonNull(entity, "Entity must be non null value!");
         Objects.requireNonNull(dto, "DTO must be non null value!");
 
