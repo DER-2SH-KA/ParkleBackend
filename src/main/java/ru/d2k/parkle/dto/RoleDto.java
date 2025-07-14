@@ -5,13 +5,18 @@ import lombok.*;
 import java.util.Objects;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString(of = {"id", "name", "priority"})
 @Getter
 public class RoleDto {
     private Integer id;
     private String name;
     private Integer priority;
+
+    public RoleDto(Integer id, String name, Integer priority) {
+        this.setId( id );
+        this.setName( name );
+        this.setPriority( priority );
+    }
 
     /**
      * Set new ID for {@code RoleDto}.
@@ -30,7 +35,7 @@ public class RoleDto {
      * Set new name for {@code RoleDto}.
      * @param name New name.
      * **/
-    public void setString(String name) {
+    public void setName(String name) {
         if (Objects.nonNull(name) && !name.isBlank()) {
             this.name = name;
         }
