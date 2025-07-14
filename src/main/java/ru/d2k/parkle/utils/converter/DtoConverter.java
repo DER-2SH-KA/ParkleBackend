@@ -1,6 +1,6 @@
-package ru.d2k.parkle.dto;
+package ru.d2k.parkle.utils.converter;
 
-public interface DtoConverterImpl<ENTITY, DTO> {
+public interface DtoConverter<ENTITY, DTO> {
     DTO toDto(ENTITY entity);
     ENTITY toNewEntity(DTO dto);
     ENTITY updateEntityByDto(ENTITY entity, DTO dto);
