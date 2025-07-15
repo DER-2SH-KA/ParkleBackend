@@ -1,0 +1,14 @@
+package ru.d2k.parkle.utils.generator;
+
+import com.fasterxml.uuid.Generators;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.id.IdentifierGenerator;
+
+import java.io.Serializable;
+
+public class UuidSevenGenerator implements IdentifierGenerator {
+    @Override
+    public Serializable generate(SharedSessionContractImplementor sharedSessionContractImplementor, Object o) {
+        return Generators.timeBasedEpochRandomGenerator().generate();
+    }
+}
