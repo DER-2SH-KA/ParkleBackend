@@ -1,26 +1,34 @@
 package ru.d2k.parkle.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.UUID;
 
 /** Entity for HEX color. **/
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(of = {"id", "hexValue"})
 @Entity
 @Table(name="hex_colors")
+@Getter
+@Setter
+@ToString(of = {"id", "hexValue"})
+@EqualsAndHashCode(of = {"id"})
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HexColor {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    @GeneratedValue(generator = "uuid-v7-hex-color-generator")
+    @GenericGenerator(name = "uuid-v7-hex-color-generator", type = Uuid7Generator.class)
+    @Column(
+            name = "id",
+            nullable = false,
+            updatable = false,
+            columnDefinition = "UUID"
+    )
+    private UUID id;
 
     @Column(
             name = "hex_value",
@@ -30,48 +38,15 @@ public class HexColor {
     )
     private String hexValue;
 
-    @OneToMany(
-            mappedBy = "hexColor",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-    )
+    @OneToMany(mappedBy = "hexColor")
     private Set<Website> websites = new HashSet<>();
 
     public HexColor(String hexValue) {
-        this.setHexValue(hexValue);
+        this.hexValue = hexValue;
     }
 
-    HexColor(Integer id, String hexValue) {
+    HexColor(UUID id, String hexValue) {
         this.id = id;
-        this.setHexValue(hexValue);
-    }
-
-    /**
-     * Set new HEX value for {@link HexColor} entity.
-     * @param newHexValue new HEX value for {@link HexColor} entity.
-     * @throws IllegalArgumentException when {@code newHexValue} is {@code null}
-     * **/
-    public void setHexValue(String newHexValue) throws IllegalArgumentException {
-        if (Objects.nonNull(newHexValue) && !newHexValue.isBlank()) {
-            this.hexValue = newHexValue;
-        } else {
-            throw new IllegalArgumentException("New HEX value for HexColor is NULL or Empty");
-        }
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (!(o instanceof HexColor oHexColor)) return false;
-
-        return Objects.nonNull(this.id) &&
-                Objects.nonNull(oHexColor.id) &&
-                Objects.equals(this.id, oHexColor.id);
-
-    }
-
-    @Override
-    public final int hashCode() {
-        return this.id != null ? Objects.hashCode(this.id) : 31;
+        this.hexValue = hexValue;
     }
 }
