@@ -1,9 +1,8 @@
 package ru.d2k.parkle.entity;
 
+import com.fasterxml.uuid.Generators;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.*;
 
@@ -20,8 +19,6 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id
-    @GeneratedValue(generator = "uuid-v7-user-generator")
-    @GenericGenerator(name = "uuid-v7-user-generator", type = Uuid7Generator.class)
     @Column(
             name = "id",
             nullable = false,
@@ -51,7 +48,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Website> websites = new ArrayList<>();
 
-    public User(Role role, String login, String email, String password) {
+    private User(Role role, String login, String email, String password) {
+        this.id = Generators.timeBasedEpochRandomGenerator().generate();
         this.role = role;
         this.login = login;
         this.email = email;
@@ -64,5 +62,17 @@ public class User {
         this.login = login;
         this.email = email;
         this.password = password;
+    }
+
+    /**
+     * Fabric method for create new User with generated ID by UUID generator.
+     * @param role role.
+     * @param login login.
+     * @param email email.
+     * @param password password.
+     * @return Created {@link User} object.
+     * **/
+    public static User create(Role role, String login, String email, String password) {
+        return new User(role, login, email, password);
     }
 }
