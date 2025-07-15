@@ -1,32 +1,36 @@
 package ru.d2k.parkle.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.*;
 
 /** Entity for user. **/
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(of = {"id", "roleId", "login", "email"})
 @Entity
 @Table(
         name = "users",
-        indexes = {
-                @Index(columnList = "login"),
-                @Index(columnList = "role_id")
-        }
+        indexes = { @Index(columnList = "role_id") }
 )
+@Getter
+@Setter
+@ToString(of = {"id", "role", "login", "email"})
+@EqualsAndHashCode(of = {"id"})
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @GeneratedValue(generator = "uuid-v7-user-generator")
+    @GenericGenerator(name = "uuid-v7-user-generator", type = Uuid7Generator.class)
+    @Column(
+            name = "id",
+            nullable = false,
+            updatable = false,
+            columnDefinition = "UUID"
+    )
+    private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
@@ -38,112 +42,27 @@ public class User {
     )
     private String login;
 
-    @Column(
-            name = "email",
-            unique = true,
-            length = 320
-    )
+    @Column(name = "email", unique = true, length = 320)
     private String email;
 
-    @Column(
-            name = "password",
-            length = 60
-    )
+    @Column(name = "password", length = 60)
     private String password;
 
-    @OneToMany(
-            mappedBy = "user",
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-    )
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Website> websites = new ArrayList<>();
 
     public User(Role role, String login, String email, String password) {
-        this.setRole(role);
-        this.setLogin(login);
-        this.setEmail(email);
-        this.setPassword(password);
+        this.role = role;
+        this.login = login;
+        this.email = email;
+        this.password = password;
     }
 
-    User(Long id, Role role, String login, String email, String password) {
+    User(UUID id, Role role, String login, String email, String password) {
         this.id = id;
-        this.setRole(role);
-        this.setLogin(login);
-        this.setEmail(email);
-        this.setPassword(password);
-    }
-
-    /**
-     * Set new {@link Role} for {@link User} entity.
-     * @param newRole new {@link Role} for {@link User} entity.
-     * @throws IllegalArgumentException when {@code newRoleId} is {@code null}
-     * **/
-    public void setRole(Role newRole) throws IllegalArgumentException {
-        if (Objects.nonNull(newRole)) {
-            this.role = newRole;
-        }
-        else {
-            throw new IllegalArgumentException("Role for User is NULL");
-        }
-    }
-
-    /**
-     * Set new login for {@link User} entity.
-     * @param newLogin new login for {@link User} entity.
-     * @throws IllegalArgumentException when {@code newLogin} is {@code null}
-     * **/
-    public void setLogin(String newLogin) throws IllegalArgumentException {
-        if (Objects.nonNull(newLogin) && !newLogin.isBlank()) {
-            this.login = newLogin;
-        }
-        else {
-            throw new IllegalArgumentException("New login is NULL or Blank");
-        }
-    }
-
-    /**
-     * Set new email for {@link User} entity.
-     * @param newEmail new email for {@link User} entity.
-     * @throws IllegalArgumentException when {@code newEmail} is {@code null}
-     * **/
-    public void setEmail(String newEmail) throws IllegalArgumentException {
-        if (Objects.nonNull(newEmail) && !newEmail.isBlank()) {
-            this.email = newEmail;
-        }
-        else {
-            throw new IllegalArgumentException("New email is NULL or Blank");
-        }
-    }
-
-    /**
-     * Set new password for {@link User} entity.
-     * @param newPassword new password for {@link User} entity.
-     * @throws IllegalArgumentException when {@code newPassword} is {@code null}
-     * **/
-    public void setPassword(String newPassword) throws IllegalArgumentException {
-        if (Objects.nonNull(newPassword) && !newPassword.isBlank()) {
-            this.password = newPassword;
-        }
-        else {
-            throw new IllegalArgumentException("New password is NULL or Blank");
-        }
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (o == null) return false;
-
-        if (this == o) return true;
-
-        if (!(o instanceof User oUser)) return false;
-
-        return Objects.nonNull(this.id) &&
-                Objects.nonNull(oUser.id) &&
-                Objects.equals(this.id, oUser.id);
-    }
-
-    @Override
-    public final int hashCode() {
-        return this.id != null ?
-                Objects.hashCode(this.id) : 31;
+        this.role = role;
+        this.login = login;
+        this.email = email;
+        this.password = password;
     }
 }
