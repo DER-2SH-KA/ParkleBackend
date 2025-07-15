@@ -6,7 +6,7 @@ import org.hibernate.id.IdentifierGenerator;
 
 import java.io.Serializable;
 
-public class UuidSevenGenerator implements IdentifierGenerator {
+public class Uuid7Generator implements IdentifierGenerator {
     @Override
     public Serializable generate(SharedSessionContractImplementor sharedSessionContractImplementor, Object o) {
         return Generators.timeBasedEpochRandomGenerator().generate();
