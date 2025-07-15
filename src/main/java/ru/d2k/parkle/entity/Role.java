@@ -20,7 +20,7 @@ import java.util.UUID;
 public class Role {
     @Id
     @GeneratedValue(generator = "uuid-v7-generator")
-    @GenericGenerator(name = "uuid-v7-generator", type = Uuid7Generator.class)
+    @GenericGenerator(name = "uuid-v7-role-generator", type = Uuid7Generator.class)
     @Column(
             name = "id",
             nullable = false,
