@@ -2,14 +2,12 @@ package ru.d2k.parkle.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.net.URI;
-import java.util.Objects;
+import java.util.UUID;
 
 /** Entity for website. **/
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(of = {"id", "user", "hexColor", "title", "description", "url"})
 @Entity
 @Table(
         name = "website",
@@ -18,129 +16,76 @@ import java.util.Objects;
                 @Index(columnList = "hex_id")
         }
 )
+
+@Getter
+@Setter
+@ToString(of = {"id", "user", "hexColor", "title", "description", "url"})
+@EqualsAndHashCode(of = {"id"})
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Website {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(
+            name = "id",
+            nullable = false,
+            updatable = false,
+            columnDefinition = "UUID"
+    )
+    private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hex_id")
     private HexColor hexColor;
 
-    @Column(
-            name = "title",
-            nullable = false,
-            length = 100
-    )
+    @Column(name = "title", nullable = false, length = 100)
     private String title;
 
-    @Setter
-    @Column(
-            name = "description",
-            length = 255
-    )
+    @Column(name = "description", length = 255)
     private String description;
 
-    @Column(
-            name = "url",
-            nullable = false
-    )
+    @Column(name = "url", nullable = false)
     private URI url;
 
-    public Website(User user, HexColor hex, String title, String description, URI url) {
-        this.setUser(user);
-        this.setHexColor(hex);
-        this.setTitle(title);
-        this.setDescription(description);
-        this.setUrl(url);
+    private Website(User user, HexColor hexColor, String title, String description, URI url) {
+        this.id = Uuid7Generator.generateNewUUID();
+        this.user = user;
+        this.hexColor = hexColor;
+        this.title = title;
+        this.description = description;
+        this.url = url;
     }
 
-    Website(Long id, User user, HexColor hex, String title, String description, URI url) {
+    /**
+     * Constructor only for tests.
+     * @param id ID.
+     * @param user {@link User} user owner.
+     * @param hexColor {@link HexColor} HEX color of first letter.
+     * @param title title of website.
+     * @param description description of website.
+     * @param url URL of website in Internet.
+     * **/
+    Website(UUID id, User user, HexColor hexColor, String title, String description, URI url) {
         this.id = id;
-        this.setUser(user);
-        this.setHexColor(hex);
-        this.setTitle(title);
-        this.setDescription(description);
-        this.setUrl(url);
+        this.user = user;
+        this.hexColor = hexColor;
+        this.title = title;
+        this.description = description;
+        this.url = url;
     }
 
     /**
-     * Set new user for {@link Website} entity.
-     * @param newUser new {@link User}.
-     * @throws IllegalArgumentException when {@code newUser} is {@code null}.
+     * Fabric method for create new {@link Website} with generated ID by UUID generator.
+     * @param user {@link User} user owner.
+     * @param hexColor {@link HexColor} HEX color of first letter.
+     * @param title title of website.
+     * @param description description of website.
+     * @param url URL of website in Internet.
+     * @return Created {@link Website} object.
      * **/
-    public void setUser(User newUser) throws IllegalArgumentException {
-        if (Objects.nonNull(newUser)) {
-            this.user = newUser;
-        }
-        else {
-            throw  new IllegalArgumentException("New User for Website is NULL");
-        }
-    }
-
-    /**
-     * Set new hex color for {@link Website} entity.
-     * @param newHexColor new {@link HexColor}.
-     * @throws IllegalArgumentException when {@code newHexColor} is {@code null}.
-     * **/
-    public void setHexColor(HexColor newHexColor) throws IllegalArgumentException {
-        if (Objects.nonNull(newHexColor)) {
-            this.hexColor = newHexColor;
-        }
-        else {
-            throw  new IllegalArgumentException("New HexColor for Website is NULL");
-        }
-    }
-
-    /**
-     * Set new title for {@link Website} entity.
-     * @param newTitle new title.
-     * @throws IllegalArgumentException when {@code newTitle} is {@code null}.
-     * **/
-    public void setTitle(String newTitle) throws IllegalArgumentException {
-        if (Objects.nonNull(newTitle) && !newTitle.isBlank()) {
-            this.title = newTitle;
-        }
-        else {
-            throw  new IllegalArgumentException("New title for Website is NULL or Blank");
-        }
-    }
-
-    /**
-     * Set new uri for {@link Website} entity.
-     * @param newUri new uri.
-     * @throws IllegalArgumentException when {@code newUri} is {@code null}.
-     * **/
-    public void setUrl(URI newUri) throws IllegalArgumentException {
-        if (Objects.nonNull(newUri)) {
-            this.url = newUri;
-        }
-        else {
-            throw  new IllegalArgumentException("New uri for Website is NULL or Blank");
-        }
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (o == null) return false;
-
-        if (this == o) return true;
-
-        if (!(o instanceof Website oWebsite)) return false;
-
-        return Objects.nonNull(this.id) &&
-                Objects.nonNull(oWebsite.id) &&
-                Objects.equals(this.id, oWebsite.id);
-    }
-
-    @Override
-    public final int hashCode() {
-        return Objects.nonNull(this.id) ?
-                Objects.hashCode(this.id) : 31;
+    public static Website create(User user, HexColor hexColor, String title, String description, URI url) {
+        return new Website(user, hexColor, title, description, url);
     }
 }

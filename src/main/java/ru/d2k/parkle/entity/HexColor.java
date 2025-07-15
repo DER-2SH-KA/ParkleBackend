@@ -2,7 +2,6 @@ package ru.d2k.parkle.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.Set;
@@ -13,6 +12,7 @@ import java.util.UUID;
 /** Entity for HEX color. **/
 @Entity
 @Table(name="hex_colors")
+
 @Getter
 @Setter
 @ToString(of = {"id", "hexValue"})
@@ -20,8 +20,6 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HexColor {
     @Id
-    @GeneratedValue(generator = "uuid-v7-hex-color-generator")
-    @GenericGenerator(name = "uuid-v7-hex-color-generator", type = Uuid7Generator.class)
     @Column(
             name = "id",
             nullable = false,
@@ -41,7 +39,8 @@ public class HexColor {
     @OneToMany(mappedBy = "hexColor")
     private Set<Website> websites = new HashSet<>();
 
-    public HexColor(String hexValue) {
+    private HexColor(String hexValue) {
+        this.id = Uuid7Generator.generateNewUUID();
         this.hexValue = hexValue;
     }
 
@@ -49,4 +48,11 @@ public class HexColor {
         this.id = id;
         this.hexValue = hexValue;
     }
+
+    /**
+     * Fabric method for create new {@link HexColor} with generated ID by UUID generator.
+     * @param hexValue HEX value.
+     * @return Created {@link HexColor} object.
+     * **/
+    public static HexColor create(String hexValue) { return new HexColor(hexValue); }
 }

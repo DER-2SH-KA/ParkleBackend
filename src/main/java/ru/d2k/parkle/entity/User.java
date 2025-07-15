@@ -12,6 +12,7 @@ import java.util.*;
         name = "users",
         indexes = { @Index(columnList = "role_id") }
 )
+
 @Getter
 @Setter
 @ToString(of = {"id", "role", "login", "email"})
@@ -56,6 +57,14 @@ public class User {
         this.password = password;
     }
 
+    /**
+     * Constructor only for tests.
+     * @param id ID.
+     * @param role {@link Role} role.
+     * @param login login.
+     * @param email email.
+     * @param password hashed by BCrypt password.
+     * **/
     User(UUID id, Role role, String login, String email, String password) {
         this.id = id;
         this.role = role;
@@ -65,11 +74,11 @@ public class User {
     }
 
     /**
-     * Fabric method for create new User with generated ID by UUID generator.
-     * @param role role.
+     * Fabric method for create new {@link User} with generated ID by UUID generator.
+     * @param role {@link Role} role.
      * @param login login.
      * @param email email.
-     * @param password password.
+     * @param password hashed by BCrypt password.
      * @return Created {@link User} object.
      * **/
     public static User create(Role role, String login, String email, String password) {

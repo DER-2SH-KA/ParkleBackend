@@ -2,7 +2,6 @@ package ru.d2k.parkle.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.HashSet;
@@ -12,6 +11,7 @@ import java.util.UUID;
 /** Entity for role. **/
 @Entity
 @Table(name = "roles")
+
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
@@ -19,8 +19,6 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Role {
     @Id
-    @GeneratedValue(generator = "uuid-v7-generator")
-    @GenericGenerator(name = "uuid-v7-role-generator", type = Uuid7Generator.class)
     @Column(
             name = "id",
             nullable = false,
@@ -46,14 +44,28 @@ public class Role {
     @OneToMany(mappedBy = "role")
     private Set<User> users = new HashSet<User>();
 
-    public Role(String name, Integer priority) {
+    private Role(String name, Integer priority) {
+        this.id = Uuid7Generator.generateNewUUID();
         this.name = name;
         this.priority = priority;
     }
 
+    /**
+     * Constructor only for tests.
+     * @param name name.
+     * @param priority priority.
+     * **/
     Role(UUID id, String name, Integer priority) {
         this.id = id;
         this.name = name;
         this.priority = priority;
     }
+
+    /**
+     * Fabric method for create new {@link Role} with generated ID by UUID generator.
+     * @param name name.
+     * @param priority priority.
+     * @return Created {@link Role} object.
+     * **/
+    public static Role create(String name, Integer priority) { return new Role(name, priority); }
 }
