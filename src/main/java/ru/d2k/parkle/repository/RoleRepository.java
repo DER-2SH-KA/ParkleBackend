@@ -6,11 +6,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.d2k.parkle.entity.Role;
 
-import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
-
-    @Query("SELECT r.id, r FROM Role r WHERE( r.name LIKE :roleName )")
-    List<Role> findRolesByName(@Param("roleName") String roleName);
+    Optional<Role> findByName(String name);
 }
