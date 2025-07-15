@@ -1,77 +1,24 @@
 package ru.d2k.parkle.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import ru.d2k.parkle.entity.Role;
 
-import java.util.Objects;
+import java.util.UUID;
 
 /** DTO of {@link Role} **/
+@Data
 @NoArgsConstructor
-@ToString(of = {"id", "name", "priority"})
-@Getter
+@AllArgsConstructor
 public class RoleDto {
-    private Integer id;
+    private UUID id;
+
+    @NotBlank(message = "RoleDto name is null or blank.")
     private String name;
+
+    @NotNull(message = "RoleDto priority is null")
+    @Positive(message = "RoleDto priority lower than 1")
     private Integer priority;
-
-    public RoleDto(Integer id, String name, Integer priority) {
-        this.setId( id );
-        this.setName( name );
-        this.setPriority( priority );
-    }
-
-    /**
-     * Set new ID for {@link RoleDto}.
-     * @param id New ID.
-     * **/
-    public void setId(Integer id) {
-        if (Objects.nonNull(id)) {
-            this.id = id;
-        }
-        else {
-            throw new IllegalArgumentException("RoleDto ID is null!");
-        }
-    }
-
-    /**
-     * Set new name for {@link RoleDto}.
-     * @param name New name.
-     * **/
-    public void setName(String name) {
-        if (Objects.nonNull(name) && !name.isBlank()) {
-            this.name = name;
-        }
-        else {
-            throw new IllegalArgumentException("RoleDto name is null or blank!");
-        }
-    }
-
-    /**
-     * Set new priority for {@link RoleDto}.
-     * @param priority New priority.
-     * **/
-    public void setPriority(Integer priority) {
-        if (Objects.nonNull(priority) && priority > 0) {
-            this.priority = priority;
-        }
-        else {
-            throw new IllegalArgumentException("RoleDto priority is null!");
-        }
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (!(o instanceof RoleDto oRoleDto)) return false;
-
-        return Objects.equals(this.id, oRoleDto.id) &&
-                Objects.equals(this.name, oRoleDto.name) &&
-                Objects.equals(this.priority, oRoleDto.priority);
-    }
-
-    @Override
-    public final int hashCode() {
-        return Objects.hash(this.id, this.name, this.priority);
-    }
 }
