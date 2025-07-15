@@ -1,8 +1,8 @@
 package ru.d2k.parkle.entity;
 
-import com.fasterxml.uuid.Generators;
 import jakarta.persistence.*;
 import lombok.*;
+import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.*;
 
@@ -49,7 +49,7 @@ public class User {
     private List<Website> websites = new ArrayList<>();
 
     private User(Role role, String login, String email, String password) {
-        this.id = Generators.timeBasedEpochRandomGenerator().generate();
+        this.id = Uuid7Generator.generateNewUUID();
         this.role = role;
         this.login = login;
         this.email = email;
