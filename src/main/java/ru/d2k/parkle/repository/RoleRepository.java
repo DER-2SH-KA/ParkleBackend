@@ -7,8 +7,11 @@ import org.springframework.stereotype.Repository;
 import ru.d2k.parkle.entity.Role;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role, Integer> {
+public interface RoleRepository extends JpaRepository<Role, UUID> {
     Optional<Role> findByName(String name);
+
+    boolean existsByName(String name);
 }
