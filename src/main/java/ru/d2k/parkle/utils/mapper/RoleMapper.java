@@ -14,14 +14,6 @@ public interface RoleMapper{
     RoleDto toDto(Role role);
 
     /**
-     * Create new {@link Role} object by {@link RoleDto}
-     * without ID value.
-     * **/
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "users", ignore = true)
-    Role toNewEntity(RoleDto dto);
-
-    /**
      * Update {@link Role} object by {@link RoleDto}
      * without ID value.
      * **/
