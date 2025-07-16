@@ -1,85 +1,203 @@
 package ru.d2k.parkle.service.rest;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.d2k.parkle.dto.RoleDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.repository.RoleRepository;
+import ru.d2k.parkle.utils.mapper.RoleMapper;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class RoleService {
     private final RoleRepository roleRepository;
-    private final DtoConverter<Role, RoleDto> roleDtoConverter;
+    private final RoleMapper roleMapper;
 
     /**
-     * Return all roles.
-     * @return List of roles.
+     * Return all roles from DB as DTO.
+     * @return Set of dto.
      * **/
-    public List<Role> findRoles() {
-        log.info("Find all roles...");
-        return roleRepository.findAll();
+    @Transactional(readOnly = true)
+    public Set<RoleDto> findRoles() {
+        log.info("Finding all roles...");
+
+        Set<RoleDto> dtos = roleRepository.findAll().stream()
+                .map(roleMapper::toDto)
+                .collect(Collectors.toSet());
+
+        log.info("Roles was founded: {}", dtos.size());
+        return dtos;
     }
 
+    // TODO: Сделать своё исключение.
     /**
-     * Return role by ID.
+     * Return role by ID as DTO.
      * @param id ID of role.
-     * @return {@code Role} role.
+     * @return {@link RoleDto} dto.
      * **/
-    public Role findRoleById(Integer id) {
-        log.info("Find role by ID: {}...", id);
-        return roleRepository.findById(id).orElseThrow();
+    @Transactional(readOnly = true)
+    public RoleDto findRoleById(UUID id) {
+        log.info("Finding role by ID: {}...", id);
+
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Role was not found with ID: " + id)
+        );
+
+        log.info("Role with ID = {} was founded", id);
+        return roleMapper.toDto(role);
     }
 
     /**
-     * Return roles by name.
+     * Return role as {@link RoleDto} by name.
      * @param name Name of role.
-     * @return {@code List<Role>} founded roles.
+     * @return {@link RoleDto} object.
      * **/
-    public List<Role> findRolesByName(String name) {
-        log.info("Find roles by Name: {}...", name);
-        return roleRepository.findRolesByName(name);
+    @Transactional(readOnly = true)
+    public RoleDto findRoleByName(String name) {
+        log.info("Finding roles by Name: {}...", name);
+
+        Role role = roleRepository.findByName(name)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Role was not found with name: " + name)
+                );
+
+        log.info("Role with name = {} was founded", name);
+
+        return roleMapper.toDto(role);
     }
 
     /**
      * Create new role.
-     * @param newRole new {@code Role} to save.
-     * @return {@code Role} which was saved.
+     * @param dto new {@code RoleDto} to create.
+     * @return {@code RoleDto} role as DTO which was saved.
      * **/
-    public Role saveRole(Role newRole) {
-        log.info("Save role: {}...", newRole.toString());
-        return roleRepository.save(newRole);
+    @Transactional
+    public RoleDto createRole(RoleDto dto) {
+        log.info("Creating role: {}...", dto.toString());
+
+        if (roleRepository.existsByName( dto.getName() )) {
+            throw new IllegalArgumentException("Role with this name is already exists");
+        }
+
+        Role role = Role.create(dto.getName(), dto.getPriority());
+        role = roleRepository.save(role);
+
+        log.info("Role was created: {}", role);
+
+        return roleMapper.toDto(role);
     }
 
     /**
-     * Create new roles.
-     * @param newRoles list of new {@code Role} to save.
-     * @return {@code List<Role>} which was saved.
+     * Create new roles and return them as DTO List.
+     * @param dtos list of new {@code RoleDto} to create.
+     * @return List of {@link RoleDto} of roles which was saved as DTO.
      * **/
-    public List<Role> saveRoles(List<Role> newRoles) {
-        log.info("Save {} roles...", newRoles.size());
-        return roleRepository.saveAll(newRoles);
+    @Transactional
+    public List<RoleDto> createRoles(List<RoleDto> dtos) {
+        log.info("Creating {} roles...", dtos.size());
+
+        List<RoleDto> createdRoleDtos = new ArrayList<>();
+
+        for (RoleDto dto : dtos) {
+            if (roleRepository.existsByName( dto.getName() )) {
+                throw new IllegalArgumentException("Role with this name is already exists");
+            }
+
+            Role role = Role.create(dto.getName(), dto.getPriority());
+            role = roleRepository.save(role);
+            RoleDto newRoleDto = roleMapper.toDto(role);
+
+            createdRoleDtos.add(newRoleDto);
+        }
+
+        log.info("Roles was created: {}", createdRoleDtos.size());
+
+        return createdRoleDtos;
     }
 
     /**
-     * Delete role.
-     * @param delRole role to delete.
+     * Update role.
+     * @param dto {@code RoleDto} to update.
+     * @return {@code RoleDto} role as DTO which was saved.
      * **/
-    public void deleteRole(Role delRole) {
-        log.info("Delete role: {}...", delRole.toString());
-        roleRepository.delete(delRole);
+    @Transactional
+    public RoleDto updateRole(RoleDto dto) {
+        log.info("Updating role: {}...", dto.toString());
+
+        if ( Objects.isNull(dto.getId()) ) {
+            throw new IllegalArgumentException("RoleDto ID is null");
+        }
+
+        Role role = roleRepository.findById(dto.getId()).orElseThrow();
+        role = roleMapper.updateEntityByDto(role, dto);
+        Role updatedRole = roleRepository.save(role);
+
+        log.info("Role was updated: {}", role);
+
+        return roleMapper.toDto(updatedRole);
     }
 
     /**
-     * Delete roles.
-     * @param delRoles roles to delete.
+     * Update roles and return them as DTO List.
+     * @param dtos list of new {@code RoleDto} to save.
+     * @return List of {@link RoleDto} of roles which was saved as DTO.
      * **/
-    public void deleteRoles(List<Role> delRoles) {
-        log.info("Delete {} roles...", delRoles.size());
-        roleRepository.deleteAll(delRoles);
+    @Transactional
+    public List<RoleDto> updateRoles(List<RoleDto> dtos) {
+        log.info("Updating {} roles...", dtos.size());
+
+        List<RoleDto> updatedRoleDtos = new ArrayList<>();
+
+        for (RoleDto dto : dtos) {
+            if ( Objects.isNull(dto.getId()) ) {
+                throw new IllegalArgumentException("RoleDto ID is null");
+            }
+
+            Role role = roleRepository.findById(dto.getId()).orElseThrow();
+            role = roleMapper.updateEntityByDto(role, dto);
+            Role updatedRole = roleRepository.save(role);
+
+            RoleDto updatedRoleDto = roleMapper.toDto(updatedRole);
+
+            updatedRoleDtos.add( updatedRoleDto );
+        }
+
+        log.info("Roles was updated: {}", updatedRoleDtos.size());
+
+        return updatedRoleDtos;
+    }
+
+    /**
+     * Delete role by ID.
+     * @param id role ID for delete.
+     * **/
+    @Transactional
+    public void deleteRole(UUID id) {
+        log.info("Delete role by ID: {}...", id);
+
+        roleRepository.deleteById(id);
+
+        log.info("Role by ID {} was deleted", id);
+    }
+
+    /**
+     * Delete roles by IDs.
+     * @param ids roles to delete.
+     * **/
+    @Transactional
+    public void deleteRoles(List<UUID> ids) {
+        log.info("Delete {} roles...", ids.size());
+
+        roleRepository.deleteAllById(ids);
+
+        log.info("Roles was deleted: {}", ids.size());
     }
 }
