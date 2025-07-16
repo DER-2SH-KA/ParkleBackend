@@ -3,6 +3,7 @@ package ru.d2k.parkle.utils.converter.db;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -10,6 +11,7 @@ import java.util.Objects;
 
 @Slf4j
 @Converter(autoApply = true)
+@Component
 public class UriConverter implements AttributeConverter<URI, String> {
     @Override
     public String convertToDatabaseColumn(URI uri) {
