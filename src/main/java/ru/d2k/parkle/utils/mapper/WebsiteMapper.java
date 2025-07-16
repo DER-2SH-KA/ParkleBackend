@@ -1,0 +1,31 @@
+package ru.d2k.parkle.utils.mapper;
+
+import org.mapstruct.*;
+import ru.d2k.parkle.dto.WebsiteResponseDto;
+import ru.d2k.parkle.dto.WebsiteUpdateDto;
+import ru.d2k.parkle.entity.Website;
+import ru.d2k.parkle.utils.converter.db.UriConverter;
+import ru.d2k.parkle.utils.resolver.UserResolver;
+
+@Mapper(
+        componentModel = "spring",
+        uses = {UserResolver.class, UriConverter.class}
+)
+public interface WebsiteMapper {
+
+    @Mapping(source = "user", target = "userId")
+    @Mapping(source = "url", target = "url")
+    WebsiteResponseDto toResponseDto(Website dto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(source = "userId", target = "user")
+    @Mapping(source = "url", target = "url")
+    @Mapping(
+            target = "description",
+            nullValuePropertyMappingStrategy =
+                    NullValuePropertyMappingStrategy.SET_TO_NULL
+    )
+    Website updateByDto(@MappingTarget Website entity, WebsiteUpdateDto dto);
+
+}
