@@ -11,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class WebsiteResponseDto {
     private UUID id;
+    private UUID userId;
     private String hexColor;
     private String title;
     private String description;
