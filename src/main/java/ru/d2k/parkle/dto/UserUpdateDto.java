@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdateDto {
-    private UUID role;
+    private UUID roleId;
 
     @Size(
             max = 100,
