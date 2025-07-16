@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 
 import java.net.URI;
 import java.util.UUID;
@@ -35,5 +36,6 @@ public class WebsiteCreateDto {
     private String description;
 
     @NotNull(message = "WebisteCreate URL can't be null")
+    @URL(message = "WebsiteUpdate url is invalid")
     private URI url;
 }

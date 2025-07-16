@@ -1,7 +1,9 @@
 package ru.d2k.parkle.utils.resolver;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.repository.UserRepository;
 
@@ -13,9 +15,14 @@ public class UserResolver {
 
     private final UserRepository userRepository;
 
-    public UUID resolve(User user) {
-        if (user == null) return null;
+    @Transactional(readOnly = true)
+    public User resolve(UUID userId) {
+        if (userId == null) return null;
 
-        return user.getId();
+        return userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("User not found with ID: " + userId)
+                );
     }
+
 }

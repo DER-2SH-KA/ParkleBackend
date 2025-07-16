@@ -11,10 +11,7 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "website",
-        indexes = {
-                @Index(columnList = "user_id"),
-                @Index(columnList = "hex_id")
-        }
+        indexes = @Index(columnList = "user_id")
 )
 
 @Getter
@@ -36,7 +33,7 @@ public class Website {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "hexColor", nullable = false, scale = 7)
+    @Column(name = "hexColor", nullable = false, length = 7)
     private String hexColor;
 
     @Column(name = "title", nullable = false, length = 100)
