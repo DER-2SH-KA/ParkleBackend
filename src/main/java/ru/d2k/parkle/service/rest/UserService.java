@@ -63,6 +63,8 @@ public class UserService {
     public UserResponseDto createUser(UserCreateDto dto) {
         log.info("Creating user: {}...", dto.toString());
 
+        log.info("Taken UserCreateDto: {}", dto);
+
         Role role = roleRepository.findById(dto.getRoleId()).orElseThrow(() ->
                 new EntityNotFoundException("Role was not found with ID: " + dto.getRoleId())
         );
