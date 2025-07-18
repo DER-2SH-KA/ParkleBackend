@@ -17,9 +17,9 @@ public interface UserMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy =
             NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "role", target = "role")
+    @Mapping(source = "roleId", target = "role")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "websites", ignore = true)
-    User updateByDto(@MappingTarget User entity, UserUpdateDto dto, Role role);
+    User updateByDto(@MappingTarget User entity, UserUpdateDto dto);
 
 }
