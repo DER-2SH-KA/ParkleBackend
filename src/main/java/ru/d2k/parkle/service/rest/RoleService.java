@@ -129,14 +129,14 @@ public class RoleService {
      * @return {@code RoleDto} role as DTO which was saved.
      * **/
     @Transactional
-    public RoleDto updateRole(RoleDto dto) {
+    public RoleDto updateRole( UUID id, RoleDto dto) {
         log.info("Updating role: {}...", dto.toString());
 
-        if ( Objects.isNull(dto.getId()) ) {
+        if ( Objects.isNull(id) ) {
             throw new IllegalArgumentException("RoleDto ID is null");
         }
 
-        Role role = roleRepository.findById(dto.getId()).orElseThrow();
+        Role role = roleRepository.findById(id).orElseThrow();
         role = roleMapper.updateEntityByDto(role, dto);
         Role updatedRole = roleRepository.save(role);
 

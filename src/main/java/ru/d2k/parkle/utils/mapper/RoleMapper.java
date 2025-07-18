@@ -1,8 +1,6 @@
 package ru.d2k.parkle.utils.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 import ru.d2k.parkle.dto.RoleDto;
 import ru.d2k.parkle.entity.Role;
 
@@ -17,6 +15,7 @@ public interface RoleMapper{
      * Update {@link Role} object by {@link RoleDto}
      * without ID value.
      * **/
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "users", ignore = true)
     Role updateEntityByDto(

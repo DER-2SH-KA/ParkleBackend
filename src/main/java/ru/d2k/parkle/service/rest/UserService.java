@@ -117,7 +117,7 @@ public class UserService {
         log.info("Deleting user by ID: {}...", id);
 
         if (Objects.nonNull(id)) {
-            roleRepository.deleteById(id);
+            userRepository.deleteById(id);
 
             log.info("User with ID = {} was deleted", id);
         }
