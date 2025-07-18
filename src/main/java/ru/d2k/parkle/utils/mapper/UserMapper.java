@@ -9,7 +9,7 @@ import ru.d2k.parkle.utils.resolver.RoleResolver;
 
 @Mapper(
         componentModel = "spring",
-        uses = {RoleMapper.class}
+        uses = {RoleMapper.class, RoleResolver.class}
 )
 public interface UserMapper {
 
@@ -17,7 +17,7 @@ public interface UserMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy =
             NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "roleId", target = "role")
+    @Mapping(source = "roleId", target = "role", qualifiedByName = "fromUuidToRole")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "websites", ignore = true)
     User updateByDto(@MappingTarget User entity, UserUpdateDto dto);
