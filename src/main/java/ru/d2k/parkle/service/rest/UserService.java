@@ -34,7 +34,7 @@ public class UserService {
      * **/
     @Transactional(readOnly = true)
     public Set<UserResponseDto> findUsers() {
-        log.info("Finding all users...");
+        log.info("Getting all users...");
 
         Set<UserResponseDto> dtos = userRepository.findAll().stream()
                 .map(userMapper::toResponseDto)
@@ -51,7 +51,7 @@ public class UserService {
      * **/
     @Transactional(readOnly = true)
     public UserResponseDto findUserById(UUID id) {
-        log.info("Finding user by ID: {}...", id);
+        log.info("Getting user by ID: {}...", id);
 
         if (id == null) return null;
 

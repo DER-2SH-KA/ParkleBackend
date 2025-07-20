@@ -26,7 +26,7 @@ public class RoleService {
      * **/
     @Transactional(readOnly = true)
     public Set<RoleDto> findRoles() {
-        log.info("Finding all roles...");
+        log.info("Getting all roles...");
 
         Set<RoleDto> dtos = roleRepository.findAll().stream()
                 .map(roleMapper::toDto)
@@ -44,7 +44,7 @@ public class RoleService {
      * **/
     @Transactional(readOnly = true)
     public RoleDto findRoleById(UUID id) {
-        log.info("Finding role by ID: {}...", id);
+        log.info("Getting role by ID: {}...", id);
 
         Role role = roleRepository.findById(id)
                 .orElseThrow(() ->
@@ -62,7 +62,7 @@ public class RoleService {
      * **/
     @Transactional(readOnly = true)
     public RoleDto findRoleByName(String name) {
-        log.info("Finding roles by Name: {}...", name);
+        log.info("Getting roles by Name: {}...", name);
 
         Role role = roleRepository.findByName(name)
                 .orElseThrow(() ->
