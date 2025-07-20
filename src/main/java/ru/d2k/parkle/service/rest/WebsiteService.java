@@ -1,15 +1,117 @@
 package ru.d2k.parkle.service.rest;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.d2k.parkle.dto.*;
+import ru.d2k.parkle.entity.User;
+import ru.d2k.parkle.entity.Website;
+import ru.d2k.parkle.repository.UserRepository;
 import ru.d2k.parkle.repository.WebsiteRepository;
+import ru.d2k.parkle.utils.mapper.WebsiteMapper;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class WebsiteService {
-    @Autowired
-    private final WebsiteRepository WEBSITE_REPOSITORY;
+    private final UserRepository userRepository;
+    private final WebsiteRepository websiteRepository;
+    private final WebsiteMapper websiteMapper;
+
+    /**
+     * Return all websites by all users from DB as DTO.
+     * @return List of {@link WebsiteResponseDto}.
+     * **/
+    @Transactional(readOnly = true)
+    public List<WebsiteResponseDto> findWebsites() {
+        log.info("Getting all websites...");
+
+        List<WebsiteResponseDto> dtos = websiteRepository.findAll().stream()
+                .map(websiteMapper::toResponseDto)
+                .toList();
+
+        log.info("Websites was founded: {}", dtos.size());
+        return dtos;
+    }
+
+    /**
+     * Return website by ID as DTO.
+     * @param id ID of website.
+     * @return {@link WebsiteResponseDto} dto.
+     * **/
+    @Transactional(readOnly = true)
+    public WebsiteResponseDto findWebsiteById(UUID id) {
+        log.info("Getting website by ID: {}...", id);
+
+        Website website = websiteRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Website was not found with ID: " + id)
+                );
+
+        log.info("Website with ID = {} was founded", id);
+        return websiteMapper.toResponseDto(website);
+    }
+
+    /**
+     * Create website from DTO and return as DTO.
+     * @param dto {@link UserCreateDto} of new user.
+     * @return {@link UserResponseDto} dto.
+     * **/
+    @Transactional
+    public WebsiteResponseDto createWebsite(WebsiteCreateDto dto) {
+        log.info("Creating website: {}...", dto.toString());
+
+        User user = userRepository.findById(dto.getUserId()).orElseThrow(() ->
+                new EntityNotFoundException("User was not found with ID: " + dto.getUserId())
+        );
+        Website website = Website.create(user, dto.getHexColor(), dto.getTitle(), dto.getDescription(), dto.getUrl());
+        website = websiteRepository.save(website);
+
+        log.info("Website was created: {}", website);
+        return websiteMapper.toResponseDto(website);
+    }
+
+    /**
+     * Update website from DTO and return as DTO.
+     * @param udto {@link WebsiteUpdateDto} dto of website to update.
+     * @return {@link WebsiteResponseDto} dto.
+     * **/
+    @Transactional
+    public WebsiteResponseDto updateWebsite(UUID id, WebsiteUpdateDto udto) {
+        log.info("Updating website by ID: {}...", id);
+
+        if (id == null) return null;
+
+        Website website = websiteRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Website was not found with ID: " + id)
+                );
+
+        websiteMapper.updateByDto( website, udto );
+        website = websiteRepository.save(website);
+
+        log.info("Website with ID = {} was updated", id);
+        return websiteMapper.toResponseDto(website);
+    }
+
+    /**
+     * Delete website by ID.
+     * @param id Website's ID.
+     * **/
+    public void deleteWebsite(UUID id) {
+        log.info("Deleting website by ID: {}", id);
+
+        if (Objects.nonNull(id)) {
+            websiteRepository.deleteById(id);
+
+            log.info("Website with ID = {} was deleted", id);
+        }
+        else { log.info("Website's ID equals null and now was deleted"); }
+    }
 }
