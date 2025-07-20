@@ -30,7 +30,7 @@ public class RoleRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RoleDto> findRoles(@PathVariable UUID id) {
+    public ResponseEntity<RoleDto> findRoleById(@PathVariable UUID id) {
         log.info("Given GET request for role by ID: {}", id);
 
         RoleDto dto = roleService.findRoleById(id);
@@ -40,7 +40,7 @@ public class RoleRestController {
     }
 
     @GetMapping("/{name}")
-    public ResponseEntity<RoleDto> findRoles(@PathVariable String name) {
+    public ResponseEntity<RoleDto> findRoleByName(@PathVariable String name) {
         log.info("Given GET request for role by NAME: {}", name);
 
         RoleDto dto = roleService.findRoleByName(name);
@@ -60,7 +60,7 @@ public class RoleRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RoleDto> createRole(@PathVariable UUID id, @RequestBody RoleDto dto) {
+    public ResponseEntity<RoleDto> updateRole(@PathVariable UUID id, @RequestBody RoleDto dto) {
         log.info("Given PUT request fot update role by ID: {}", id);
 
         RoleDto newDto = roleService.updateRole(id, dto);
@@ -70,7 +70,7 @@ public class RoleRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUserById(@PathVariable UUID id) {
+    public ResponseEntity<?> deleteRoleById(@PathVariable UUID id) {
         log.info("Given DELETE role request by ID: {}", id);
 
         roleService.deleteRole(id);
