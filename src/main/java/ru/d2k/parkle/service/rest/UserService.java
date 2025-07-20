@@ -30,7 +30,7 @@ public class UserService {
 
     /**
      * Return all users from DB as DTO.
-     * @return Set of dto.
+     * @return Set of {@link UserResponseDto}.
      * **/
     @Transactional(readOnly = true)
     public Set<UserResponseDto> findUsers() {
@@ -73,8 +73,6 @@ public class UserService {
     public UserResponseDto createUser(UserCreateDto dto) {
         log.info("Creating user: {}...", dto.toString());
 
-        log.info("Taken UserCreateDto: {}", dto);
-
         Role role = roleRepository.findById(dto.getRoleId()).orElseThrow(() ->
                 new EntityNotFoundException("Role was not found with ID: " + dto.getRoleId())
         );
@@ -109,7 +107,7 @@ public class UserService {
     }
 
     /**
-     * Delete user from DTO by ID.
+     * Delete user by ID.
      * @param id ID of user to delete.
      * **/
     @Transactional
