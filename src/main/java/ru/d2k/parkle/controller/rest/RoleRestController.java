@@ -60,7 +60,7 @@ public class RoleRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RoleDto> updateRole(@PathVariable UUID id, @RequestBody RoleDto dto) {
+    public ResponseEntity<RoleDto> updateRoleById(@PathVariable UUID id, @RequestBody RoleDto dto) {
         log.info("Given PUT request fot update role by ID: {}", id);
 
         RoleDto newDto = roleService.updateRole(id, dto);

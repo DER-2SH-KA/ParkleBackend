@@ -20,16 +20,6 @@ import java.util.Set;
 public class UserRestController {
     private final UserService userService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> findUserById(@PathVariable UUID id) {
-        log.info("Given GET request to return user by ID: {}", id);
-
-        UserResponseDto responseDto = userService.findUserById(id);
-
-        log.info("GET request was served");
-        return ResponseEntity.ok( responseDto );
-    }
-
     @GetMapping
     public ResponseEntity<Set<UserResponseDto>> findUsers() {
         log.info("Given GET request to return all users");
@@ -38,6 +28,16 @@ public class UserRestController {
 
         log.info("GET request was served");
         return ResponseEntity.ok( userResponseDtos );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDto> findUserById(@PathVariable UUID id) {
+        log.info("Given GET request to return user by ID: {}", id);
+
+        UserResponseDto responseDto = userService.findUserById(id);
+
+        log.info("GET request was served");
+        return ResponseEntity.ok( responseDto );
     }
 
     @PostMapping("/new")
