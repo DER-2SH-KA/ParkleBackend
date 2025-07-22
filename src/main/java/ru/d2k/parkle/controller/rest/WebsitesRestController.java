@@ -40,7 +40,7 @@ public class WebsitesRestController {
      * @param userId user's ID.
      * @return List of {@link WebsiteResponseDto} objects.
      * **/
-    @GetMapping("/user/{id}")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<List<WebsiteResponseDto>> findWebsitesByUserId(@PathVariable UUID userId) {
         log.info("Given GET request to return all websites by user ID: {}", userId);
 
