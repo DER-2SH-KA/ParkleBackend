@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.d2k.parkle.dto.UserAuthDto;
 import ru.d2k.parkle.dto.UserCreateDto;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
@@ -62,6 +63,28 @@ public class UserService {
 
         log.info("User with ID = {} was founded", id);
         return userMapper.toResponseDto(user);
+    }
+
+    /**
+     * Authentication user by login and password.
+     * @param uadto {@link UserAuthDto} object with login and password data.
+     * @return {@link UserResponseDto} object. Can be null.
+     * @throws EntityNotFoundException if user with given login and password was not found.
+     * **/
+    @Transactional(readOnly = true)
+    public UserResponseDto authentication(UserAuthDto uadto) {
+        log.info("Authenticate user by login and password. Login: {}", uadto.getLogin());
+
+        UserResponseDto dto;
+
+        User user = userRepository.findByLoginAndPassword(uadto.getLogin(), uadto.getPassword())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("User was not found with login: {} and password" + uadto.getLogin())
+                );
+        dto = userMapper.toResponseDto(user);
+
+        log.info("Authenticated user with DTO: {}", dto);
+        return dto;
     }
 
     /**
