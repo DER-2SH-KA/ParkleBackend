@@ -59,6 +59,21 @@ public class WebsiteService {
     }
 
     /**
+     * Return websites by user ID as DTO.
+     * @param userId user ID.
+     * @return {@link WebsiteResponseDto} dto.
+     * **/
+    @Transactional(readOnly = true)
+    public List<WebsiteResponseDto> findWebsiteByUserId(UUID userId) {
+        log.info("Getting websites by user ID: {}...", userId);
+
+        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(userId);
+
+        log.info("Websites was found: {}", websites.size());
+        return websites.stream().map(websiteMapper::toResponseDto).toList();
+    }
+
+    /**
      * Create website from DTO and return as DTO.
      * @param dto {@link UserCreateDto} of new user.
      * @return {@link UserResponseDto} dto.
