@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/start_page_test_db
+    username: cock
+    password: cockMaster
