@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.d2k.parkle.aspect.annotation.LoggableGetMapping;
 import ru.d2k.parkle.controller.ApiPaths;
 import ru.d2k.parkle.dto.RoleDto;
 import ru.d2k.parkle.service.rest.RoleService;
@@ -23,12 +24,13 @@ public class RoleRestController {
      * @return {@link ResponseEntity} with Set of {@link RoleDto}.
      * **/
     @GetMapping
+    @LoggableGetMapping
     public ResponseEntity<Set<RoleDto>> findRoles() {
-        log.info("Given GET request for all roles");
+        // log.info("Given GET request for all roles");
 
         Set<RoleDto> dtos = roleService.findRoles();
 
-        log.info("GET request was served");
+        // log.info("GET request was served");
         return ResponseEntity.ok(dtos);
     }
 
@@ -38,12 +40,13 @@ public class RoleRestController {
      * @return {@link ResponseEntity} with {@link RoleDto}.
      * **/
     @GetMapping("/{id}")
+    @LoggableGetMapping
     public ResponseEntity<RoleDto> findRoleById(@PathVariable UUID id) {
-        log.info("Given GET request for role by ID: {}", id);
+        // log.info("Given GET request for role by ID: {}", id);
 
         RoleDto dto = roleService.findRoleById(id);
 
-        log.info("GET request was served");
+        // log.info("GET request was served");
         return ResponseEntity.ok(dto);
     }
 
@@ -52,13 +55,14 @@ public class RoleRestController {
      * @param name name of role.
      * @return {@link ResponseEntity} with {@link RoleDto}.
      * **/
-    @GetMapping("/{name}")
+    @GetMapping("/name/{name}")
+    @LoggableGetMapping
     public ResponseEntity<RoleDto> findRoleByName(@PathVariable String name) {
-        log.info("Given GET request for role by NAME: {}", name);
+        // log.info("Given GET request for role by NAME: {}", name);
 
         RoleDto dto = roleService.findRoleByName(name);
 
-        log.info("GET request was served");
+        // log.info("GET request was served");
         return ResponseEntity.ok(dto);
     }
 
