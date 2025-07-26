@@ -27,11 +27,8 @@ public class WebsitesRestController {
      * **/
     @GetMapping
     public ResponseEntity<List<WebsiteResponseDto>> findWebsites() {
-        log.info("Given GET request to return all websites");
-
         List<WebsiteResponseDto> websiteResponseDtos = websiteService.findWebsites();
 
-        log.info("GET request was served");
         return ResponseEntity.ok( websiteResponseDtos );
     }
 
@@ -42,11 +39,8 @@ public class WebsitesRestController {
      * **/
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<WebsiteResponseDto>> findWebsitesByUserId(@PathVariable UUID userId) {
-        log.info("Given GET request to return all websites by user ID: {}", userId);
-
         List<WebsiteResponseDto> websiteResponseDtos = websiteService.findWebsiteByUserId(userId);
 
-        log.info("GET request was served");
         return ResponseEntity.ok( websiteResponseDtos );
     }
 

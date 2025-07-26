@@ -14,7 +14,7 @@ import java.util.Arrays;
 @Component
 public class LoggingAspect {
 
-    @Pointcut("@annotation(ru.d2k.parkle.aspect.annotation.LoggableGetMapping)")
+    @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping)")
     public void loggableGetMethods() {}
 
     @Before("loggableGetMethods()")

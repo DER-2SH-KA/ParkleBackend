@@ -27,11 +27,8 @@ public class AuthRestController {
      * **/
     @GetMapping("/login")
     public ResponseEntity<UserResponseDto> authentication(@RequestBody UserAuthDto uadto) {
-        log.info("Given GET user request to authentication with DTO: {}", uadto);
-
         UserResponseDto responseDto = userService.authentication(uadto);
 
-        log.info("GET request was served");
         return ResponseEntity.ok(responseDto);
     }
 
