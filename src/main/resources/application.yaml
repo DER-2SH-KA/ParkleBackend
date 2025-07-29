@@ -1,8 +1,6 @@
 spring:
   application:
     name: Parkle Project Jun 2025
-  # profiles:
-    # active: @activatedProperties@
 
   jpa:
     hibernate:
