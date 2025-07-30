@@ -7,8 +7,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @ToString(exclude = "password")
@@ -16,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdateDto {
-    private UUID roleId;
+    private String roleName;
 
     @Size(
             max = 100,

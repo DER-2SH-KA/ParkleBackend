@@ -75,8 +75,8 @@ public class WebsiteService {
 
     /**
      * Create website from DTO and return as DTO.
-     * @param dto {@link UserCreateDto} of new user.
-     * @return {@link UserResponseDto} dto.
+     * @param dto {@link WebsiteCreateDto} of new website.
+     * @return {@link WebsiteResponseDto} dto.
      * **/
     @Transactional
     public WebsiteResponseDto createWebsite(WebsiteCreateDto dto) {

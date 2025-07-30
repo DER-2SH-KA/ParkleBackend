@@ -16,14 +16,14 @@ public class RoleResolver {
 
     private final RoleRepository roleRepository;
 
-    @Named("fromUuidToRole")
+    @Named("fromNameToRole")
     @Transactional(readOnly = true)
-    public Role resolve(UUID roleId) {
-        if (roleId == null) return null;
+    public Role resolve(String roleName) {
+        if (roleName == null || roleName.isBlank()) return null;
 
-        return roleRepository.findById(roleId)
+        return roleRepository.findByName(roleName)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Role not found with ID: " + roleId)
+                        new EntityNotFoundException("Role not found with Name: " + roleName)
                 );
     }
 

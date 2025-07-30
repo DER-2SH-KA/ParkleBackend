@@ -96,8 +96,8 @@ public class UserService {
     public UserResponseDto createUser(UserCreateDto dto) {
         log.info("Creating user: {}...", dto.toString());
 
-        Role role = roleRepository.findById(dto.getRoleId()).orElseThrow(() ->
-                new EntityNotFoundException("Role was not found with ID: " + dto.getRoleId())
+        Role role = roleRepository.findByName(dto.getRoleName()).orElseThrow(() ->
+                new EntityNotFoundException("Role was not found with Name: " + dto.getRoleName())
         );
         User user = User.create(role, dto.getLogin(), dto.getEmail(), dto.getPassword());
         user = userRepository.save(user);

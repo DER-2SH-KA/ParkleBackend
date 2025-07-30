@@ -6,8 +6,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @ToString(exclude = "password")
@@ -16,8 +14,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserCreateDto {
 
-    @NotNull(message = "UserCreate must have any role")
-    private UUID roleId;
+    @NotNull(message = "UserCreate must have any role (by Name)")
+    private String roleName;
 
     @NotBlank(message = "UserCreate's login can't be null or blank")
     @Size(

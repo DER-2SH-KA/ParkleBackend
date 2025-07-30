@@ -25,7 +25,7 @@ public class AuthRestController {
      * @param uadto {@link UserAuthDto} object for login.
      * @return {@link UserResponseDto} object of authenticated user.
      * **/
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<UserResponseDto> authentication(@RequestBody UserAuthDto uadto) {
         UserResponseDto responseDto = userService.authentication(uadto);
 
