@@ -91,9 +91,13 @@ public class WebsitesRestController {
      * @return OK status.
      * **/
     @DeleteMapping("/{id}")
-    public ResponseEntity<WebsiteResponseDto> deleteWebsite(@PathVariable UUID id) {
-        websiteService.deleteWebsite(id);
+    public ResponseEntity<?> deleteWebsite(@PathVariable UUID id) {
+        boolean result = websiteService.deleteWebsite(id);
 
-        return ResponseEntity.ok().build();
+        return result
+                ? ResponseEntity.ok().build()
+                : ResponseEntity
+                    .internalServerError()
+                    .body("Website was not deleted!");
     }
 }

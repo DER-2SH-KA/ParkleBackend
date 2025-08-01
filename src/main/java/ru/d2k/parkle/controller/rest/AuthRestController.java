@@ -68,8 +68,12 @@ public class AuthRestController {
      * **/
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable UUID id) {
-        userService.deleteUser(id);
+        boolean result = userService.deleteUser(id);
 
-        return ResponseEntity.ok().build();
+        return result
+                ? ResponseEntity.ok().build()
+                : ResponseEntity
+                    .internalServerError()
+                    .body("User was not deleted!");
     }
 }

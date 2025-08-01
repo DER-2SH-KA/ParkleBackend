@@ -86,8 +86,12 @@ public class RoleRestController {
      * **/
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRoleById(@PathVariable UUID id) {
-        roleService.deleteRole(id);
+        boolean result = roleService.deleteRole(id);
 
-        return ResponseEntity.ok().build();
+        return result
+                ? ResponseEntity.ok().build()
+                : ResponseEntity
+                    .internalServerError()
+                    .body("Role was not deleted!");
     }
 }
