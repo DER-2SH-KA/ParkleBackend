@@ -92,6 +92,6 @@ public class RoleRestController {
                 ? ResponseEntity.ok().build()
                 : ResponseEntity
                     .internalServerError()
-                    .body("Role was not deleted!");
+                    .body("Role was not deleted or not exists!");
     }
 }

@@ -74,6 +74,6 @@ public class AuthRestController {
                 ? ResponseEntity.ok().build()
                 : ResponseEntity
                     .internalServerError()
-                    .body("User was not deleted!");
+                    .body("User was not deleted or not exists!");
     }
 }
