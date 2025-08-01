@@ -1,5 +1,6 @@
 package ru.d2k.parkle.controller.rest;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -59,12 +60,9 @@ public class RoleRestController {
      * @return {@link ResponseEntity} with {@link RoleDto}.
      * **/
     @PostMapping("new")
-    public ResponseEntity<RoleDto> createRole(@RequestBody RoleDto dto) {
-        log.info("Given POST request fot create role with data: {}", dto);
-
+    public ResponseEntity<RoleDto> createRole(@Valid @RequestBody RoleDto dto) {
         RoleDto newDto = roleService.createRole(dto);
 
-        log.info("POST request was served");
         return ResponseEntity.ok(newDto);
     }
 
@@ -75,12 +73,9 @@ public class RoleRestController {
      * @return {@link ResponseEntity} with {@link RoleDto}.
      * **/
     @PutMapping("/{id}")
-    public ResponseEntity<RoleDto> updateRoleById(@PathVariable UUID id, @RequestBody RoleDto dto) {
-        log.info("Given PUT request fot update role by ID: {}", id);
-
+    public ResponseEntity<RoleDto> updateRoleById(@PathVariable UUID id, @Valid @RequestBody RoleDto dto) {
         RoleDto newDto = roleService.updateRole(id, dto);
 
-        log.info("PUT request was served");
         return ResponseEntity.ok(newDto);
     }
 
@@ -91,11 +86,8 @@ public class RoleRestController {
      * **/
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRoleById(@PathVariable UUID id) {
-        log.info("Given DELETE role request by ID: {}", id);
-
         roleService.deleteRole(id);
 
-        log.info("DELETE request was served");
         return ResponseEntity.ok().build();
     }
 }

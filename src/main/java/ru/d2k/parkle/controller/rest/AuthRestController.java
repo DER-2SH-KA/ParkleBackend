@@ -1,5 +1,6 @@
 package ru.d2k.parkle.controller.rest;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class AuthRestController {
      * @return {@link UserResponseDto} object of authenticated user.
      * **/
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDto> authentication(@RequestBody UserAuthDto uadto) {
+    public ResponseEntity<UserResponseDto> authentication(@Valid @RequestBody UserAuthDto uadto) {
         UserResponseDto responseDto = userService.authentication(uadto);
 
         return ResponseEntity.ok(responseDto);
@@ -38,12 +39,9 @@ public class AuthRestController {
      * @return {@link UserResponseDto} object of created user.
      * **/
     @PostMapping("/registration")
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserCreateDto cdto) {
-        log.info("Given POST user request with DTO: {}", cdto);
-
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserCreateDto cdto) {
         UserResponseDto responseDto = userService.createUser(cdto);
 
-        log.info("POST request was served");
         return ResponseEntity.ok(responseDto);
     }
 
@@ -54,12 +52,12 @@ public class AuthRestController {
      * @return {@link UserResponseDto} object of updated user.
      * **/
     @PutMapping("/update/{id}")
-    public ResponseEntity<UserResponseDto> updateUserById(@PathVariable UUID id, @RequestBody UserUpdateDto dto) {
-        log.info("Given PUT user request with ID: {}", id);
-
+    public ResponseEntity<UserResponseDto> updateUserById(
+            @PathVariable UUID id,
+            @Valid @RequestBody UserUpdateDto dto
+    ) {
         UserResponseDto responseDto = userService.updateUser(id, dto);
 
-        log.info("PUT request was served");
         return ResponseEntity.ok(responseDto);
     }
 
@@ -70,11 +68,8 @@ public class AuthRestController {
      * **/
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable UUID id) {
-        log.info("Given DELETE user request by ID: {}", id);
-
         userService.deleteUser(id);
 
-        log.info("DELETE request was served");
         return ResponseEntity.ok().build();
     }
 }

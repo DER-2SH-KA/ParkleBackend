@@ -1,5 +1,6 @@
 package ru.d2k.parkle.controller.rest;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -51,11 +52,8 @@ public class WebsitesRestController {
      * **/
     @GetMapping("/{id}")
     public ResponseEntity<WebsiteResponseDto> findWebsitesById(@PathVariable UUID id) {
-        log.info("Given GET request to return website by ID: {}", id);
-
         WebsiteResponseDto dto = websiteService.findWebsiteById(id);
 
-        log.info("GET request was served");
         return ResponseEntity.ok( dto );
     }
 
@@ -65,12 +63,9 @@ public class WebsitesRestController {
      * @return {@link WebsiteResponseDto} object.
      * **/
     @PostMapping("/new")
-    public ResponseEntity<WebsiteResponseDto> createWebsite(@RequestBody WebsiteCreateDto cdto) {
-        log.info("Given POST request to create website");
-
+    public ResponseEntity<WebsiteResponseDto> createWebsite(@Valid @RequestBody WebsiteCreateDto cdto) {
         WebsiteResponseDto dto = websiteService.createWebsite(cdto);
 
-        log.info("POST request was served");
         return ResponseEntity.ok( dto );
     }
 
@@ -81,12 +76,12 @@ public class WebsitesRestController {
      * @return updated {@link WebsiteResponseDto} object.
      * **/
     @PutMapping("/{id}")
-    public ResponseEntity<WebsiteResponseDto> updateWebsite(@PathVariable UUID id, @RequestBody WebsiteUpdateDto udto) {
-        log.info("Given PUT request to update website by ID: {}", id);
-
+    public ResponseEntity<WebsiteResponseDto> updateWebsite(
+            @PathVariable UUID id,
+            @Valid @RequestBody WebsiteUpdateDto udto
+    ) {
         WebsiteResponseDto dto = websiteService.updateWebsite(id, udto);
 
-        log.info("PUT request was served");
         return ResponseEntity.ok( dto );
     }
 
@@ -97,11 +92,8 @@ public class WebsitesRestController {
      * **/
     @DeleteMapping("/{id}")
     public ResponseEntity<WebsiteResponseDto> deleteWebsite(@PathVariable UUID id) {
-        log.info("Given DELETE request to delete website by ID: {}", id);
-
         websiteService.deleteWebsite(id);
 
-        log.info("DELETE request was served");
         return ResponseEntity.ok().build();
     }
 }

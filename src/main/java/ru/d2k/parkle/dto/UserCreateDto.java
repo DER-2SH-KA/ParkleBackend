@@ -1,9 +1,6 @@
 package ru.d2k.parkle.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Getter
@@ -29,10 +26,7 @@ public class UserCreateDto {
             max = 320,
             message = "UserCreate's email size must be lower then 320 symbols"
     )
-    @Pattern(
-            regexp = "^([a-zA-Z0-9-._]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+)$",
-            message = "UserCreate's email is not valid by pattern"
-    )
+    @Email(message = "UserCreate's email is not valid")
     private String email;
 
     @NotBlank(message = "UserCreate's password can't be null or blank")
