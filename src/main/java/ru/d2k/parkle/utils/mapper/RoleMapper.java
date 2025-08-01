@@ -2,14 +2,24 @@ package ru.d2k.parkle.utils.mapper;
 
 import org.mapstruct.*;
 import ru.d2k.parkle.dto.RoleDto;
+import ru.d2k.parkle.dto.UserRoleDto;
 import ru.d2k.parkle.entity.Role;
 
 @Mapper(componentModel = "spring")
 public interface RoleMapper{
     /**
      * Create new {@link RoleDto} by {@link Role} object.
+     * @param role {@link Role} role entity.
+     * @return {@link RoleDto} object.
      * **/
     RoleDto toDto(Role role);
+
+    /**
+     * Create new {@link UserRoleDto} by {@link Role} object.
+     * @param role
+     * @return
+     */
+    UserRoleDto toUserRoleDto(Role role);
 
     /**
      * Update {@link Role} object by {@link RoleDto}

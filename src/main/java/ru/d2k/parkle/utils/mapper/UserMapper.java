@@ -12,7 +12,6 @@ import ru.d2k.parkle.utils.resolver.RoleResolver;
         uses = {RoleMapper.class, RoleResolver.class}
 )
 public interface UserMapper {
-
     UserResponseDto toResponseDto(User entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy =
