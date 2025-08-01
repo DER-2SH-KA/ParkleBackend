@@ -1,6 +1,7 @@
 services:
 
   spring:
+    build: .
     image: parkle
     container_name: app
     ports:
