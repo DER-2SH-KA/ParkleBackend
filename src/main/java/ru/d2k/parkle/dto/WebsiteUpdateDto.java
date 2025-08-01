@@ -1,5 +1,6 @@
 package ru.d2k.parkle.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -20,18 +21,20 @@ public class WebsiteUpdateDto {
             regexp = "^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$",
             message = "WebsiteUpdate hexColor must be type as #fff or #FFFFFF"
     )
+    @NotBlank(message = "WebsiteUpdate hexColor can't be null or blank")
     private String hexColor;
 
-    @NotNull(message = "WebsiteUpdate must have userId")
+    @NotBlank(message = "WebsiteUpdate must have userId")
     private UUID userId;
 
     @Size(max = 100, message = "WebsiteUpdate title length must be lower than 100 symbols")
+    @NotBlank(message = "WebsiteUpdate title can't be null or blank")
     private String title;
 
     @Size(max = 255, message = "WebsiteUpdate description length must be lower than 255 symbols")
     private String description;
 
-    @URL(message = "WebsiteUpdate url is invalid")
-    private URI url;
+    @NotBlank(message = "WebsiteUpdate url can't be null or blank")
+    private String url;
 
 }

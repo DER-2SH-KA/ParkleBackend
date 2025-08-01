@@ -43,9 +43,9 @@ public class Website {
     private String description;
 
     @Column(name = "url", nullable = false)
-    private URI url;
+    private String url;
 
-    private Website(User user, String hexColor, String title, String description, URI url) {
+    private Website(User user, String hexColor, String title, String description, String url) {
         this.id = Uuid7Generator.generateNewUUID();
         this.user = user;
         this.hexColor = hexColor;
@@ -63,7 +63,7 @@ public class Website {
      * @param description description of website.
      * @param url URL of website in Internet.
      * **/
-    Website(UUID id, User user, String hexColor, String title, String description, URI url) {
+    Website(UUID id, User user, String hexColor, String title, String description, String url) {
         this.id = id;
         this.user = user;
         this.hexColor = hexColor;
@@ -81,7 +81,7 @@ public class Website {
      * @param url URL of website in Internet.
      * @return Created {@link Website} object.
      * **/
-    public static Website create(User user, String hexColor, String title, String description, URI url) {
+    public static Website create(User user, String hexColor, String title, String description, String url) {
         return new Website(user, hexColor, title, description, url);
     }
 }
