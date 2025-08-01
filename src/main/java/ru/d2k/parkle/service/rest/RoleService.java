@@ -180,24 +180,22 @@ public class RoleService {
      * @param id role ID for delete.
      * **/
     @Transactional
-    public void deleteRole(UUID id) {
+    public boolean deleteRole(UUID id) {
         log.info("Delete role by ID: {}...", id);
 
-        roleRepository.deleteById(id);
+        if (Objects.nonNull(id)) {
+            roleRepository.deleteById(id);
 
-        log.info("Role by ID {} was deleted", id);
-    }
+            if (!roleRepository.existsById(id)) {
+                log.info("Role by ID {} was deleted", id);
+                return true;
+            }
+            else {
+                log.info("Role by ID {} wasn't deleted", id);
+            }
+        }
+        else { log.info("Role's ID equals null and now was deleted"); }
 
-    /**
-     * Delete roles by IDs.
-     * @param ids roles to delete.
-     * **/
-    @Transactional
-    public void deleteRoles(List<UUID> ids) {
-        log.info("Delete {} roles...", ids.size());
-
-        roleRepository.deleteAllById(ids);
-
-        log.info("Roles was deleted: {}", ids.size());
+        return false;
     }
 }

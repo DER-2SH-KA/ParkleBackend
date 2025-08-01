@@ -134,14 +134,20 @@ public class UserService {
      * @param id ID of user to delete.
      * **/
     @Transactional
-    public void deleteUser(UUID id) {
+    public boolean deleteUser(UUID id) {
         log.info("Deleting user by ID: {}...", id);
 
         if (Objects.nonNull(id)) {
             userRepository.deleteById(id);
 
-            log.info("User with ID = {} was deleted", id);
+            if (!userRepository.existsById(id)) {
+                log.info("User with ID = {} was deleted", id);
+                return true;
+            }
+            else log.info("User with ID = {} wasn't deleted", id);
         }
         else log.info("User ID equals null and not was deleted");
+
+        return false;
     }
 }

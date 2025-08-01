@@ -119,14 +119,22 @@ public class WebsiteService {
      * Delete website by ID.
      * @param id Website's ID.
      * **/
-    public void deleteWebsite(UUID id) {
+    public boolean deleteWebsite(UUID id) {
         log.info("Deleting website by ID: {}", id);
 
         if (Objects.nonNull(id)) {
             websiteRepository.deleteById(id);
 
-            log.info("Website with ID = {} was deleted", id);
+            if (!websiteRepository.existsById(id)) {
+                log.info("Website with ID = {} was deleted", id);
+                return true;
+            }
+            else {
+                log.info("Website with ID = {} wasn't deleted", id);
+            }
         }
         else { log.info("Website's ID equals null and now was deleted"); }
+
+        return false;
     }
 }
