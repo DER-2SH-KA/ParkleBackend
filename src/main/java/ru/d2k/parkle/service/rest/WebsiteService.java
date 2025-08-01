@@ -123,6 +123,12 @@ public class WebsiteService {
         log.info("Deleting website by ID: {}", id);
 
         if (Objects.nonNull(id)) {
+
+            if (!websiteRepository.existsById(id)) {
+                log.info("Website with ID = {} is already not exists", id);
+                return false;
+            }
+
             websiteRepository.deleteById(id);
 
             if (!websiteRepository.existsById(id)) {

@@ -184,6 +184,12 @@ public class RoleService {
         log.info("Delete role by ID: {}...", id);
 
         if (Objects.nonNull(id)) {
+
+            if (!roleRepository.existsById(id)) {
+                log.info("Role with ID = {} is already not exists", id);
+                return false;
+            }
+
             roleRepository.deleteById(id);
 
             if (!roleRepository.existsById(id)) {

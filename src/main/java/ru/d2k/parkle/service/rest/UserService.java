@@ -138,6 +138,12 @@ public class UserService {
         log.info("Deleting user by ID: {}...", id);
 
         if (Objects.nonNull(id)) {
+
+            if (!userRepository.existsById(id)) {
+                log.info("User with ID = {} is already not exists", id);
+                return false;
+            }
+
             userRepository.deleteById(id);
 
             if (!userRepository.existsById(id)) {
