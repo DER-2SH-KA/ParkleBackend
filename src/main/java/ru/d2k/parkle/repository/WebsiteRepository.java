@@ -10,5 +10,7 @@ import java.util.UUID;
 @Repository
 public interface WebsiteRepository extends JpaRepository<Website, UUID> {
     List<Website> findByUserIdOrderByTitleAsc(UUID userId);
+
+    boolean existsById(UUID id);
 }
 
