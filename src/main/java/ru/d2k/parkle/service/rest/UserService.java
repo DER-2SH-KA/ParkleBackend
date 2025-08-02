@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.d2k.parkle.dto.UserAuthDto;
@@ -28,6 +29,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Return all users from DB as DTO.
@@ -77,10 +79,17 @@ public class UserService {
 
         UserResponseDto dto;
 
-        User user = userRepository.findByLoginAndPassword(uadto.getLogin(), uadto.getPassword())
+        User user = userRepository.findByLogin(uadto.getLogin())
                 .orElseThrow(() ->
                         new EntityNotFoundException("User was not found with login: {} and password" + uadto.getLogin())
                 );
+
+        if (!passwordEncoder.matches(uadto.getPassword(), user.getPassword())) {
+            throw new EntityNotFoundException(
+                    String.format("User was not found with login: %s and password%n", uadto.getLogin())
+            );
+        }
+
         dto = userMapper.toResponseDto(user);
 
         log.info("Authenticated user with DTO: {}", dto);
@@ -99,7 +108,12 @@ public class UserService {
         Role role = roleRepository.findByName(dto.getRoleName()).orElseThrow(() ->
                 new EntityNotFoundException("Role was not found with Name: " + dto.getRoleName())
         );
-        User user = User.create(role, dto.getLogin(), dto.getEmail(), dto.getPassword());
+        User user = User.create(
+                role,
+                dto.getLogin(),
+                dto.getEmail(),
+                passwordEncoder.encode(dto.getPassword())
+        );
         user = userRepository.save(user);
 
         log.info("User was created: {}", user);
