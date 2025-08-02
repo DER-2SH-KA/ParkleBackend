@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="2025-08-02-21_08-create-websites-table" author="DER-2SH-KA">
+        <createTable tableName="websites">
+            <column name="id" type="uuid">
+                <constraints nullable="false" unique="true" primaryKey="true" primaryKeyName="PK_websites" />
+            </column>
+
+            <column name="user_id" type="uuid">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="hex_color" type="VARCHAR(7)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="title" type="VARCHAR(100)">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="description" type="VARCHAR(255)" />
+
+            <column name="url" type="text">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

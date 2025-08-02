@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="2025-08-02-20_31-create-role-table" author="DER-2SH-KA">
+        <createTable tableName="roles">
+            <column name="id" type="uuid">
+                <constraints nullable="false" unique="true" primaryKey="true" primaryKeyName="PK_roles" />
+            </column>
+
+            <column name="name" type="VARCHAR(32)">
+                <constraints nullable="false" unique="true" />
+            </column>
+
+            <column name="priority" type="integer">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <include file="changeset/2025-08-02-20_31-create-role-table.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2025-08-02-20_51-insert-roles.xml" relativeToChangelogFile="true" />
+
+    <include file="changeset/2025-08-02-20_59-create-users-table.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2025-08-02-21_13-add-fk-users-roles.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2025-08-02-21_14-create-users-role_id-index.xml" relativeToChangelogFile="true" />
+
+    <include file="changeset/2025-08-02-21_08-create-websites-table.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2025-08-02-21_23-add-fk-websites-user_id.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2025-08-02-21_25-create-websites-user_id-index.xml" relativeToChangelogFile="true" />
+
+</databaseChangeLog>

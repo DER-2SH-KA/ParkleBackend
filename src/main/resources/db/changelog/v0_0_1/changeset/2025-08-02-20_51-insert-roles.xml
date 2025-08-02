@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="2025-08-02-20_51-insert-roles" author="DER-2SH-KA">
+        <insert tableName="roles">
+            <column name="id" value="0198140d-e0de-70d6-a3f1-4c8178b5657d" />
+            <column name="name" value="ADMIN" />
+            <column name="priority" valueNumeric="1" />
+        </insert>
+
+        <insert tableName="roles">
+            <column name="id" value="01981410-b7f7-7d6d-9acc-ef08a16164af" />
+            <column name="name" value="USER" />
+            <column name="priority" valueNumeric="10" />
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

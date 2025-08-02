@@ -4,13 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
-import java.net.URI;
 import java.util.UUID;
 
 /** Entity for website. **/
 @Entity
 @Table(
-        name = "website",
+        name = "websites",
         indexes = @Index(columnList = "user_id")
 )
 
