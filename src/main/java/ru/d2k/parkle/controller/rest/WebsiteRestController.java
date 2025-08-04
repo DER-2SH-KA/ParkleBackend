@@ -2,7 +2,6 @@ package ru.d2k.parkle.controller.rest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.d2k.parkle.controller.ApiPaths;
@@ -14,11 +13,10 @@ import ru.d2k.parkle.service.rest.WebsiteService;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @RestController
 @RequestMapping(value = ApiPaths.WEBSITE_API)
 @RequiredArgsConstructor
-public class WebsitesRestController {
+public class WebsiteRestController {
     private final WebsiteService websiteService;
 
     //TODO: ONLY FOR TESTS! DELETE AFTER THEM.

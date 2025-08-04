@@ -8,8 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.repository.RoleRepository;
 
-import java.util.UUID;
-
 @Component
 @RequiredArgsConstructor
 public class RoleResolver {

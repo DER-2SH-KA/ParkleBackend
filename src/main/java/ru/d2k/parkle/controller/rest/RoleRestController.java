@@ -12,7 +12,6 @@ import ru.d2k.parkle.service.rest.RoleService;
 import java.util.Set;
 import java.util.UUID;
 
-@Slf4j
 @RestController
 @RequestMapping(ApiPaths.ROLE_API)
 @RequiredArgsConstructor
