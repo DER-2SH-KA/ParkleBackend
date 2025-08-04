@@ -20,8 +20,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> {
-           authorize.anyRequest().permitAll();
-        }).csrf().disable();
+           authorize
+                   .requestMatchers("/swagger-ui/**").denyAll()
+                   .anyRequest().permitAll();
+        }).csrf(csrf -> csrf.disable());
 
         return http.build();
     }
