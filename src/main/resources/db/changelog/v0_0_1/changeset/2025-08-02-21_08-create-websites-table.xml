@@ -25,7 +25,7 @@
 
             <column name="description" type="VARCHAR(255)" />
 
-            <column name="url" type="text">
+            <column name="url" type="VARCHAR(2048)">
                 <constraints nullable="false" />
             </column>
         </createTable>

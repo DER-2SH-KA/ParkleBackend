@@ -41,7 +41,7 @@ public class Website {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "url", nullable = false)
+    @Column(name = "url", nullable = false, length = 2048)
     private String url;
 
     private Website(User user, String hexColor, String title, String description, String url) {
