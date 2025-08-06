@@ -5,8 +5,6 @@ import ru.d2k.parkle.dto.WebsiteResponseDto;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
-import ru.d2k.parkle.utils.converter.db.UriConverter;
-import ru.d2k.parkle.utils.resolver.UserResolver;
 
 @Mapper(componentModel = "spring")
 public interface WebsiteMapper {

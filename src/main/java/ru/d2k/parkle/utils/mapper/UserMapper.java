@@ -5,7 +5,6 @@ import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
-import ru.d2k.parkle.utils.resolver.RoleResolver;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
