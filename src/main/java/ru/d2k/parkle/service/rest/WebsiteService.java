@@ -108,7 +108,14 @@ public class WebsiteService {
                         new EntityNotFoundException("Website was not found with ID: " + id)
                 );
 
-        websiteMapper.updateByDto( website, udto );
+        User user = null;
+        if (udto.getUserId() != null) {
+            user = userRepository.findById(udto.getUserId()).orElseThrow(() ->
+                    new EntityNotFoundException("User was not found with ID: " + udto.getUserId())
+            );
+        }
+
+        websiteMapper.updateByDto( website, udto, user );
         website = websiteRepository.save(website);
 
         log.info("Website with ID = {} was updated", id);

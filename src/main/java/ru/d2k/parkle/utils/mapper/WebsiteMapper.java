@@ -3,14 +3,12 @@ package ru.d2k.parkle.utils.mapper;
 import org.mapstruct.*;
 import ru.d2k.parkle.dto.WebsiteResponseDto;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
+import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
 import ru.d2k.parkle.utils.converter.db.UriConverter;
 import ru.d2k.parkle.utils.resolver.UserResolver;
 
-@Mapper(
-        componentModel = "spring",
-        uses = {UserResolver.class, UriConverter.class}
-)
+@Mapper(componentModel = "spring")
 public interface WebsiteMapper {
 
     @Mapping(source = "user.id", target = "userId")
@@ -19,13 +17,13 @@ public interface WebsiteMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(source = "userId", target = "user")
-    @Mapping(source = "url", target = "url")
+    @Mapping(source = "user", target = "user")
+    @Mapping(source = "dto.url", target = "url")
     @Mapping(
             target = "description",
             nullValuePropertyMappingStrategy =
                     NullValuePropertyMappingStrategy.SET_TO_NULL
     )
-    Website updateByDto(@MappingTarget Website entity, WebsiteUpdateDto dto);
+    Website updateByDto(@MappingTarget Website entity, WebsiteUpdateDto dto, User user);
 
 }

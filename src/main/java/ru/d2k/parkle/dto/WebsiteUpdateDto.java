@@ -18,20 +18,16 @@ public class WebsiteUpdateDto {
             regexp = "^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$",
             message = "WebsiteUpdate hexColor must be type as #fff or #FFFFFF"
     )
-    @NotBlank(message = "WebsiteUpdate hexColor can't be null or blank")
     private String hexColor;
 
-    @NotBlank(message = "WebsiteUpdate must have userId")
     private UUID userId;
 
     @Size(max = 100, message = "WebsiteUpdate title length must be lower than 100 symbols")
-    @NotBlank(message = "WebsiteUpdate title can't be null or blank")
     private String title;
 
     @Size(max = 255, message = "WebsiteUpdate description length must be lower than 255 symbols")
     private String description;
 
-    @NotBlank(message = "WebsiteUpdate url can't be null or blank")
     private String url;
 
 }

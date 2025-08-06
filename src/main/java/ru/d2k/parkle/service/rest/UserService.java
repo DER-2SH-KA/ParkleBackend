@@ -136,7 +136,15 @@ public class UserService {
                         new EntityNotFoundException("User was not found with ID: " + id)
                 );
 
-        userMapper.updateByDto( user, udto );
+        Role role = null;
+        if (udto.getRoleName() != null) {
+            role = roleRepository.findByName(udto.getRoleName())
+                    .orElseThrow(() ->
+                            new EntityNotFoundException("Role was not found with name: " + udto.getRoleName())
+                    );
+        }
+
+        userMapper.updateByDto( user, udto, role);
         user = userRepository.save(user);
 
         log.info("User with ID = {} was updated", id);
