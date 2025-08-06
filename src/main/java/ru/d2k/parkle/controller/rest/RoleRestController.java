@@ -58,7 +58,7 @@ public class RoleRestController {
      * @param dto DTO of new role.
      * @return {@link ResponseEntity} with {@link RoleDto}.
      * **/
-    @PostMapping("new")
+    @PostMapping("/new")
     public ResponseEntity<RoleDto> createRole(@Valid @RequestBody RoleDto dto) {
         RoleDto newDto = roleService.createRole(dto);
 
@@ -71,7 +71,7 @@ public class RoleRestController {
      * @param dto DTO witn new data for role.
      * @return {@link ResponseEntity} with {@link RoleDto}.
      * **/
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<RoleDto> updateRoleById(@PathVariable UUID id, @Valid @RequestBody RoleDto dto) {
         RoleDto newDto = roleService.updateRole(id, dto);
 
@@ -83,7 +83,7 @@ public class RoleRestController {
      * @param id ID of role.
      * @return {@link ResponseEntity} with ok() status.
      * **/
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteRoleById(@PathVariable UUID id) {
         boolean result = roleService.deleteRole(id);
 

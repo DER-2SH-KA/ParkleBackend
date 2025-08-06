@@ -88,7 +88,7 @@ public class WebsiteRestController {
      * @param id website's ID.
      * @return OK status.
      * **/
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteWebsite(@PathVariable UUID id) {
         boolean result = websiteService.deleteWebsite(id);
 

@@ -64,7 +64,7 @@ public class AuthRestController {
      * @param id user's ID.
      * @return OK status.
      * **/
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable UUID id) {
         boolean result = userService.deleteUser(id);
 
