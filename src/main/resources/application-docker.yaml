@@ -7,3 +7,12 @@ spring:
   security:
     bcrypt:
       strength: ${SPRING_SECURITY_BCRYPT_STRENGTH}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: "*"
+  endpoint:
+    health:
+      show-details: never
