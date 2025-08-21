@@ -1,6 +1,5 @@
 package ru.d2k.parkle.service.rest;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
+import ru.d2k.parkle.exception.UserNotFoundException;
+import ru.d2k.parkle.exception.WebsiteNotFoundException;
 import ru.d2k.parkle.repository.UserRepository;
 import ru.d2k.parkle.repository.WebsiteRepository;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
@@ -51,7 +52,7 @@ public class WebsiteService {
 
         Website website = websiteRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Website was not found with ID: " + id)
+                        new WebsiteNotFoundException("Website was not found with ID: " + id)
                 );
 
         log.info("Website with ID = {} was founded", id);
@@ -83,7 +84,7 @@ public class WebsiteService {
         log.info("Creating website: {}...", dto.toString());
 
         User user = userRepository.findById(dto.getUserId()).orElseThrow(() ->
-                new EntityNotFoundException("User was not found with ID: " + dto.getUserId())
+                new UserNotFoundException("User was not found with ID: " + dto.getUserId())
         );
         Website website = Website.create(user, dto.getHexColor(), dto.getTitle(), dto.getDescription(), dto.getUrl());
         website = websiteRepository.save(website);
@@ -105,13 +106,13 @@ public class WebsiteService {
 
         Website website = websiteRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Website was not found with ID: " + id)
+                        new WebsiteNotFoundException("Website was not found with ID: " + id)
                 );
 
         User user = null;
         if (udto.getUserId() != null) {
             user = userRepository.findById(udto.getUserId()).orElseThrow(() ->
-                    new EntityNotFoundException("User was not found with ID: " + udto.getUserId())
+                    new UserNotFoundException("User was not found with ID: " + udto.getUserId())
             );
         }
 

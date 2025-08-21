@@ -1,12 +1,12 @@
 package ru.d2k.parkle.service.rest;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.d2k.parkle.dto.RoleDto;
 import ru.d2k.parkle.entity.Role;
+import ru.d2k.parkle.exception.RoleNotFoundException;
 import ru.d2k.parkle.repository.RoleRepository;
 import ru.d2k.parkle.utils.mapper.RoleMapper;
 
@@ -48,7 +48,7 @@ public class RoleService {
 
         Role role = roleRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Role was not found with ID: " + id)
+                        new RoleNotFoundException("Role was not found with ID: " + id)
         );
 
         log.info("Role with ID = {} was founded", id);
@@ -66,7 +66,7 @@ public class RoleService {
 
         Role role = roleRepository.findByName(name)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Role was not found with name: " + name)
+                        new RoleNotFoundException("Role was not found with name: " + name)
                 );
 
         log.info("Role with name = {} was founded", name);

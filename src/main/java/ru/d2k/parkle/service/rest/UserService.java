@@ -1,6 +1,5 @@
 package ru.d2k.parkle.service.rest;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,6 +17,9 @@ import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
+import ru.d2k.parkle.exception.RoleNotFoundException;
+import ru.d2k.parkle.exception.UserNotFoundException;
+import ru.d2k.parkle.exception.UserWrongPasswordException;
 import ru.d2k.parkle.repository.RoleRepository;
 import ru.d2k.parkle.repository.UserRepository;
 import ru.d2k.parkle.utils.mapper.UserMapper;
@@ -51,6 +53,7 @@ public class UserService {
      * Return user by ID as DTO.
      * @param id ID of user.
      * @return {@link UserResponseDto} dto.
+     * @throws UserNotFoundException if user was not found by ID.
      * **/
     @Transactional(readOnly = true)
     public UserResponseDto findUserById(UUID id) {
@@ -60,7 +63,7 @@ public class UserService {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("User was not found with ID: " + id)
+                        new UserNotFoundException("User was not found with ID: " + id)
                 );
 
         log.info("User with ID = {} was founded", id);
@@ -71,7 +74,7 @@ public class UserService {
      * Authentication user by login and password.
      * @param uadto {@link UserAuthDto} object with login and password data.
      * @return {@link UserResponseDto} object. Can be null.
-     * @throws EntityNotFoundException if user with given login and password was not found.
+     * @throws UserNotFoundException if user with given login and password was not found.
      * **/
     @Transactional(readOnly = true)
     public UserResponseDto authentication(UserAuthDto uadto) {
@@ -81,12 +84,12 @@ public class UserService {
 
         User user = userRepository.findByLogin(uadto.getLogin())
                 .orElseThrow(() ->
-                        new EntityNotFoundException("User was not found with login: {} and password" + uadto.getLogin())
+                        new UserNotFoundException("User was not found with login: {} and password in repository" + uadto.getLogin())
                 );
 
         if (!passwordEncoder.matches(uadto.getPassword(), user.getPassword())) {
-            throw new EntityNotFoundException(
-                    String.format("User was not found with login: %s and password%n", uadto.getLogin())
+            throw new UserWrongPasswordException(
+                    String.format("For User with login: %s given wrong password", uadto.getLogin())
             );
         }
 
@@ -106,7 +109,7 @@ public class UserService {
         log.info("Creating user: {}...", dto.toString());
 
         Role role = roleRepository.findByName(dto.getRoleName()).orElseThrow(() ->
-                new EntityNotFoundException("Role was not found with Name: " + dto.getRoleName())
+                new RoleNotFoundException("Role was not found with Name: " + dto.getRoleName())
         );
         User user = User.create(
                 role,
@@ -133,14 +136,14 @@ public class UserService {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("User was not found with ID: " + id)
+                        new UserNotFoundException("User was not found with ID: " + id)
                 );
 
         Role role = null;
         if (udto.getRoleName() != null) {
             role = roleRepository.findByName(udto.getRoleName())
                     .orElseThrow(() ->
-                            new EntityNotFoundException("Role was not found with name: " + udto.getRoleName())
+                            new RoleNotFoundException("Role was not found with name: " + udto.getRoleName())
                     );
         }
 
