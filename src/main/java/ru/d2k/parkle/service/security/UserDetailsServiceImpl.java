@@ -34,4 +34,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException(String.format("User not found with username (login): %s", username));
         }
     }
+
+    public boolean userExists(String login) {
+        return userRepository.existsByLogin(login);
+    }
 }
