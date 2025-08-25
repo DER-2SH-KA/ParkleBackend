@@ -41,7 +41,10 @@ public class Role {
     )
     private Integer priority;
 
-    @OneToMany(mappedBy = "role")
+    @OneToMany(
+            mappedBy = "role",
+            fetch = FetchType.LAZY
+    )
     private Set<User> users = new HashSet<User>();
 
     private Role(String name, Integer priority) {
