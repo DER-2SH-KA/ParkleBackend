@@ -16,3 +16,7 @@ management:
   endpoint:
     health:
       show-details: never
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  expiration: ${JWT_EXPIRATION}
