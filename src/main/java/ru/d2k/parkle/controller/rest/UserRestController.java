@@ -16,6 +16,7 @@ import java.util.Set;
 public class UserRestController {
     private final UserService userService;
 
+    // TODO: ONLY FOR TESTS! DELETE AFTER ALL!
     /**
      * Get all users from database as DTO.
      * @return List of {@link UserResponseDto}.
