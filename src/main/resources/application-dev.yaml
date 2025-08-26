@@ -17,5 +17,5 @@ management:
     health:
       show-details: always
 jwt:
-  secret-key: a_very_long_and_complex_secret_key_that_is_at_least_256_bits_long_and_base64_encoded_or_just_a_long_random_string_like_this_example_but_longer_and_random
+  secret-key: RjZkNHd5N3pAJ0MoRitKQE5jUmZValhuMnI1dTh4L0E
   expiration: 86400000
