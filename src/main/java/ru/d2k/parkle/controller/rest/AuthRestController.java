@@ -1,7 +1,11 @@
 package ru.d2k.parkle.controller.rest;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,13 +31,19 @@ public class AuthRestController {
 
     private final UserService userService;
 
+    @Value("${jwt.expiration}")
+    private Long jwtExpiration;
+
     /**
      * Authentication user in system by login and password in body.
      * @param uadto {@link UserAuthDto} object for login.
      * @return {@link UserResponseDto} object of authenticated user.
      * **/
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> authentication(@Valid @RequestBody UserAuthDto uadto) {
+    public ResponseEntity<?> authentication(
+            @Valid @RequestBody UserAuthDto uadto,
+            HttpServletResponse response
+    ) {
         UserResponseDto responseDto = userService.authentication(uadto);
 
         Authentication authentication = authenticationManager.authenticate(
@@ -47,7 +57,17 @@ public class AuthRestController {
 
         String jwtToken = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new AuthResponseDto(jwtToken));
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt-token", jwtToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge((int) (jwtExpiration / 1000))
+                // .sameSite("None")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+
+        return ResponseEntity.ok(responseDto);
     }
 
     /**
@@ -56,14 +76,27 @@ public class AuthRestController {
      * @return {@link UserResponseDto} object of created user.
      * **/
     @PostMapping("/registration")
-    public ResponseEntity<AuthResponseDto> createUser(@Valid @RequestBody UserCreateDto cdto) {
+    public ResponseEntity<?> createUser(
+            @Valid @RequestBody UserCreateDto cdto,
+            HttpServletResponse response
+    ) {
 
         UserResponseDto responseDto = userService.createUser(cdto);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(cdto.getLogin());
         String jwtToken = jwtUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok( new AuthResponseDto(jwtToken) );
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt-token", jwtToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge((int) (jwtExpiration / 1000))
+                // .sameSite("None")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+
+        return ResponseEntity.ok( responseDto );
     }
 
     /**
@@ -78,6 +111,8 @@ public class AuthRestController {
             @Valid @RequestBody UserUpdateDto dto
     ) {
         UserResponseDto responseDto = userService.updateUser(login, dto);
+
+        // TODO: Сделать здесь обновление токена пользователя (перевыпуск с обновлёнными данными)!
 
         return ResponseEntity.ok(responseDto);
     }

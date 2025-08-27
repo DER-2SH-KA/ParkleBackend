@@ -16,6 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://parkle-der2shka.ru:8080"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
                 .allowCredentials(true);
 
     }
