@@ -75,6 +75,26 @@ public class WebsiteService {
     }
 
     /**
+     * Return websites by user login as DTO.
+     * @param login user login.
+     * @return {@link WebsiteResponseDto} dto.
+     * **/
+    @Transactional(readOnly = true)
+    public List<WebsiteResponseDto> findWebsiteByUserLogin(String login) {
+        log.info("Getting websites by user login: {}...", login);
+
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found with login: " + login)
+                );
+
+        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(user.getId());
+
+        log.info("Websites was found: {}", websites.size());
+        return websites.stream().map(websiteMapper::toResponseDto).toList();
+    }
+
+    /**
      * Create website from DTO and return as DTO.
      * @param dto {@link WebsiteCreateDto} of new website.
      * @return {@link WebsiteResponseDto} dto.
@@ -83,8 +103,9 @@ public class WebsiteService {
     public WebsiteResponseDto createWebsite(WebsiteCreateDto dto) {
         log.info("Creating website: {}...", dto.toString());
 
-        User user = userRepository.findById(dto.getUserId()).orElseThrow(() ->
-                new UserNotFoundException("User was not found with ID: " + dto.getUserId())
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() ->
+                        new UserNotFoundException("User was not found with ID: " + dto.getUserId())
         );
         Website website = Website.create(user, dto.getHexColor(), dto.getTitle(), dto.getDescription(), dto.getUrl());
         website = websiteRepository.save(website);

@@ -71,6 +71,27 @@ public class UserService {
     }
 
     /**
+     * Return user by login as DTO.
+     * @param login User's login.
+     * @return {@link UserResponseDto} dto.
+     * @throws UserNotFoundException if user not found by login.
+     * */
+    @Transactional(readOnly = true)
+    public UserResponseDto findUserByLogin(String login) {
+        log.info("Getting user by login: {}...", login);
+
+        if (Objects.isNull(login)) return null;
+
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User was not found with login: " + login)
+                );
+
+        log.info("User with login = {} was founded", login);
+        return userMapper.toResponseDto(user);
+    }
+
+    /**
      * Authentication user by login and password.
      * @param uadto {@link UserAuthDto} object with login and password data.
      * @return {@link UserResponseDto} object. Can be null.
@@ -125,18 +146,19 @@ public class UserService {
 
     /**
      * Update user from DTO and return as DTO.
+     * @param login User's login.
      * @param udto {@link UserUpdateDto} dto of user to update.
      * @return {@link UserResponseDto} dto.
      * **/
     @Transactional
-    public UserResponseDto updateUser(UUID id, UserUpdateDto udto) {
-        log.info("Updating user by ID: {}...", id);
+    public UserResponseDto updateUser(String login, UserUpdateDto udto) {
+        log.info("Updating user by login: {}...", login);
 
-        if (id == null) return null;
+        if (Objects.isNull(login)) return null;
 
-        User user = userRepository.findById(id)
+        User user = userRepository.findByLogin(login)
                 .orElseThrow(() ->
-                        new UserNotFoundException("User was not found with ID: " + id)
+                        new UserNotFoundException("User was not found with login: " + login)
                 );
 
         Role role = null;
@@ -150,34 +172,34 @@ public class UserService {
         userMapper.updateByDto( user, udto, role);
         user = userRepository.save(user);
 
-        log.info("User with ID = {} was updated", id);
+        log.info("User with login = {} was updated", login);
         return userMapper.toResponseDto(user);
     }
 
     /**
      * Delete user by ID.
-     * @param id ID of user to delete.
+     * @param login User's login to delete.
      * **/
     @Transactional
-    public boolean deleteUser(UUID id) {
-        log.info("Deleting user by ID: {}...", id);
+    public boolean deleteUser(String login) {
+        log.info("Deleting user by login: {}...", login);
 
-        if (Objects.nonNull(id)) {
+        if (Objects.nonNull(login)) {
 
-            if (!userRepository.existsById(id)) {
-                log.info("User with ID = {} is already not exists", id);
+            if (!userRepository.existsByLogin(login)) {
+                log.info("User with login = {} is already not exists", login);
                 return false;
             }
 
-            userRepository.deleteById(id);
+            userRepository.deleteByLogin(login);
 
-            if (!userRepository.existsById(id)) {
-                log.info("User with ID = {} was deleted", id);
+            if (!userRepository.existsByLogin(login)) {
+                log.info("User with login = {} was deleted", login);
                 return true;
             }
-            else log.info("User with ID = {} wasn't deleted", id);
+            else log.info("User with login = {} wasn't deleted", login);
         }
-        else log.info("User ID equals null and not was deleted");
+        else log.info("User login equals null and not was deleted");
 
         return false;
     }

@@ -7,7 +7,6 @@ import ru.d2k.parkle.controller.ApiPaths;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.service.rest.UserService;
 
-import java.util.UUID;
 import java.util.Set;
 
 @RestController
@@ -30,12 +29,12 @@ public class UserRestController {
 
     /**
      * Get user from database by user's ID as DTO.
-     * @param id user's ID.
+     * @param login user's login.
      * @return {@link UserResponseDto} object.
      * **/
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> findUserById(@PathVariable UUID id) {
-        UserResponseDto responseDto = userService.findUserById(id);
+    @GetMapping("/{login}")
+    public ResponseEntity<UserResponseDto> findUserById(@PathVariable String login) {
+        UserResponseDto responseDto = userService.findUserByLogin(login);
 
         return ResponseEntity.ok( responseDto );
     }

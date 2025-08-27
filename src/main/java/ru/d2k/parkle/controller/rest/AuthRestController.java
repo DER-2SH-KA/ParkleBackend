@@ -68,28 +68,28 @@ public class AuthRestController {
 
     /**
      * Update user information.
-     * @param id user's ID.
+     * @param login user's login.
      * @param dto {@link UserUpdateDto} object for update user.
      * @return {@link UserResponseDto} object of updated user.
      * **/
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/{login}")
     public ResponseEntity<UserResponseDto> updateUserById(
-            @PathVariable UUID id,
+            @PathVariable String login,
             @Valid @RequestBody UserUpdateDto dto
     ) {
-        UserResponseDto responseDto = userService.updateUser(id, dto);
+        UserResponseDto responseDto = userService.updateUser(login, dto);
 
         return ResponseEntity.ok(responseDto);
     }
 
     /**
      * Delete user by ID.
-     * @param id user's ID.
+     * @param login user's login.
      * @return OK status.
      * **/
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteUserById(@PathVariable UUID id) {
-        boolean result = userService.deleteUser(id);
+    @DeleteMapping("/delete/{login}")
+    public ResponseEntity<?> deleteUserById(@PathVariable String login) {
+        boolean result = userService.deleteUser(login);
 
         return result
                 ? ResponseEntity.ok().build()
