@@ -13,6 +13,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdateDto {
+
+    @Size(
+            max = 32,
+            message = "UserUpdate roleName must be not grater than 32 symbols"
+    )
     private String roleName;
 
     @Size(
