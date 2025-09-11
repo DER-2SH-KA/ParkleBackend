@@ -21,7 +21,6 @@ public class UserUpdateDto {
     )
     private String login;
 
-    @NotBlank(message = "UserUpdate email can't be null or blank")
     @Size(
             max = 320,
             message = "UserUpdate email size must be lower then 320 symbols"
