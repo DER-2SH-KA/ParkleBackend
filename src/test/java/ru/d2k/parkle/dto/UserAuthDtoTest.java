@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -78,8 +79,14 @@ public class UserAuthDtoTest {
     }
 
     private static Stream<UserAuthDto> shouldBeFalseWhenValidationObjectHasWrongFieldsValues() {
-        final String overMaxLogin = "abcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdeabcdea";
-        final String overMaxPassword = "1234567891234567891234567891234567891234567891234567891234567891234567891";
+        final char[] overMaxLoginChars = new char[101];
+        final char[] overMaxPasswordChars = new char[73];
+
+        Arrays.fill(overMaxLoginChars, 'l');
+        Arrays.fill(overMaxPasswordChars, 'p');
+
+        final String overMaxLogin = new String(overMaxLoginChars);
+        final String overMaxPassword = new String(overMaxPasswordChars);
 
         return Stream.of(
                 new UserAuthDto(null, PASSWORD),
