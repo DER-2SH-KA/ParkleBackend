@@ -18,6 +18,7 @@ import org.springframework.web.util.WebUtils;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -68,14 +69,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);*/
 
-        String jwt = extractJwtFromCookie(request);
+        Optional<String> jwtOptional = JwtUtil.extractJwtFromCookie(request);
 
-        if (Objects.isNull(jwt)) {
+        if (jwtOptional.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String userLogin = jwtUtil.extractUsername(jwt);
+        final String jwt = jwtOptional
+                .orElseThrow(() -> new NullPointerException("JWT token is null but extracting itself continued"));
+        final String userLogin = jwtUtil.extractUsername(jwtOptional
+                .orElseThrow(() -> new NullPointerException("JWT token is null but extracting login from itself continued"))
+        );
 
         if (
                 Objects.nonNull(userLogin) &&
@@ -96,10 +101,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String extractJwtFromCookie(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, "jwt-token");
-        return Objects.nonNull(cookie) ? cookie.getValue() : null;
     }
 }
