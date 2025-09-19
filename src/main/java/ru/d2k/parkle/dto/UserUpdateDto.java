@@ -1,5 +1,7 @@
 package ru.d2k.parkle.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -11,6 +13,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdateDto {
+
+    @Size(
+            max = 32,
+            message = "UserUpdate roleName must be not grater than 32 symbols"
+    )
     private String roleName;
 
     @Size(
@@ -23,10 +30,7 @@ public class UserUpdateDto {
             max = 320,
             message = "UserUpdate email size must be lower then 320 symbols"
     )
-    @Pattern(
-            regexp = "^([a-zA-Z0-9-._]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+)$",
-            message = "UserUpdate email is not valid by pattern"
-    )
+    @Email(message = "UserUpdate email is not valid")
     private String email;
 
     @Size(

@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 public class UserCreateDto {
 
-    @NotNull(message = "UserCreate must have any role (by Name)")
+    @NotBlank(message = "UserCreate must have any role (by name)")
     private String roleName;
 
     @NotBlank(message = "UserCreate's login can't be null or blank")
