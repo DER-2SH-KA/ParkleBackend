@@ -1,12 +1,11 @@
 package ru.d2k.parkle.controller.rest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,8 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.d2k.parkle.controller.ApiPaths;
 import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.service.rest.UserService;
+import ru.d2k.parkle.service.security.JwtService;
 import ru.d2k.parkle.utils.jwt.JwtUtil;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -28,6 +29,7 @@ public class AuthRestController {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     private final UserService userService;
 
@@ -131,5 +133,13 @@ public class AuthRestController {
                 : ResponseEntity
                     .internalServerError()
                     .body("User was not deleted or not exists!");
+    }
+
+    public ResponseEntity<?> isAuthed(HttpServletRequest request) {
+        Optional<UUID> uuid = jwtService.getUserUuidByJwtToken(request);
+
+        return uuid.isPresent() ?
+                ResponseEntity.ok(uuid.get()) :
+                new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }
