@@ -26,6 +26,6 @@ jobs:
           java-version: '21'
 
       - name: Run Package
-        uses: ./mvwn clean package
+        run: ./mvnw clean package
         env:
           JAVA_HOME: ${{ env.JAVA_HOME_21_x64 || '' }}
