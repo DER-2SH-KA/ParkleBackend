@@ -29,3 +29,8 @@ jobs:
         run: ./mvnw clean package
         env:
           JAVA_HOME: ${{ env.JAVA_HOME_21_x64 || '' }}
+
+      - name: Run Tests
+        run: ./mvnw test
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_21_x64 || '' }}
