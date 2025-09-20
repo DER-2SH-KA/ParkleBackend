@@ -136,10 +136,10 @@ public class AuthRestController {
     }
 
     public ResponseEntity<?> isAuthed(HttpServletRequest request) {
-        Optional<UUID> uuid = jwtService.getUserUuidByJwtToken(request);
+        Optional<UserResponseDto> dto = jwtService.getUserUuidByJwtToken(request);
 
-        return uuid.isPresent() ?
-                ResponseEntity.ok(uuid.get()) :
+        return dto.isPresent() ?
+                ResponseEntity.ok(dto.get()) :
                 new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }

@@ -2,6 +2,8 @@ package ru.d2k.parkle.service.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.service.rest.UserService;
@@ -15,6 +17,7 @@ import java.util.UUID;
 public class JwtService {
     private final UserService userService;
     private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
 
     public boolean hasJwtInCookie(HttpServletRequest request) {
         final Optional<String> jwt = JwtUtil.extractJwtFromCookie(request);
@@ -29,7 +32,7 @@ public class JwtService {
     }
 
 
-    public Optional<UUID> getUserUuidByJwtToken(HttpServletRequest request) {
+    public Optional<UserResponseDto> getUserUuidByJwtToken(HttpServletRequest request) {
         if (hasJwtInCookie(request)) {
             final Optional<String> jwt = JwtUtil.extractJwtFromCookie(request);
 
@@ -37,7 +40,11 @@ public class JwtService {
                     jwt.orElseThrow(() -> new NullPointerException("Trying extract username from null JWT is false"))
             );
 
-            return Optional.ofNullable( getUserUuidByUsername(username) );
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+            return jwtUtil.isTokenValid(jwt.get(), userDetails) ?
+                    Optional.ofNullable( userService.findUserByLogin(username) ) :
+                    Optional.empty();
         }
 
         return Optional.empty();
