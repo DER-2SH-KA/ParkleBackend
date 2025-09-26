@@ -34,6 +34,8 @@ public class JwtService {
 
     public Optional<UserResponseDto> getUserUuidByJwtToken(HttpServletRequest request) {
         if (hasJwtInCookie(request)) {
+            System.out.println("HttpServletRequest has JWT!");
+
             final Optional<String> jwt = JwtUtil.extractJwtFromCookie(request);
 
             String username = jwtUtil.extractUsername(
@@ -42,10 +44,14 @@ public class JwtService {
 
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
+            System.out.println("Is JWT Valid?: " + jwtUtil.isTokenValid(jwt.get(), userDetails));
+
             return jwtUtil.isTokenValid(jwt.get(), userDetails) ?
                     Optional.ofNullable( userService.findUserByLogin(username) ) :
                     Optional.empty();
         }
+
+        System.out.println("HttpServletRequest hasn't JWT!");
 
         return Optional.empty();
     }

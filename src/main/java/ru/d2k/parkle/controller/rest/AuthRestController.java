@@ -135,8 +135,27 @@ public class AuthRestController {
                     .body("User was not deleted or not exists!");
     }
 
-    public ResponseEntity<?> isAuthed(HttpServletRequest request) {
+    @GetMapping("/isAuthed")
+    public ResponseEntity<?> isAuthed(HttpServletRequest request, HttpServletResponse response) {
         Optional<UserResponseDto> dto = jwtService.getUserUuidByJwtToken(request);
+
+        System.out.println(dto.isPresent() ? dto.get().toString() : "DTO None!");
+
+        if (dto.isPresent()) {
+            Optional<String> jwtToken = JwtUtil.extractJwtFromCookie(request);
+
+            if (jwtToken.isPresent()) {
+                ResponseCookie jwtCookie = ResponseCookie.from("jwt-token", jwtToken.get())
+                        .httpOnly(true)
+                        .secure(false)
+                        .path("/")
+                        .maxAge((int) (jwtExpiration / 1000))
+                        // .sameSite("None")
+                        .build();
+
+                response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+            }
+        }
 
         return dto.isPresent() ?
                 ResponseEntity.ok(dto.get()) :
