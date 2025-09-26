@@ -37,6 +37,39 @@ public class AuthRestController {
     private Long jwtExpiration;
 
     /**
+     * Check user is authorized in system by JWT.
+     * @param request
+     * @param response
+     * @return {@link ResponseEntity} with {@link UserResponseDto} or error 401.
+     */
+    @GetMapping("/isAuthed")
+    public ResponseEntity<?> isAuthed(HttpServletRequest request, HttpServletResponse response) {
+        Optional<UserResponseDto> dto = jwtService.getUserUuidByJwtToken(request);
+
+        System.out.println(dto.isPresent() ? dto.get().toString() : "DTO None!");
+
+        if (dto.isPresent()) {
+            Optional<String> jwtToken = JwtUtil.extractJwtFromCookie(request);
+
+            if (jwtToken.isPresent()) {
+                ResponseCookie jwtCookie = ResponseCookie.from("jwt-token", jwtToken.get())
+                        .httpOnly(true)
+                        .secure(false)
+                        .path("/")
+                        .maxAge((int) (jwtExpiration / 1000))
+                        // .sameSite("None")
+                        .build();
+
+                response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+            }
+        }
+
+        return dto.isPresent() ?
+                ResponseEntity.ok(dto.get()) :
+                new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
      * Authentication user in system by login and password in body.
      * @param uadto {@link UserAuthDto} object for login.
      * @return {@link UserResponseDto} object of authenticated user.
@@ -133,13 +166,5 @@ public class AuthRestController {
                 : ResponseEntity
                     .internalServerError()
                     .body("User was not deleted or not exists!");
-    }
-
-    public ResponseEntity<?> isAuthed(HttpServletRequest request) {
-        Optional<UUID> uuid = jwtService.getUserUuidByJwtToken(request);
-
-        return uuid.isPresent() ?
-                ResponseEntity.ok(uuid.get()) :
-                new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }

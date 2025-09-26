@@ -45,19 +45,21 @@ public class SecurityConfig {
                                         "/",
                                         "/api/auth/login",
                                         "/api/auth/registration",
+                                        "/api/auth/isAuthed",
                                         "/index.html",
                                         "/*.js",
                                         "/*.css",
                                         "/*.ico",
-                                        "/assets/**",
-                                        "/actuator", // TODO: ТОЛЬКО ДЛЯ ТЕСТОВ! УДАЛИТЬ ПОСЛЕ!
-                                        "/actuator/**"
+                                        "/assets/**"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/api/roles",
                                         "/api/roles/**",
                                         "/api/users",
-                                        "/api/websites"
+                                        "/api/websites",
+                                        "/swagger-ui/**",
+                                        "/actuator",
+                                        "/actuator/**"
                                 ).hasRole("DEV")
                                 .anyRequest().authenticated()
 
