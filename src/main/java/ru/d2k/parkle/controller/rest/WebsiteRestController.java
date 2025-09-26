@@ -37,7 +37,7 @@ public class WebsiteRestController {
      * @return List of {@link WebsiteResponseDto} objects.
      * **/
     @GetMapping("/user/{login}")
-    public ResponseEntity<List<WebsiteResponseDto>> findWebsitesByUserId(@PathVariable String login) {
+    public ResponseEntity<List<WebsiteResponseDto>> findWebsitesByUserLogin(@PathVariable String login) {
         List<WebsiteResponseDto> websiteResponseDtos = websiteService.findWebsiteByUserLogin(login);
 
         return ResponseEntity.ok( websiteResponseDtos );
