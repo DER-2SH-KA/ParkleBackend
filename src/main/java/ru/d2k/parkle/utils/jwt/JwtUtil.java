@@ -6,6 +6,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -84,6 +85,13 @@ public class JwtUtil {
     private SecretKey getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public static boolean resetJwt(HttpServletResponse response) {
+        response.setHeader("jwt-token", "");
+        String jwtAfterReset = response.getHeader("jwt-token");
+
+        return Objects.isNull(jwtAfterReset) ||  jwtAfterReset.isEmpty();
     }
 
     public static Optional<String> extractJwtFromCookie(HttpServletRequest request) {
