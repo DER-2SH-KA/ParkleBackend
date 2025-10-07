@@ -1,6 +1,7 @@
 package ru.d2k.parkle.service.security;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -54,5 +55,13 @@ public class JwtService {
         System.out.println("HttpServletRequest hasn't JWT!");
 
         return Optional.empty();
+    }
+
+    public boolean resetJwt(HttpServletRequest request, HttpServletResponse response) {
+        final boolean hasJwt = this.hasJwtInCookie(request);
+
+        if (hasJwt) return JwtUtil.resetJwt(response);
+
+        return true;
     }
 }
