@@ -50,8 +50,9 @@ public class AuthRestController {
 
         if (dto.isPresent()) {
             Optional<String> jwtToken = JwtUtil.extractJwtFromCookie(request);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(dto.get().getLogin());
 
-            if (jwtToken.isPresent()) {
+            if (jwtToken.isPresent() && jwtUtil.isTokenValid(jwtToken.get(), userDetails)) {
                 ResponseCookie jwtCookie = ResponseCookie.from("jwt-token", jwtToken.get())
                         .httpOnly(true)
                         .secure(false)
@@ -132,6 +133,18 @@ public class AuthRestController {
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
         return ResponseEntity.ok( responseDto );
+    }
+
+    /**
+     * Logout user from system.
+     * **/
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        boolean isReset = jwtService.resetJwt(request, response);
+
+        return isReset ?
+                new ResponseEntity<>(HttpStatus.OK) :
+                new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     /**
