@@ -18,4 +18,4 @@ management:
       show-details: always
 jwt:
   secret-key: RjZkNHd5N3pAJ0MoRitKQE5jUmZValhuMnI1dTh4L0E
-  expiration: 20000
+  expiration: 200000
