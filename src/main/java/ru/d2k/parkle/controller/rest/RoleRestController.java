@@ -70,7 +70,7 @@ public class RoleRestController {
      * @param dto DTO witn new data for role.
      * @return {@link ResponseEntity} with {@link RoleDto}.
      * **/
-    @PutMapping("/update/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<RoleDto> updateRoleById(@PathVariable UUID id, @Valid @RequestBody RoleDto dto) {
         RoleDto newDto = roleService.updateRole(id, dto);
 
