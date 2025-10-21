@@ -4,37 +4,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.d2k.parkle.controller.ApiPaths;
 import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.service.rest.UserService;
-import ru.d2k.parkle.service.security.JwtService;
-import ru.d2k.parkle.utils.jwt.JwtUtil;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(value = ApiPaths.AUTH_API)
 @RequiredArgsConstructor
 public class AuthRestController {
-    private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
-    private final JwtUtil jwtUtil;
-    private final JwtService jwtService;
-
     private final UserService userService;
-
-    @Value("${jwt.expiration}")
-    private Long jwtExpiration;
 
     /**
      * Check user is authorized in system by JWT.
@@ -44,25 +26,7 @@ public class AuthRestController {
      */
     @GetMapping("/isAuthed")
     public ResponseEntity<?> isAuthed(HttpServletRequest request, HttpServletResponse response) {
-        Optional<UserResponseDto> dto = jwtService.getUserUuidByJwtToken(request);
-
-        System.out.println(dto.isPresent() ? dto.get().toString() : "DTO None!");
-
-        if (dto.isPresent()) {
-            Optional<String> jwtToken = JwtUtil.extractJwtFromCookie(request);
-
-            if (jwtToken.isPresent()) {
-                ResponseCookie jwtCookie = ResponseCookie.from("jwt-token", jwtToken.get())
-                        .httpOnly(true)
-                        .secure(false)
-                        .path("/")
-                        .maxAge((int) (jwtExpiration / 1000))
-                        // .sameSite("None")
-                        .build();
-
-                response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-            }
-        }
+        Optional<UserResponseDto> dto = userService.getUserByJwt(request, response);
 
         return dto.isPresent() ?
                 ResponseEntity.ok(dto.get()) :
@@ -79,30 +43,11 @@ public class AuthRestController {
             @Valid @RequestBody UserAuthDto uadto,
             HttpServletResponse response
     ) {
-        UserResponseDto responseDto = userService.authentication(uadto);
+        Optional<UserResponseDto> dto = userService.getUserByUserAuthDto(uadto, response);
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        uadto.getLogin(),
-                        uadto.getPassword()
-                )
-        );
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        String jwtToken = jwtUtil.generateToken(userDetails);
-
-        ResponseCookie jwtCookie = ResponseCookie.from("jwt-token", jwtToken)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge((int) (jwtExpiration / 1000))
-                // .sameSite("None")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-
-        return ResponseEntity.ok(responseDto);
+        return dto.isPresent() ?
+                ResponseEntity.ok(dto.get()) :
+                new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     /**
@@ -115,23 +60,11 @@ public class AuthRestController {
             @Valid @RequestBody UserCreateDto cdto,
             HttpServletResponse response
     ) {
+        Optional<UserResponseDto> dto = userService.getUserByUserCreateDto(cdto, response);
 
-        UserResponseDto responseDto = userService.createUser(cdto);
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(cdto.getLogin());
-        String jwtToken = jwtUtil.generateToken(userDetails);
-
-        ResponseCookie jwtCookie = ResponseCookie.from("jwt-token", jwtToken)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge((int) (jwtExpiration / 1000))
-                // .sameSite("None")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-
-        return ResponseEntity.ok( responseDto );
+        return dto.isPresent() ?
+                ResponseEntity.ok(dto.get()) :
+                new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     /**
