@@ -1,13 +1,24 @@
 package ru.d2k.parkle.service.rest;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +33,8 @@ import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.exception.UserWrongPasswordException;
 import ru.d2k.parkle.repository.RoleRepository;
 import ru.d2k.parkle.repository.UserRepository;
+import ru.d2k.parkle.service.security.JwtService;
+import ru.d2k.parkle.utils.jwt.JwtUtil;
 import ru.d2k.parkle.utils.mapper.UserMapper;
 
 @Slf4j
@@ -32,6 +45,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     /**
      * Return all users from DB as DTO.
@@ -98,26 +116,31 @@ public class UserService {
      * @throws UserNotFoundException if user with given login and password was not found.
      * **/
     @Transactional(readOnly = true)
-    public UserResponseDto authentication(UserAuthDto uadto) {
+    public Optional<UserResponseDto> getUserByAuthDao(UserAuthDto uadto) {
         log.info("Authenticate user by login and password. Login: {}", uadto.getLogin());
 
-        UserResponseDto dto;
+        try {
+            User user = userRepository.findByLogin(uadto.getLogin())
+                    .orElseThrow(() ->
+                            new UserNotFoundException("User was not found with login: {} and password in repository" + uadto.getLogin())
+                    );
 
-        User user = userRepository.findByLogin(uadto.getLogin())
-                .orElseThrow(() ->
-                        new UserNotFoundException("User was not found with login: {} and password in repository" + uadto.getLogin())
+            if (!passwordEncoder.matches(uadto.getPassword(), user.getPassword())) {
+                throw new UserWrongPasswordException(
+                        String.format("For User with login: %s given wrong password", uadto.getLogin())
                 );
+            }
 
-        if (!passwordEncoder.matches(uadto.getPassword(), user.getPassword())) {
-            throw new UserWrongPasswordException(
-                    String.format("For User with login: %s given wrong password", uadto.getLogin())
-            );
+            Optional<UserResponseDto> dto = Optional.ofNullable(userMapper.toResponseDto(user));
+
+            log.info("Authenticated user with DTO: {}", dto);
+
+            return dto;
         }
-
-        dto = userMapper.toResponseDto(user);
-
-        log.info("Authenticated user with DTO: {}", dto);
-        return dto;
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return Optional.empty();
     }
 
     /**
@@ -202,5 +225,100 @@ public class UserService {
         else log.info("User login equals null and not was deleted");
 
         return false;
+    }
+
+    @Transactional
+    public Optional<UserResponseDto> getUserByUserAuthDto(
+            UserAuthDto uadto,
+            HttpServletResponse response
+    ) {
+        System.out.println("Start to getUserByUserAuthDto(): " + uadto);
+
+        try {
+            Optional<UserResponseDto> responseDto = this.getUserByAuthDao(uadto);
+
+            Authentication authentication = this.getAuthenticationByDto(uadto);
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+            String jwtToken = jwtUtil.generateToken(userDetails);
+
+            ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
+            response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+
+            return responseDto;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return Optional.empty();
+    }
+
+    @Transactional
+    public Optional<UserResponseDto> getUserByUserCreateDto(
+            UserCreateDto cdto,
+            HttpServletResponse response
+
+    ) {
+        try {
+            Optional<UserResponseDto> savedDto = Optional.ofNullable(this.createUser(cdto));
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(cdto.getLogin());
+            String jwtToken = jwtUtil.generateToken(userDetails);
+
+            ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
+            response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+
+            return savedDto;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<UserResponseDto> getUserByJwt(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        Optional<UserResponseDto> dto = Optional.empty();
+
+        try {
+            Optional<String> jwt = JwtUtil.extractJwtFromCookie(request);
+
+            if (jwt.isPresent()) {
+                dto = jwtService.getUserUuidByJwtToken(request);
+
+                System.out.println(dto.isPresent() ? dto.get().toString() : "DTO None!");
+
+                ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwt.get());
+
+                response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+            }
+            else throw new IllegalArgumentException("JWT token in Cookie is empty or null!");
+        }
+        catch (ExpiredJwtException ex) {
+            log.info("User's JWT is expited!");
+            ResponseCookie expiredCookie = jwtUtil.createJwtExpiredCookie();
+            response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
+        }
+        catch (Exception ex) {
+            log.info("Exception in getUserByJwt()!: ", ex);
+            ResponseCookie expiredCookie = jwtUtil.createJwtExpiredCookie();
+            response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
+        }
+
+        return dto;
+    }
+
+    public Authentication getAuthenticationByDto(UserAuthDto uadto) {
+        return authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        uadto.getLogin(),
+                        uadto.getPassword()
+                )
+        );
     }
 }
