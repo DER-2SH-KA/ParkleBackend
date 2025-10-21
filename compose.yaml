@@ -16,7 +16,9 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
     depends_on:
-    - postgres
+      postgres:
+        condition: service_healthy
+        restart: true
 
   postgres:
     image: postgres:16.9
@@ -29,6 +31,13 @@ services:
       - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
   
   nginx:
     image: nginx:latest
