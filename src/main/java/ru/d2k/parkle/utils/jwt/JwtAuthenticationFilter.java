@@ -66,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         catch (Exception ex) {
-            System.out.println(ex);
+            System.out.println(ex.getMessage());
 
             ResponseCookie responseCookie = jwtUtil.createJwtExpiredCookie();
             response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
