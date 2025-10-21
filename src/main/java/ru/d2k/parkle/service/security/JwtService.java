@@ -2,20 +2,25 @@ package ru.d2k.parkle.service.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import ru.d2k.parkle.dto.UserResponseDto;
-import ru.d2k.parkle.service.rest.UserService;
+import ru.d2k.parkle.entity.User;
+import ru.d2k.parkle.exception.UserNotFoundException;
+import ru.d2k.parkle.repository.UserRepository;
 import ru.d2k.parkle.utils.jwt.JwtUtil;
+import ru.d2k.parkle.utils.mapper.UserMapper;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class JwtService {
-    private final UserService userService;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
@@ -24,13 +29,6 @@ public class JwtService {
 
         return jwt.isPresent();
     }
-
-    private UUID getUserUuidByUsername(String username) {
-        UserResponseDto dto = userService.findUserByLogin(username);
-
-        return dto.getId();
-    }
-
 
     public Optional<UserResponseDto> getUserUuidByJwtToken(HttpServletRequest request) {
         if (hasJwtInCookie(request)) {
@@ -46,8 +44,15 @@ public class JwtService {
 
             System.out.println("Is JWT Valid?: " + jwtUtil.isTokenValid(jwt.get(), userDetails));
 
+            User userByLogin = userRepository.findByLogin(username)
+                    .orElseThrow(() ->
+                            new UserNotFoundException("User not found with login: " + username)
+                    );
+
+            UserResponseDto dto = userMapper.toResponseDto(userByLogin);
+
             return jwtUtil.isTokenValid(jwt.get(), userDetails) ?
-                    Optional.ofNullable( userService.findUserByLogin(username) ) :
+                    Optional.ofNullable( dto) :
                     Optional.empty();
         }
 
