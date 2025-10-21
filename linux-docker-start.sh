@@ -1,0 +1,1 @@
+docker-compose -p parkle_app up -d --build
