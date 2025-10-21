@@ -73,7 +73,7 @@ public class AuthRestController {
      * @param dto {@link UserUpdateDto} object for update user.
      * @return {@link UserResponseDto} object of updated user.
      * **/
-    @PutMapping("/update/{login}")
+    @PatchMapping("/update/{login}")
     public ResponseEntity<UserResponseDto> updateUserById(
             @PathVariable String login,
             @Valid @RequestBody UserUpdateDto dto

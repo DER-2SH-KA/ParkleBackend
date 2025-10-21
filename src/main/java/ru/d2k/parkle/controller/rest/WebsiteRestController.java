@@ -73,7 +73,7 @@ public class WebsiteRestController {
      * @param udto {@link WebsiteUpdateDto} object for update website.
      * @return updated {@link WebsiteResponseDto} object.
      * **/
-    @PutMapping("/update/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity<WebsiteResponseDto> updateWebsite(
             @PathVariable UUID id,
             @Valid @RequestBody WebsiteUpdateDto udto
