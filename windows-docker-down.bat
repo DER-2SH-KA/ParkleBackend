@@ -1,1 +1,1 @@
-docker-compose -p parkle_app down
+docker-compose -p parkle down
