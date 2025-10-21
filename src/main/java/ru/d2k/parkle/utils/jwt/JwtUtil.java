@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
@@ -89,5 +90,23 @@ public class JwtUtil {
     public static Optional<String> extractJwtFromCookie(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, "jwt-token");
         return Objects.nonNull(cookie) ? Optional.of(cookie.getValue()) : Optional.empty();
+    }
+
+    public ResponseCookie getResponseCookieWithJwt(String jwt) {
+        return ResponseCookie.from("jwt-token", jwt)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge((int) (jwtTokenExpiration / 1000))
+                .build();
+    }
+
+    public ResponseCookie createJwtExpiredCookie() {
+        return ResponseCookie.from("jwt-token", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(this.jwtTokenExpiration / 1000)
+                .build();
     }
 }

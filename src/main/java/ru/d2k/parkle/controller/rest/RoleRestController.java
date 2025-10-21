@@ -2,7 +2,6 @@ package ru.d2k.parkle.controller.rest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.d2k.parkle.controller.ApiPaths;
