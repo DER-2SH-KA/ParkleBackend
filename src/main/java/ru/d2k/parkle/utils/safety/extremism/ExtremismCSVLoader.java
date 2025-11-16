@@ -1,5 +1,7 @@
 package ru.d2k.parkle.utils.safety.extremism;
 
+import lombok.Getter;
+
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashSet;
@@ -9,22 +11,27 @@ import java.util.ArrayList;
 
 import java.util.regex.*;
 
-public final class ExtremismCSVLoader extends ExtremismMaterialLoader{
-    private String divider = ";";
+@Getter
+public final class ExtremismCSVLoader extends ExtremismMaterialLoader {
+    private final String filePath;
+    private final Charset charset;
+    private final String divider;
 
-    private static Pattern urlHttpPattern =
+    private static final Pattern urlHttpPattern =
             Pattern.compile("http(s)?://\\S+", Pattern.CASE_INSENSITIVE);
 
-    @Override
-    Set<String> getExtremismLinks(String filePath, Charset charset) {
-        return new HashSet<>(
-                this.loadLinksFromFile(filePath, charset)
-        );
+    public ExtremismCSVLoader(String filePath, Charset charset, String divider) {
+        this.filePath = filePath;
+        this.charset = charset;
+        this.divider = divider;
     }
 
-    public String getDivider() { return this.divider; }
-
-    public void setDivider(String divider) { this.divider = divider; }
+    @Override
+    public Set<String> getExtremismLinks() {
+        return new HashSet<>(
+                this.loadLinksFromFile(this.filePath, this.charset)
+        );
+    }
 
     private List<String> loadLinksFromFile(String filePath, Charset charset) {
         final List<String> lines = new ArrayList<>();
@@ -33,10 +40,11 @@ public final class ExtremismCSVLoader extends ExtremismMaterialLoader{
                 InputStream in = getClass().getResourceAsStream(filePath);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in, charset));
         ) {
-            String line;
+            String lineRaw;
 
-            while ((line = reader.readLine()) != null) {
-                Matcher matcher = urlHttpPattern.matcher(line);
+            while ((lineRaw = reader.readLine()) != null) {
+                String[] line = lineRaw.trim().split(this.divider);
+                Matcher matcher = urlHttpPattern.matcher(line[1]);
 
                 while (matcher.find()) {
                     lines.add(matcher.group());
@@ -44,7 +52,10 @@ public final class ExtremismCSVLoader extends ExtremismMaterialLoader{
             }
         }
         catch (IOException ioex) {
-            System.out.println("Can't load CSV file with path '" + filePath + "':" + ioex.getMessage());
+            System.err.println("Can't load CSV file with path '" + filePath + "':" + ioex.getMessage());
+        }
+        catch (Exception ex) {
+            System.err.println("Some Exception in CSV Loader: " + ex);
         }
 
         return lines;
