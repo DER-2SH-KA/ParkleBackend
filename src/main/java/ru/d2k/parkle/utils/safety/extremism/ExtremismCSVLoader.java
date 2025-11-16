@@ -1,18 +1,16 @@
 package ru.d2k.parkle.utils.safety.extremism;
 
 import lombok.Getter;
+import ru.d2k.parkle.ParkleProjectJun2025Application;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 import java.util.regex.*;
 
 @Getter
-public final class ExtremismCSVLoader extends ExtremismMaterialLoader {
+public class ExtremismCSVLoader extends ExtremismMaterialLoader {
     private final String filePath;
     private final Charset charset;
     private final String divider;
@@ -34,20 +32,39 @@ public final class ExtremismCSVLoader extends ExtremismMaterialLoader {
     }
 
     private List<String> loadLinksFromFile(String filePath, Charset charset) {
-        final List<String> lines = new ArrayList<>();
+        final List<String> links = new ArrayList<>();
 
         try (
-                InputStream in = getClass().getResourceAsStream(filePath);
+                InputStream in = Thread.currentThread()
+                        .getContextClassLoader()
+                        .getResourceAsStream(filePath);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in, charset));
         ) {
             String lineRaw;
 
             while ((lineRaw = reader.readLine()) != null) {
                 String[] line = lineRaw.trim().split(this.divider);
-                Matcher matcher = urlHttpPattern.matcher(line[1]);
+
+                Matcher matcher = urlHttpPattern.matcher(line[1].trim());
 
                 while (matcher.find()) {
-                    lines.add(matcher.group());
+                    String extremismLinkRaw = matcher.group().trim();
+                    String extremismLink = extremismLinkRaw;
+
+                    if (
+                        extremismLinkRaw.endsWith("/") ||
+                        extremismLink.endsWith(",") ||
+                        extremismLink.endsWith("!") ||
+                        extremismLink.endsWith(".") ||
+                        extremismLink.endsWith("?")
+                    ) {
+                        StringBuffer sb = new StringBuffer(extremismLinkRaw);
+                        sb.deleteCharAt(sb.length() - 1);
+
+                        extremismLink = sb.toString();
+                    }
+
+                    links.add(extremismLink);
                 }
             }
         }
@@ -58,7 +75,7 @@ public final class ExtremismCSVLoader extends ExtremismMaterialLoader {
             System.err.println("Some Exception in CSV Loader: " + ex);
         }
 
-        return lines;
+        return links;
     }
 
 }
