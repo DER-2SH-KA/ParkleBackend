@@ -1,27 +1,38 @@
 package ru.d2k.parkle.utils.safety.extremism;
 
+import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
+@Component
 public class ExtremismUtil {
-    private final ExtremismMaterialLoader loader;
+    private final ExtremismMaterialLoader extremismLoader;
     private final Set<String> links = new HashSet<>();
 
     /**
      * Extremism util class. Must have loader class.
-     * @param loader {@link ExtremismMaterialLoader} realization class by load extremism links.
+     * @param extremismLoader {@link ExtremismMaterialLoader} realization class by load extremism links.
      * */
-    public ExtremismUtil(ExtremismMaterialLoader loader) {
-        this.loader = loader;
+    public ExtremismUtil(ExtremismMaterialLoader extremismLoader) {
+        this.extremismLoader = extremismLoader;
 
         this.loadExtremismLinks();
     }
 
     public boolean checkOnExtremism(String websiteUrl) {
-        return links.contains(websiteUrl);
+        Set<String> foundedLinksLikeWebsite = links.parallelStream()
+                .filter(websiteUrl::contains)
+                .collect(Collectors.toSet());
+
+        System.out.println(Arrays.toString(foundedLinksLikeWebsite.toArray()));
+
+        return !foundedLinksLikeWebsite.isEmpty();
     }
 
     private void loadExtremismLinks() {
-        links.addAll(loader.getExtremismLinks());
+        links.addAll(extremismLoader.getExtremismLinks());
     }
 }
