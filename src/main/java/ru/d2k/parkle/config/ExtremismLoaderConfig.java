@@ -9,12 +9,12 @@ import java.nio.charset.StandardCharsets;
 
 @Configuration
 public class ExtremismLoaderConfig {
-    @Bean
+    /*@Bean
     public ExtremismMaterialLoader extremismLoader() {
         return new ExtremismCSVLoader(
                 "exportfsm_fixed.csv",
                 StandardCharsets.UTF_8,
                 ";"
         );
-    }
+    }*/
 }

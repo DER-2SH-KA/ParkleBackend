@@ -26,7 +26,7 @@ public class WebsiteService {
     private final UserRepository userRepository;
     private final WebsiteRepository websiteRepository;
     private final WebsiteMapper websiteMapper;
-    private final ExtremismUtil extremismUtil;
+    // private final ExtremismUtil extremismUtil;
 
     /**
      * Return all websites by all users from DB as DTO.
@@ -106,7 +106,7 @@ public class WebsiteService {
     public WebsiteResponseDto createWebsite(WebsiteCreateDto dto) {
         log.info("Creating website: {}...", dto.toString());
 
-        log.info("Checking website on extremism...");
+        /*log.info("Checking website on extremism...");
 
         boolean isExtremism = this.isExtremism(dto.getUrl());
 
@@ -115,7 +115,7 @@ public class WebsiteService {
             throw new WebsiteIsExtremismSourceException("Website '" + dto.getUrl() + "' is extremism!");
         }
 
-        log.info("Website is not extremism");
+        log.info("Website is not extremism");*/
 
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() ->
@@ -139,6 +139,8 @@ public class WebsiteService {
 
         if (id == null) return null;
 
+        /*log.info("Checking website on extremism...");
+
         boolean isExtremism = this.isExtremism(udto.getUrl());
 
         if (isExtremism) {
@@ -146,7 +148,7 @@ public class WebsiteService {
             throw new WebsiteIsExtremismSourceException("Website '" + udto.getUrl() + "' is extremism!");
         }
 
-        log.info("Website is not extremism");
+        log.info("Website is not extremism");*/
 
         Website website = websiteRepository.findById(id)
                 .orElseThrow(() ->
@@ -196,7 +198,7 @@ public class WebsiteService {
         return false;
     }
 
-    private boolean isExtremism(String websiteUrl) {
+    /*private boolean isExtremism(String websiteUrl) {
         return extremismUtil.checkOnExtremism(websiteUrl);
-    }
+    }*/
 }

@@ -1,7 +1,6 @@
 package ru.d2k.parkle.utils.safety.extremism;
 
 import lombok.Getter;
-import ru.d2k.parkle.ParkleProjectJun2025Application;
 
 import java.io.*;
 import java.nio.charset.Charset;
