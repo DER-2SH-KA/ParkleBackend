@@ -108,4 +108,9 @@ public class AuthRestController {
 
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/ping")
+    public ResponseEntity<?> ping() {
+        return ResponseEntity.ok().build();
+    }
 }
