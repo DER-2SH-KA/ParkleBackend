@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.d2k.parkle.controller.ApiPaths;
 import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.service.rest.UserService;
+import ru.d2k.parkle.service.security.JwtService;
 
 import java.util.Optional;
 
@@ -99,5 +100,12 @@ public class AuthRestController {
                 : ResponseEntity
                     .internalServerError()
                     .body("User was not deleted or not exists!");
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        userService.userLogout(response);
+
+        return ResponseEntity.ok().build();
     }
 }
