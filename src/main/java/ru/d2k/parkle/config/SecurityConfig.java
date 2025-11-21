@@ -50,7 +50,8 @@ public class SecurityConfig {
                                         "/*.js",
                                         "/*.css",
                                         "/*.ico",
-                                        "/assets/**"
+                                        "/assets/**",
+                                        "/api/auth/ping"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/api/roles",
