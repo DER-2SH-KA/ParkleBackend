@@ -313,6 +313,12 @@ public class UserService {
         return dto;
     }
 
+    public void userLogout(HttpServletResponse response) {
+        ResponseCookie logoutCookie = jwtUtil.createJwtExpiredCookie();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, logoutCookie.toString());
+    }
+
     public Authentication getAuthenticationByDto(UserAuthDto uadto) {
         return authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

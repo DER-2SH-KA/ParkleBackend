@@ -8,10 +8,12 @@ import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
 import ru.d2k.parkle.exception.UserNotFoundException;
+import ru.d2k.parkle.exception.WebsiteIsExtremismSourceException;
 import ru.d2k.parkle.exception.WebsiteNotFoundException;
 import ru.d2k.parkle.repository.UserRepository;
 import ru.d2k.parkle.repository.WebsiteRepository;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
+import ru.d2k.parkle.utils.safety.extremism.ExtremismUtil;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +26,7 @@ public class WebsiteService {
     private final UserRepository userRepository;
     private final WebsiteRepository websiteRepository;
     private final WebsiteMapper websiteMapper;
+    // private final ExtremismUtil extremismUtil;
 
     /**
      * Return all websites by all users from DB as DTO.
@@ -103,6 +106,17 @@ public class WebsiteService {
     public WebsiteResponseDto createWebsite(WebsiteCreateDto dto) {
         log.info("Creating website: {}...", dto.toString());
 
+        /*log.info("Checking website on extremism...");
+
+        boolean isExtremism = this.isExtremism(dto.getUrl());
+
+        if (isExtremism) {
+            log.info("Website URL is extremism!");
+            throw new WebsiteIsExtremismSourceException("Website '" + dto.getUrl() + "' is extremism!");
+        }
+
+        log.info("Website is not extremism");*/
+
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() ->
                         new UserNotFoundException("User was not found with ID: " + dto.getUserId())
@@ -124,6 +138,17 @@ public class WebsiteService {
         log.info("Updating website by ID: {}...", id);
 
         if (id == null) return null;
+
+        /*log.info("Checking website on extremism...");
+
+        boolean isExtremism = this.isExtremism(udto.getUrl());
+
+        if (isExtremism) {
+            log.info("Website URL is extremism!");
+            throw new WebsiteIsExtremismSourceException("Website '" + udto.getUrl() + "' is extremism!");
+        }
+
+        log.info("Website is not extremism");*/
 
         Website website = websiteRepository.findById(id)
                 .orElseThrow(() ->
@@ -172,4 +197,8 @@ public class WebsiteService {
 
         return false;
     }
+
+    /*private boolean isExtremism(String websiteUrl) {
+        return extremismUtil.checkOnExtremism(websiteUrl);
+    }*/
 }
