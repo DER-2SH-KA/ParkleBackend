@@ -10,6 +10,7 @@ import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
 
 import org.assertj.core.api.Assertions.*;
+import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.List;
 
@@ -47,6 +48,29 @@ public class WebsiteRepositoryTest {
     }
 
     @Test
+    void findByUserIdOrderByTitleAsc_shouldReturnEmptyListOfWebsites() {
+        Role newRole = Role.create("Test", 10);
+        User newUser = User.create(newRole, "Login", "Email@mail.ru", "Password");
+
+        Website website1 = Website.create(newUser, "#000", "Website1", null, "http://example.com");
+        Website website2 = Website.create(newUser, "#F00", "Website2", "Description 1", "http://example2.com");
+        Website website3 = Website.create(newUser, "#0F0", "Website3", null, "http://example3.com");
+
+        testEntityManager.persistAndFlush(newRole);
+        testEntityManager.persistAndFlush(newUser);
+
+        testEntityManager.persistAndFlush(website1);
+        testEntityManager.persistAndFlush(website2);
+        testEntityManager.persistAndFlush(website3);
+
+        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(Uuid7Generator.generateNewUUID());
+
+        Assertions
+                .assertThat(websites.size())
+                .isEqualTo(0);
+    }
+
+    @Test
     void existsById_shouldBeTrueWhenWebsiteByIdExists() {
         Role newRole = Role.create("Test", 10);
         User newUser = User.create(newRole, "Login", "Email@mail.ru", "Password");
@@ -61,5 +85,22 @@ public class WebsiteRepositoryTest {
         Assertions
                 .assertThat(isWebsiteExist)
                 .isTrue();
+    }
+
+    @Test
+    void existsById_shouldBeFalseWhenWebsiteNotExistById() {
+        Role newRole = Role.create("Test", 10);
+        User newUser = User.create(newRole, "Login", "Email@mail.ru", "Password");
+        Website website = Website.create(newUser, "#000", "Website1", null, "http://example.com");
+
+        testEntityManager.persistAndFlush(newRole);
+        testEntityManager.persistAndFlush(newUser);
+        testEntityManager.persistAndFlush(website);
+
+        boolean isWebsiteExist = websiteRepository.existsById(Uuid7Generator.generateNewUUID());
+
+        Assertions
+                .assertThat(isWebsiteExist)
+                .isFalse();
     }
 }
