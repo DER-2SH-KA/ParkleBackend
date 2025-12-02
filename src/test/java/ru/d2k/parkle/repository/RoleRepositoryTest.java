@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import ru.d2k.parkle.entity.Role;
 
 import org.assertj.core.api.Assertions.*;
+import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.Optional;
 
@@ -37,7 +38,20 @@ public class RoleRepositoryTest {
     }
 
     @Test
-    void existsByName_shouldSaveAndExistsByNameNewRole() {
+    void findByName_shouldReturnOptionalEmptyWhenUserByLoginNotExists() {
+        Role newRole = Role.create("Test1", 10);
+
+        testEntityManager.persistAndFlush(newRole);
+
+        Optional<Role> savedRole = roleRepository.findByName("Test");
+
+        Assertions
+                .assertThat(savedRole)
+                .isEmpty();
+    }
+
+    @Test
+    void existsByName_shouldBeTrueWhenSaveAndExistByNameNewRole() {
         Role newRole = Role.create("Test", 10);
 
         testEntityManager.persistAndFlush(newRole);
@@ -47,6 +61,19 @@ public class RoleRepositoryTest {
         Assertions
                 .assertThat(isRoleExists)
                 .isTrue();
+    }
+
+    @Test
+    void existsByName_shouldBeFalseWhenSaveAndExistByNameNewRole() {
+        Role newRole = Role.create("Test1", 10);
+
+        testEntityManager.persistAndFlush(newRole);
+
+        boolean isRoleExists = roleRepository.existsByName("Test");
+
+        Assertions
+                .assertThat(isRoleExists)
+                .isFalse();
     }
 
     @Test
@@ -60,5 +87,18 @@ public class RoleRepositoryTest {
         Assertions
                 .assertThat(isRoleExists)
                 .isTrue();
+    }
+
+    @Test
+    void existsById_shouldBeFalseWhenSaveAndExistByIdNewRole() {
+        Role newRole = Role.create("Test1", 10);
+
+        testEntityManager.persistAndFlush(newRole);
+
+        boolean isRoleExists = roleRepository.existsById(Uuid7Generator.generateNewUUID());
+
+        Assertions
+                .assertThat(isRoleExists)
+                .isFalse();
     }
 }
