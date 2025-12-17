@@ -27,7 +27,7 @@ public class WebsiteCreateDto {
     private String hexColor;
 
     @NotBlank(message = "WebisteCreate title can't be null or blank")
-    @Size(max = 100, message = "WebisteCreate title length must be lower than 100 symbols")
+    @Size(max = 40, message = "WebisteCreate title length must be lower than or equal 40 symbols")
     private String title;
 
     @Size(max = 255, message = "WebisteCreate title length must be lower than 255 symbols")

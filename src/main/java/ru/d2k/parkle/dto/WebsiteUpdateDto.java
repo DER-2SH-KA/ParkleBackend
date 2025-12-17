@@ -22,7 +22,7 @@ public class WebsiteUpdateDto {
 
     private UUID userId;
 
-    @Size(max = 100, message = "WebsiteUpdate title length must be lower than 100 symbols")
+    @Size(max = 40, message = "WebsiteUpdate title length must be lower than or equal 40 symbols")
     private String title;
 
     @Size(max = 255, message = "WebsiteUpdate description length must be lower than 255 symbols")

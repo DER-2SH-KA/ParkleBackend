@@ -35,10 +35,10 @@ public class Website {
     @Column(name = "hexColor", nullable = false, length = 7)
     private String hexColor;
 
-    @Column(name = "title", nullable = false, length = 100)
+    @Column(name = "title", nullable = false, length = 40)
     private String title;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 255)
     private String description;
 
     @Column(name = "url", nullable = false, length = 2048)
