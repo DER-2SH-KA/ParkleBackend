@@ -28,7 +28,6 @@ public class WebsiteCreateDto {
 
     @NotBlank(message = "WebsiteCreateDto title can't be null or blank")
     @Size(max = 40, message = "WebsiteCreateDto title length must be lower than or equal 40 symbols")
-    @Pattern(regexp = "^[a-zA-Z0-9]{3,40}$", message = "WebsiteCreateDto title not allowed by regexp pattern")
     private String title;
 
     @Size(max = 255, message = "WebsiteCreateDto title length must be lower than 255 symbols")

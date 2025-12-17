@@ -26,7 +26,6 @@ public class WebsiteUpdateDto {
             max = 40,
             message = "WebsiteUpdateDto title length must be lower than or equal 40 symbols"
     )
-    @Pattern(regexp = "^[a-zA-Z0-9]{3,40}$", message = "WebsiteUpdateDto title not allowed by regexp pattern")
     private String title;
 
     @Size(max = 255, message = "WebsiteUpdateDto description length must be lower than 255 symbols")
