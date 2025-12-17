@@ -16,23 +16,24 @@ import java.util.UUID;
 @AllArgsConstructor
 public class WebsiteCreateDto {
 
-    @NotNull(message = "WebisteCreate userId can't be null")
+    @NotNull(message = "WebsiteCreateDto userId can't be null")
     private UUID userId;
 
-    @NotBlank(message = "WebisteCreate hexColorValue cannot be null or blank")
+    @NotBlank(message = "WebsiteCreateDto hexColorValue cannot be null or blank")
     @Pattern(
             regexp = "^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$",
-            message = "WebisteCreate hexColor must be type as #fff or #FFFFFF"
+            message = "WebsiteCreateDto hexColor must be type as #fff or #FFFFFF"
     )
     private String hexColor;
 
-    @NotBlank(message = "WebisteCreate title can't be null or blank")
-    @Size(max = 40, message = "WebisteCreate title length must be lower than or equal 40 symbols")
+    @NotBlank(message = "WebsiteCreateDto title can't be null or blank")
+    @Size(max = 40, message = "WebsiteCreateDto title length must be lower than or equal 40 symbols")
+    @Pattern(regexp = "^[a-zA-Z0-9]{3,50}$", message = "WebsiteCreateDto title not allowed by regexp pattern")
     private String title;
 
-    @Size(max = 255, message = "WebisteCreate title length must be lower than 255 symbols")
+    @Size(max = 255, message = "WebsiteCreateDto title length must be lower than 255 symbols")
     private String description;
 
-    @NotBlank(message = "WebisteCreate URL can't be null or blank")
+    @NotBlank(message = "WebsiteCreateDto URL can't be null or blank")
     private String url;
 }
