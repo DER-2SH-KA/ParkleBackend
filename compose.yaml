@@ -39,7 +39,7 @@ services:
 
   
   nginx:
-    image: nginx:latest
+    image: nginx:mainline-alpine3.23
     container_name: nginx_parkle
     ports:
     - "80:80"
