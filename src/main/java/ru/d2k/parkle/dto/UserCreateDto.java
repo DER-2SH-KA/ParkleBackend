@@ -37,6 +37,7 @@ public class UserCreateDto {
             max = 72,
             message = "UserCreateDto password length must be between 8 and 72"
     )
+    @Pattern(regexp = "^[a-zA-Z0-9`=!@#$%^&*()_+№;:?\\-\\\\/|]{8,72}$", message = "UserCreateDto password isn't allowed by regexp pattern")
     private String password;
 
 }
