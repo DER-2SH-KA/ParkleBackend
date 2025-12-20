@@ -119,28 +119,22 @@ public class UserService {
     public Optional<UserResponseDto> getUserByAuthDao(UserAuthDto uadto) {
         log.info("Authenticate user by login and password. Login: {}", uadto.getLogin());
 
-        try {
-            User user = userRepository.findByLogin(uadto.getLogin())
-                    .orElseThrow(() ->
-                            new UserNotFoundException("User was not found with login: {} and password in repository" + uadto.getLogin())
-                    );
-
-            if (!passwordEncoder.matches(uadto.getPassword(), user.getPassword())) {
-                throw new UserWrongPasswordException(
-                        String.format("For User with login: %s given wrong password", uadto.getLogin())
+        User user = userRepository.findByLogin(uadto.getLogin())
+                .orElseThrow(() ->
+                        new UserNotFoundException("User was not found with login: {} and password in repository" + uadto.getLogin())
                 );
-            }
 
-            Optional<UserResponseDto> dto = Optional.ofNullable(userMapper.toResponseDto(user));
-
-            log.info("Authenticated user with DTO: {}", dto);
-
-            return dto;
+        if (!passwordEncoder.matches(uadto.getPassword(), user.getPassword())) {
+            throw new UserWrongPasswordException(
+                    String.format("For User with login: %s given wrong password", uadto.getLogin())
+            );
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return Optional.empty();
+
+        Optional<UserResponseDto> dto = Optional.ofNullable(userMapper.toResponseDto(user));
+
+        log.info("Authenticated user with DTO: {}", dto);
+
+        return dto;
     }
 
     /**
@@ -234,25 +228,18 @@ public class UserService {
     ) {
         System.out.println("Start to getUserByUserAuthDto(): " + uadto);
 
-        try {
-            Optional<UserResponseDto> responseDto = this.getUserByAuthDao(uadto);
+        Optional<UserResponseDto> responseDto = this.getUserByAuthDao(uadto);
 
-            Authentication authentication = this.getAuthenticationByDto(uadto);
+        Authentication authentication = this.getAuthenticationByDto(uadto);
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-            String jwtToken = jwtUtil.generateToken(userDetails);
+        String jwtToken = jwtUtil.generateToken(userDetails);
 
-            ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
-            response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+        ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-            return responseDto;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return Optional.empty();
+        return responseDto;
     }
 
     @Transactional
@@ -261,22 +248,15 @@ public class UserService {
             HttpServletResponse response
 
     ) {
-        try {
-            Optional<UserResponseDto> savedDto = Optional.ofNullable(this.createUser(cdto));
+        Optional<UserResponseDto> savedDto = Optional.ofNullable(this.createUser(cdto));
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(cdto.getLogin());
-            String jwtToken = jwtUtil.generateToken(userDetails);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(cdto.getLogin());
+        String jwtToken = jwtUtil.generateToken(userDetails);
 
-            ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
-            response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+        ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-            return savedDto;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return Optional.empty();
+        return savedDto;
     }
 
     public Optional<UserResponseDto> getUserByJwt(
@@ -305,7 +285,7 @@ public class UserService {
             response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
         }
         catch (Exception ex) {
-            log.info("Exception in getUserByJwt()!: ", ex);
+            log.info("Exception in getUserByJwt()!: {}", ex.getMessage());
             ResponseCookie expiredCookie = jwtUtil.createJwtExpiredCookie();
             response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
         }

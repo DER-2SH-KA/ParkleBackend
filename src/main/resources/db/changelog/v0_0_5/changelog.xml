@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <include file="changeset/2025-12-17-12_54-alter-table-websites-column.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2025-12-17-14_01-alter-table-users-column.xml" relativeToChangelogFile="true" />
+
+</databaseChangeLog>

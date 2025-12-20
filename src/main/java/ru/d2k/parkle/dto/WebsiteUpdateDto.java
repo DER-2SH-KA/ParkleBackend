@@ -16,16 +16,19 @@ public class WebsiteUpdateDto {
 
     @Pattern(
             regexp = "^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$",
-            message = "WebsiteUpdate hexColor must be type as #fff or #FFFFFF"
+            message = "WebsiteUpdateDto hexColor must be type as #fff or #FFFFFF"
     )
     private String hexColor;
 
     private UUID userId;
 
-    @Size(max = 100, message = "WebsiteUpdate title length must be lower than 100 symbols")
+    @Size(
+            max = 40,
+            message = "WebsiteUpdateDto title length must be lower than or equal 40 symbols"
+    )
     private String title;
 
-    @Size(max = 255, message = "WebsiteUpdate description length must be lower than 255 symbols")
+    @Size(max = 255, message = "WebsiteUpdateDto description length must be lower than 255 symbols")
     private String description;
 
     private String url;

@@ -36,7 +36,7 @@ public class User {
             name = "login",
             unique = true,
             nullable = false,
-            length = 100
+            length = 50
     )
     private String login;
 

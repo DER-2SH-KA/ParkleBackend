@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.d2k.parkle.exception.JwtNotExistInRequestException;
+import ru.d2k.parkle.exception.JwtNotIncludeUserLoginException;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -42,10 +44,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = jwtOptional
-                    .orElseThrow(() -> new NullPointerException("JWT token is null but extracting itself continued"));
+                    .orElseThrow(() ->
+                            new JwtNotExistInRequestException("JWT token is null but extracting itself continued")
+                );
             final String userLogin = jwtUtil.extractUsername(jwtOptional
-                    .orElseThrow(() -> new NullPointerException("JWT token is null but extracting login from itself continued"))
-            );
+                    .orElseThrow(() ->
+                            new JwtNotIncludeUserLoginException("JWT token is null but extracting login from itself continued")
+                    )
+                );
 
             if (
                     Objects.nonNull(userLogin) &&

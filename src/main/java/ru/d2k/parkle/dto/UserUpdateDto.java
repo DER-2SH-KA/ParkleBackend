@@ -16,27 +16,30 @@ public class UserUpdateDto {
 
     @Size(
             max = 32,
-            message = "UserUpdate roleName must be not grater than 32 symbols"
+            message = "UserUpdateDto roleName must be not grater than 32 symbols"
     )
     private String roleName;
 
     @Size(
-            max = 100,
-            message = "UserUpdate login size must be lower then 100 symbols"
+            min = 3,
+            max = 50,
+            message = "UserUpdateDto login size must be between 3 and 50 symbols"
     )
+    @Pattern(regexp = "^[a-zA-Z0-9_-]{3,50}$", message = "UserUpdateDto login isn't allowed by regexp pattern")
     private String login;
 
     @Size(
             max = 320,
-            message = "UserUpdate email size must be lower then 320 symbols"
+            message = "UserUpdateDto email size must be lower then 320 symbols"
     )
-    @Email(message = "UserUpdate email is not valid")
+    @Email(message = "UserUpdateDto email is not valid")
     private String email;
 
     @Size(
             min = 8,
             max = 72,
-            message = "UserUpdate password length must be between 8 and 72"
+            message = "UserUpdateDto password length must be between 8 and 72"
     )
+    @Pattern(regexp = "^[a-zA-Z0-9`=!@#$%^&*()_+№;:?\\-\\\\/|]{8,72}$", message = "UserCreateDto password isn't allowed by regexp pattern")
     private String password;
 }
