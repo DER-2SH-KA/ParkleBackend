@@ -25,7 +25,7 @@ public class UserUpdateDto {
             max = 50,
             message = "UserUpdateDto login size must be between 3 and 50 symbols"
     )
-    @Pattern(regexp = "^[a-zA-Z0-9]{3,50}$", message = "UserUpdateDto login isn't allowed by regexp pattern")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]{3,50}$", message = "UserUpdateDto login isn't allowed by regexp pattern")
     private String login;
 
     @Size(
