@@ -2,12 +2,15 @@ package ru.d2k.parkle.model;
 
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private String username;
@@ -18,6 +21,13 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
     public CustomUserDetails(ru.d2k.parkle.entity.User entity) {
         this.entity = entity;
+
+        this.username = entity.getLogin();
+        this.password = entity.getPassword();
+        this.grantedAuthorities = Stream
+                .of(entity.getRole().getName())
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toSet());
     }
 
     @Override
