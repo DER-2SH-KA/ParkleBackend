@@ -47,6 +47,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .orElseThrow(() ->
                             new JwtNotExistInRequestException("JWT token is null but extracting itself continued")
                 );
+
+            // TODO: Переделать. Одна и та же исключительная ситуация (как выше) делает разные ошибки.
+            // Заменить jwtOptional -> jwt.
             final String userLogin = jwtUtil.extractUsername(jwtOptional
                     .orElseThrow(() ->
                             new JwtNotIncludeUserLoginException("JWT token is null but extracting login from itself continued")
