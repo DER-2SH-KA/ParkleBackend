@@ -47,11 +47,10 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro # for nginx configuration
-      - ./nginx/certbot/www:/var/www/certbot   # for ACME challenge
-      - ./nginx/certbot/conf:/etc/letsencrypt  # for certificates
-      - ./nginx/ssl:/etc/nginx/ssl:ro   # copy ssl certificates
-      # - /etc/letsencrypt/live/parkle-der2shka.ru/fullchain.pem:/etc/nginx/certs/fullchain.pem:ro
-      # - /etc/letsencrypt/live/parkle-der2shka.ru/privkey.pem:/etc/nginx/certs/privkey.pem:ro
+      # - ./nginx/certbot/www:/var/www/certbot   # for ACME challenge
+      # - ./nginx/certbot/conf:/etc/letsencrypt  # for certificates
+      # - ./nginx/ssl:/etc/nginx/ssl:ro   # copy ssl certificates
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - spring
 
