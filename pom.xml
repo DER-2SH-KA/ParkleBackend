@@ -11,7 +11,7 @@
 
 	<groupId>ru.d2k</groupId>
 	<artifactId>parkle</artifactId>
-	<version>0.0.5</version>
+	<version>0.0.6</version>
 	<name>Parkle Project Jun 2025</name>
 	<description>This is backend for Parkle Project</description>
 	<url/>
