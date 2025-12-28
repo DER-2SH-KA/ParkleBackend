@@ -11,7 +11,7 @@ import lombok.*;
 @EqualsAndHashCode(exclude = "password")
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserAuthDto {
+public class UserAuthDto implements UserDto {
     @NotBlank(message = "UserAuthDto login must not be null or blank")
     @Size(
             min = 3,

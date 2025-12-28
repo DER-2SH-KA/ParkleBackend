@@ -9,7 +9,7 @@ import lombok.*;
 @EqualsAndHashCode(exclude = "password")
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCreateDto {
+public class UserCreateDto implements UserDto {
 
     @NotBlank(message = "UserCreateDto must have any role (by name)")
     private String roleName;
