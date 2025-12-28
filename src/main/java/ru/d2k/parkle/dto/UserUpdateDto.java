@@ -12,7 +12,7 @@ import lombok.*;
 @EqualsAndHashCode(exclude = "password")
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserUpdateDto {
+public class UserUpdateDto implements UserDto {
 
     @Size(
             max = 32,

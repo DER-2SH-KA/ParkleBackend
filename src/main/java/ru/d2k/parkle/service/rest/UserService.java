@@ -17,20 +17,18 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.d2k.parkle.dto.UserAuthDto;
-import ru.d2k.parkle.dto.UserCreateDto;
-import ru.d2k.parkle.dto.UserResponseDto;
-import ru.d2k.parkle.dto.UserUpdateDto;
+import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
+import ru.d2k.parkle.exception.JwtNotExistInRequestException;
 import ru.d2k.parkle.exception.RoleNotFoundException;
 import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.exception.UserWrongPasswordException;
+import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.repository.RoleRepository;
 import ru.d2k.parkle.repository.UserRepository;
 import ru.d2k.parkle.service.security.JwtService;
@@ -226,20 +224,17 @@ public class UserService {
             UserAuthDto uadto,
             HttpServletResponse response
     ) {
-        System.out.println("Start to getUserByUserAuthDto(): " + uadto);
+        log.info("Start to getUserByUserAuthDto(): {}", uadto);
 
-        Optional<UserResponseDto> responseDto = this.getUserByAuthDao(uadto);
-
-        Authentication authentication = this.getAuthenticationByDto(uadto);
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Authentication signedAuthentication = this.createAuthenticationByDto(uadto);
+        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
         String jwtToken = jwtUtil.generateToken(userDetails);
 
         ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-        return responseDto;
+        return Optional.ofNullable(userMapper.toResponseDto(userDetails.getEntity()));
     }
 
     @Transactional
@@ -248,15 +243,17 @@ public class UserService {
             HttpServletResponse response
 
     ) {
-        Optional<UserResponseDto> savedDto = Optional.ofNullable(this.createUser(cdto));
+        this.createUser(cdto);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(cdto.getLogin());
+        Authentication signedAuthentication = this.createAuthenticationByDto(cdto);
+        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
+
         String jwtToken = jwtUtil.generateToken(userDetails);
 
         ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-        return savedDto;
+        return Optional.ofNullable(userMapper.toResponseDto(userDetails.getEntity()));
     }
 
     public Optional<UserResponseDto> getUserByJwt(
@@ -271,21 +268,21 @@ public class UserService {
             if (jwt.isPresent()) {
                 dto = jwtService.getUserUuidByJwtToken(request);
 
-                System.out.println(dto.isPresent() ? dto.get().toString() : "DTO None!");
+                log.info(dto.isPresent() ? dto.get().toString() : "DTO None!");
 
                 ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwt.get());
-
                 response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
             }
-            else throw new IllegalArgumentException("JWT token in Cookie is empty or null!");
+            else throw new JwtNotExistInRequestException("JWT token in Cookie is empty or null!");
         }
         catch (ExpiredJwtException ex) {
-            log.info("User's JWT is expited!");
+            log.error("User's JWT is expired!");
+
             ResponseCookie expiredCookie = jwtUtil.createJwtExpiredCookie();
             response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
         }
         catch (Exception ex) {
-            log.info("Exception in getUserByJwt()!: {}", ex.getMessage());
+            log.error("Exception in getUserByJwt()!: {}", ex.getMessage());
             ResponseCookie expiredCookie = jwtUtil.createJwtExpiredCookie();
             response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
         }
@@ -299,7 +296,7 @@ public class UserService {
         response.addHeader(HttpHeaders.SET_COOKIE, logoutCookie.toString());
     }
 
-    public Authentication getAuthenticationByDto(UserAuthDto uadto) {
+    public Authentication createAuthenticationByDto(UserDto uadto) {
         return authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         uadto.getLogin(),
