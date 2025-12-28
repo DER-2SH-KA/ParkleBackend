@@ -64,7 +64,7 @@ public class AuthRestController {
         Optional<UserResponseDto> dto = userService.getUserByUserCreateDto(cdto, response);
 
         return dto.isPresent() ?
-                ResponseEntity.ok(dto.get()) :
+                ResponseEntity.status(HttpStatus.CREATED).body(dto.get()) :
                 new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
