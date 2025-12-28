@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
+import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.repository.RoleRepository;
 import ru.d2k.parkle.repository.UserRepository;
 
@@ -22,20 +23,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Optional<User> user = userRepository.findByLogin(username);
 
         if (user.isPresent()) {
-            UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                    .username(username)
-                    .password(user.get().getPassword())
-                    .roles(user.get().getRole().getName())
-                    .build();
-
-            return userDetails;
+            return new CustomUserDetails(user.get());
         }
         else {
             throw new UsernameNotFoundException(String.format("User not found with username (login): %s", username));
         }
-    }
-
-    public boolean userExists(String login) {
-        return userRepository.existsByLogin(login);
     }
 }
