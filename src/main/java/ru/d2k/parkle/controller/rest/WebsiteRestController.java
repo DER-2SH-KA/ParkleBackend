@@ -32,13 +32,12 @@ public class WebsiteRestController {
     }
 
     /**
-     * Get all websites from database by user ID as DTO.
-     * @param login user's login.
+     * Get all websites from database by user login ib JWT as DTO.
      * @return List of {@link WebsiteResponseDto} objects.
      * **/
-    @GetMapping("/user/{login}")
-    public ResponseEntity<List<WebsiteResponseDto>> findWebsitesByUserLogin(@PathVariable String login) {
-        List<WebsiteResponseDto> websiteResponseDtos = websiteService.findWebsiteByUserLogin(login);
+    @GetMapping("/me")
+    public ResponseEntity<List<WebsiteResponseDto>> findWebsitesByUserLogin() {
+        List<WebsiteResponseDto> websiteResponseDtos = websiteService.findWebsiteByUserLogin();
 
         return ResponseEntity.ok( websiteResponseDtos );
     }
@@ -48,8 +47,8 @@ public class WebsiteRestController {
      * @param id website's ID.
      * @return {@link WebsiteResponseDto} object.
      * **/
-    @GetMapping("/{id}")
-    public ResponseEntity<WebsiteResponseDto> findWebsitesById(@PathVariable UUID id) {
+    @GetMapping("/{websiteId}")
+    public ResponseEntity<WebsiteResponseDto> findWebsitesById(@PathVariable(name = "websiteId") UUID id) {
         WebsiteResponseDto dto = websiteService.findWebsiteById(id);
 
         return ResponseEntity.ok( dto );
