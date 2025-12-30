@@ -40,13 +40,13 @@ public class User {
     )
     private String login;
 
-    @Column(name = "email", unique = true, length = 320)
+    @Column(name = "email", unique = true, nullable = false, length = 320)
     private String email;
 
-    @Column(name = "password", length = 60)
+    @Column(name = "password", nullable = false, length = 60)
     private String password;
 
-    @Column(name = "is_bocked")
+    @Column(name = "is_bocked", nullable = false)
     private Boolean isBocked;
 
     @OneToMany(
