@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRoleDto {
+public class RoleResponseDto {
     private String name;
     private Integer priority;
 }
