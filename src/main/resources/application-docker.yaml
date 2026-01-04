@@ -7,7 +7,7 @@ spring:
   data:
     redis:
       host: redis_parkle
-      port: ${REDIS_PORT}
+      port: 6379
 
   security:
     bcrypt:
