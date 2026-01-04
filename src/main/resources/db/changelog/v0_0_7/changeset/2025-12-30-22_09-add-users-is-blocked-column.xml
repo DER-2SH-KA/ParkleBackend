@@ -7,7 +7,7 @@
 
     <changeSet id="2025-12-31-22_509-add-users-is-blocked-column" author="DER-2SH-KA">
         <addColumn tableName="users">
-            <column name="is_bocked" type="boolean" value="false">
+            <column name="is_blocked" type="boolean" value="false">
                 <constraints nullable="false" />
             </column>
         </addColumn>
