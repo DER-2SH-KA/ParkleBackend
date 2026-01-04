@@ -40,14 +40,14 @@ public class User {
     )
     private String login;
 
-    @Column(name = "email", unique = true, nullable = false, length = 320)
+    @Column(name = "email", unique = true, length = 320)
     private String email;
 
-    @Column(name = "password", nullable = false, length = 60)
+    @Column(name = "password", length = 60)
     private String password;
 
-    @Column(name = "is_bocked", nullable = false)
-    private Boolean isBocked;
+    @Column(name = "is_blocked", nullable = false)
+    private Boolean isBlocked;
 
     @OneToMany(
             mappedBy = "user",
@@ -63,11 +63,11 @@ public class User {
         this.login = login;
         this.email = email;
         this.password = password;
-        this.isBocked = isBlocked;
+        this.isBlocked = isBlocked;
     }
 
     /**
-     * Constructor only for tests ({@code isBlocked = false}.
+     * Constructor only for tests ({@code isBlocked = false}).
      * @param id ID.
      * @param role {@link Role} role.
      * @param login login.
@@ -80,7 +80,7 @@ public class User {
         this.login = login;
         this.email = email;
         this.password = password;
-        this.isBocked = false;
+        this.isBlocked = false;
     }
 
     /**
@@ -90,7 +90,6 @@ public class User {
      * @param login login.
      * @param email email.
      * @param password hashed by BCrypt password.
-     * @param isBlocked is user account blocked.
      * **/
     User(UUID id, Role role, String login, String email, String password, boolean isBlocked) {
         this.id = id;
@@ -98,11 +97,11 @@ public class User {
         this.login = login;
         this.email = email;
         this.password = password;
-        this.isBocked = isBlocked;
+        this.isBlocked = isBlocked;
     }
 
     /**
-     * Fabric method for create new {@link User} with generated ID by UUID generator {@code isBlocked = false}.
+     * Fabric method for create new {@link User} with generated ID by UUID generator ({@code isBlocked = false}).
      * @param role {@link Role} role.
      * @param login login.
      * @param email email.
@@ -119,10 +118,9 @@ public class User {
      * @param login login.
      * @param email email.
      * @param password hashed by BCrypt password.
-     * @param isBocked is user account blocked.
      * @return Created {@link User} object.
      * **/
-    public static User create(Role role, String login, String email, String password, boolean isBocked) {
-        return new User(role, login, email, password, isBocked);
+    public static User create(Role role, String login, String email, String password, boolean isBlocked) {
+        return new User(role, login, email, password, isBlocked);
     }
 }
