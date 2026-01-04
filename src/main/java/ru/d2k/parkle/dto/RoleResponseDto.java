@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RoleResponseDto {
-    private String name;
-    private Integer priority;
-}
+public record RoleResponseDto(
+        String name,
+        Integer priority
+) { }
