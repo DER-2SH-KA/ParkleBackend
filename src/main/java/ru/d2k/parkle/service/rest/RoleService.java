@@ -83,11 +83,11 @@ public class RoleService {
     public RoleDto createRole(RoleDto dto) {
         log.info("Creating role: {}...", dto.toString());
 
-        if (roleRepository.existsByName( dto.getName() )) {
+        if (roleRepository.existsByName( dto.name() )) {
             throw new IllegalArgumentException("Role with this name is already exists");
         }
 
-        Role role = Role.create(dto.getName(), dto.getPriority());
+        Role role = Role.create(dto.name(), dto.priority());
         role = roleRepository.save(role);
 
         log.info("Role was created: {}", role);
@@ -107,11 +107,11 @@ public class RoleService {
         List<RoleDto> createdRoleDtos = new ArrayList<>();
 
         for (RoleDto dto : dtos) {
-            if (roleRepository.existsByName( dto.getName() )) {
+            if (roleRepository.existsByName( dto.name() )) {
                 throw new IllegalArgumentException("Role with this name is already exists");
             }
 
-            Role role = Role.create(dto.getName(), dto.getPriority());
+            Role role = Role.create(dto.name(), dto.priority());
             role = roleRepository.save(role);
             RoleDto newRoleDto = roleMapper.toDto(role);
 
@@ -157,11 +157,11 @@ public class RoleService {
         List<RoleDto> updatedRoleDtos = new ArrayList<>();
 
         for (RoleDto dto : dtos) {
-            if ( Objects.isNull(dto.getId()) ) {
+            if ( Objects.isNull(dto.id()) ) {
                 throw new IllegalArgumentException("RoleDto ID is null");
             }
 
-            Role role = roleRepository.findById(dto.getId()).orElseThrow();
+            Role role = roleRepository.findById(dto.id()).orElseThrow();
             role = roleMapper.updateEntityByDto(role, dto);
             Role updatedRole = roleRepository.save(role);
 
