@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class UserRoleDtoTest {
+public class RoleResponseDtoTest {
     @DisplayName("equals -- Two different objects with same field's values")
     @Test
     public void equals_TwoDifferentObjectsWithSameFields() {
-        UserRoleDto firstUserRoleDto = new UserRoleDto("USER", 10);
-        UserRoleDto secondUserRoleDto = new UserRoleDto("USER", 10);
+        RoleResponseDto firstRoleResponseDto = new RoleResponseDto("USER", 10);
+        RoleResponseDto secondRoleResponseDto = new RoleResponseDto("USER", 10);
 
-        Assertions.assertEquals(firstUserRoleDto, secondUserRoleDto);
+        Assertions.assertEquals(firstRoleResponseDto, secondRoleResponseDto);
     }
 }
