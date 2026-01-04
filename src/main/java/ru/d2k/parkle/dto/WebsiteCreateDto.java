@@ -28,5 +28,5 @@ public record WebsiteCreateDto(
         String description,
 
         @NotBlank(message = "WebsiteCreateDto URL can't be null or blank")
-        String URL
+        String url
 ) { }
