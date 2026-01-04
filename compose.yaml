@@ -57,7 +57,7 @@ services:
     image: redis:alpine3.22
     container_name: redis_parkle
     expose:
-      - ${REDIS_PORT}:6379
+      - "6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
