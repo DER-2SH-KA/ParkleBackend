@@ -21,8 +21,8 @@ public class RoleDtoTest {
     @DisplayName("hashCode/equals - return true with similar objects")
     @Test
     public void shouldBeTrueWhenEqualsAndHashCodeWithSimilarObjects() {
-        RoleDto roleDto1 = new RoleDto(uuid, "Role", 0);
-        RoleDto roleDto2 = new RoleDto(uuid, "Role", 0);
+        RoleDto roleDto1 = new RoleDto(uuid, "Role", 1);
+        RoleDto roleDto2 = new RoleDto(uuid, "Role", 1);
 
         Assertions.assertEquals(roleDto1.hashCode(), roleDto2.hashCode());
         Assertions.assertEquals(roleDto1, roleDto2);
@@ -31,7 +31,7 @@ public class RoleDtoTest {
     @DisplayName("equals - return false with null")
     @Test
     public void shouldBeFalseWhenEqualsWithNull() {
-        RoleDto roleDto = new RoleDto(uuid, "Role", 0);
+        RoleDto roleDto = new RoleDto(uuid, "Role", 1);
 
         Assertions.assertFalse(roleDto.equals(null));
     }
@@ -39,7 +39,7 @@ public class RoleDtoTest {
     @DisplayName("equals - return false with object which has null fields")
     @Test
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
-        RoleDto roleDto = new RoleDto(uuid, "Role", 0);
+        RoleDto roleDto = new RoleDto(uuid, "Role", 1);
 
         Assertions.assertNotEquals(roleDto, new RoleDto(null, null, null));
     }
