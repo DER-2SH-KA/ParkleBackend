@@ -6,18 +6,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,9 +46,10 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final JwtService jwtService;
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * Return all users from DB as DTO.
@@ -113,6 +115,7 @@ public class UserService {
      * @return {@link UserResponseDto} object. Can be null.
      * @throws UserNotFoundException if user with given login and password was not found.
      * **/
+    // TODO: Удалить.
     @Transactional(readOnly = true)
     public Optional<UserResponseDto> getUserByAuthDao(UserAuthDto uadto) {
         log.info("Authenticate user by login and password. Login: {}", uadto.getLogin());
@@ -253,7 +256,20 @@ public class UserService {
         ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-        return Optional.ofNullable(userMapper.toResponseDto(userDetails.getEntity()));
+        // TODO: Эксперементально взаимодействую с Redis. Удалить.
+        UserResponseDto dto = userMapper.toResponseDto(userDetails.getEntity());
+
+        if (Objects.nonNull(dto)) {
+
+            final String sliceKey = "users:";
+            final String key = sliceKey + dto.id();
+
+            redisTemplate.opsForValue().set(key, dto, Duration.ofHours(1));
+
+            return Optional.ofNullable(dto);
+        }
+
+        return Optional.empty();
     }
 
     public Optional<UserResponseDto> getUserByJwt(
