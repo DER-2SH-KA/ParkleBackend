@@ -8,7 +8,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import ru.d2k.parkle.entity.Role;
+import ru.d2k.parkle.entity.cache.RoleCache;
 
 @Configuration
 public class RedisConfig {
@@ -43,8 +43,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Role> redisRoleTemplate(LettuceConnectionFactory connectionFactory) {
-        RedisTemplate<String, Role> template = new RedisTemplate<>();
+    public RedisTemplate<String, RoleCache> redisRoleTemplate(LettuceConnectionFactory connectionFactory) {
+        RedisTemplate<String, RoleCache> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
