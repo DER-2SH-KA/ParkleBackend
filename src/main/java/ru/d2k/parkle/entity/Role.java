@@ -58,7 +58,7 @@ public class Role {
      * @param name name.
      * @param priority priority.
      * **/
-    Role(UUID id, String name, Integer priority) {
+    public Role(UUID id, String name, Integer priority) {
         this.id = id;
         this.name = name;
         this.priority = priority;
