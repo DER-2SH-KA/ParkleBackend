@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.entity.Role;
-import ru.d2k.parkle.exception.EntityAlreadyExistException;
-import ru.d2k.parkle.exception.RoleNotFoundException;
 import ru.d2k.parkle.redis.RedisCacheKeys;
 import ru.d2k.parkle.repository.RoleRepository;
 
@@ -57,6 +55,7 @@ public class RoleDao {
                 .ofNullable(redisRoleTemplate.opsForValue().get(RedisCacheKeys.ROLE_SLICE_KEY + name));
 
         if (entityFromCache.isPresent()) {
+            System.out.println("Role with name '" + name + "' taken from cache!");
             return entityFromCache;
         }
         else {
@@ -72,16 +71,20 @@ public class RoleDao {
                 );
             }
 
+            System.out.println("Role with name '" + name + "' taken from database!");
+
             return entityFromDb;
         }
     }
 
     // Update.
-    public Role update(Role oldEntity, Role modifiedEntity) {
+    public Role update(UUID id, Role modifiedEntity) {
+        Optional<Role> oldEntity = this.getById(id);
+
         Role updatedEntity = roleRepository.save(modifiedEntity);
 
         // Delete old entity information from Redis cache.
-        redisRoleTemplate.opsForValue().getAndDelete(RedisCacheKeys.ROLE_SLICE_KEY + oldEntity.getName());
+        redisRoleTemplate.opsForValue().getAndDelete(RedisCacheKeys.ROLE_SLICE_KEY + oldEntity.get().getName());
 
         redisRoleTemplate.opsForValue().set(
                 RedisCacheKeys.ROLE_SLICE_KEY + updatedEntity.getName(),
@@ -98,5 +101,24 @@ public class RoleDao {
         redisRoleTemplate.opsForValue().getAndDelete(RedisCacheKeys.ROLE_SLICE_KEY + entityToDelete.getName());
 
         return !roleRepository.existsById(entityToDelete.getId());
+    }
+
+    // Exists.
+    public boolean existById(UUID id) {
+        Optional<Role> entityFromCache = this.getById(id);
+
+        if (entityFromCache.isPresent()) return true;
+        else {
+            return roleRepository.existsById(id);
+        }
+    }
+
+    public boolean existByName(String name) {
+        Optional<Role> entityFromCache = this.getByName(name);
+
+        if (entityFromCache.isPresent()) return true;
+        else {
+            return roleRepository.existsByName(name);
+        }
     }
 }
