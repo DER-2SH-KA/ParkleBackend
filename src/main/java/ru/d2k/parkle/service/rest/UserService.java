@@ -26,6 +26,7 @@ import ru.d2k.parkle.dao.RoleDao;
 import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
+import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.exception.JwtNotExistInRequestException;
 import ru.d2k.parkle.exception.RoleNotFoundException;
 import ru.d2k.parkle.exception.UserNotFoundException;
@@ -42,6 +43,7 @@ import ru.d2k.parkle.utils.mapper.UserMapper;
 @Service
 public class UserService {
     private final RoleDao roleDao;
+    private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -148,11 +150,12 @@ public class UserService {
     public UserResponseDto createUser(UserCreateDto dto) {
         log.info("Creating user: {}...", dto.toString());
 
-        Role role = roleDao.getByName(dto.getRoleName()).orElseThrow(() ->
+        RoleCache role = roleDao.getByName(dto.getRoleName()).orElseThrow(() ->
                 new RoleNotFoundException("Role was not found with Name: " + dto.getRoleName())
         );
+
         User user = User.create(
-                role,
+                new Role(role.id(), role.name(), role.priority()),
                 dto.getLogin(),
                 dto.getEmail(),
                 passwordEncoder.encode(dto.getPassword())
@@ -179,13 +182,14 @@ public class UserService {
                 .orElseThrow(() ->
                         new UserNotFoundException("User was not found with login: " + login)
                 );
-
         Role role = null;
         if (udto.getRoleName() != null) {
-            role = roleDao.getByName(udto.getRoleName())
+            RoleCache roleCache = roleDao.getByName(udto.getRoleName())
                     .orElseThrow(() ->
                             new RoleNotFoundException("Role was not found with name: " + udto.getRoleName())
                     );
+
+            role = new Role(roleCache.id(), roleCache.name(), roleCache.priority());
         }
 
         userMapper.updateByDto( user, udto, role);
