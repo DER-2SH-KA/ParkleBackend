@@ -1,28 +1,17 @@
 package ru.d2k.parkle.utils.mapper;
 
 import org.mapstruct.*;
-import ru.d2k.parkle.dto.RoleDto;
+import ru.d2k.parkle.dto.RoleUpdateDto;
 import ru.d2k.parkle.dto.RoleResponseDto;
 import ru.d2k.parkle.entity.Role;
+import ru.d2k.parkle.entity.cache.RoleCache;
 
 @Mapper(componentModel = "spring")
 public interface RoleMapper{
-    /**
-     * Create new {@link RoleDto} by {@link Role} object.
-     * @param role {@link Role} role entity.
-     * @return {@link RoleDto} object.
-     * **/
-    RoleDto toDto(Role role);
 
     /**
-     * Create new {@link RoleResponseDto} by {@link Role} object.
-     * @param role
-     * @return
-     */
-    RoleResponseDto toUserRoleDto(Role role);
-
-    /**
-     * Update {@link Role} object by {@link RoleDto}
+     * DTO => ENTITY
+     * Update {@link Role} object by {@link RoleUpdateDto}
      * without ID value.
      * **/
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -30,6 +19,21 @@ public interface RoleMapper{
     @Mapping(target = "users", ignore = true)
     Role updateEntityByDto(
             @MappingTarget Role role,
-            RoleDto dto
+            RoleUpdateDto dto
     );
+
+    /**
+     * DTO => CACHE
+     * */
+    RoleCache toCache(RoleUpdateDto dto);
+
+    /**
+     * CACHE => DTO
+     * */
+    RoleResponseDto toResponseDto(RoleCache cache);
+
+    /**
+     * ENTITY => CACHE
+     * */
+    RoleCache toCache(Role entity);
 }
