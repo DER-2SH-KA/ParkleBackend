@@ -24,12 +24,6 @@ public class RoleDao {
     // CRUD.
     // Create.
     public Role create(Role newEntity) {
-        Optional<Role> sameEntity = roleRepository.findByName(newEntity.getName());
-
-        if (sameEntity.isPresent()) {
-            throw new EntityAlreadyExistException("Role with name '" + newEntity.getName() + "' is already exist");
-        }
-
         Role createdEntity = roleRepository.save(newEntity);
 
         redisRoleTemplate.opsForValue().set(
@@ -49,6 +43,13 @@ public class RoleDao {
         entities = roleRepository.findAll();
 
         return entities;
+    }
+
+    // TODO: сделать поиск по ID (нюанс в том, что ключ состоит из Name).
+    public Optional<Role> getById(UUID id) {
+        Optional<Role> entityFromDb = roleRepository.findById(id);
+
+        return entityFromDb;
     }
 
     public Optional<Role> getByName(String name) {
@@ -76,38 +77,26 @@ public class RoleDao {
     }
 
     // Update.
-    public Role update(Role modifiedEntity) {
-        Optional<Role> oldEntity = roleRepository.findById(modifiedEntity.getId());
+    public Role update(Role oldEntity, Role modifiedEntity) {
+        Role updatedEntity = roleRepository.save(modifiedEntity);
 
-        if (oldEntity.isPresent()) {
-            Role updatedEntity = roleRepository.save(modifiedEntity);
+        // Delete old entity information from Redis cache.
+        redisRoleTemplate.opsForValue().getAndDelete(RedisCacheKeys.ROLE_SLICE_KEY + oldEntity.getName());
 
-            // Delete old entity information from Redis cache.
-            redisRoleTemplate.opsForValue().getAndDelete(RedisCacheKeys.ROLE_SLICE_KEY + oldEntity.get().getName());
+        redisRoleTemplate.opsForValue().set(
+                RedisCacheKeys.ROLE_SLICE_KEY + updatedEntity.getName(),
+                updatedEntity,
+                Duration.ofMinutes(15)
+        );
 
-            redisRoleTemplate.opsForValue().set(
-                    RedisCacheKeys.ROLE_SLICE_KEY + updatedEntity.getName(),
-                    updatedEntity,
-                    Duration.ofMinutes(15)
-            );
-
-            return updatedEntity;
-        }
-        else {
-            throw new RoleNotFoundException("Role with ID = " + modifiedEntity.getId() + " is not exist");
-        }
+        return updatedEntity;
     }
 
     // Delete.
-    public boolean delete(UUID id) {
-        Role entityFromDb = roleRepository.findById(id)
-                .orElseThrow(
-                        () -> new RoleNotFoundException("Role with ID = " + id + " is not exist")
-                );
+    public boolean delete(Role entityToDelete) {
+        roleRepository.deleteById(entityToDelete.getId());
+        redisRoleTemplate.opsForValue().getAndDelete(RedisCacheKeys.ROLE_SLICE_KEY + entityToDelete.getName());
 
-        roleRepository.deleteById(id);
-        redisRoleTemplate.opsForValue().getAndDelete(RedisCacheKeys.ROLE_SLICE_KEY + entityFromDb.getName());
-
-        return !roleRepository.existsById(id);
+        return !roleRepository.existsById(entityToDelete.getId());
     }
 }
