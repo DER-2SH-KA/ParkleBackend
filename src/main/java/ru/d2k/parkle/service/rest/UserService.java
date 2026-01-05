@@ -22,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.d2k.parkle.dao.RoleDao;
 import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
@@ -40,7 +41,7 @@ import ru.d2k.parkle.utils.mapper.UserMapper;
 @RequiredArgsConstructor
 @Service
 public class UserService {
-    private final RoleRepository roleRepository;
+    private final RoleDao roleDao;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -147,7 +148,7 @@ public class UserService {
     public UserResponseDto createUser(UserCreateDto dto) {
         log.info("Creating user: {}...", dto.toString());
 
-        Role role = roleRepository.findByName(dto.getRoleName()).orElseThrow(() ->
+        Role role = roleDao.getByName(dto.getRoleName()).orElseThrow(() ->
                 new RoleNotFoundException("Role was not found with Name: " + dto.getRoleName())
         );
         User user = User.create(
@@ -181,7 +182,7 @@ public class UserService {
 
         Role role = null;
         if (udto.getRoleName() != null) {
-            role = roleRepository.findByName(udto.getRoleName())
+            role = roleDao.getByName(udto.getRoleName())
                     .orElseThrow(() ->
                             new RoleNotFoundException("Role was not found with name: " + udto.getRoleName())
                     );
