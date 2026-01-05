@@ -9,18 +9,19 @@ import ru.d2k.parkle.entity.Role;
 import java.util.UUID;
 
 /** DTO of {@link Role} **/
-public record RoleDto(
+public record RoleUpdateDto(
+        @NotNull
         UUID id,
 
-        @NotBlank(message = "RoleDto name is null or blank.")
+        @NotBlank(message = "RoleUpdateDto name is null or blank.")
         @Size(
                 max = 32,
-                message = "RoleDto name's length grater than 32 symbol"
+                message = "RoleUpdateDto name's length grater than 32 symbol"
         )
         String name,
 
-        @NotNull(message = "RoleDto priority is null")
-        @Positive(message = "RoleDto priority lower than 1")
+        @NotNull(message = "RoleUpdateDto priority is null")
+        @Positive(message = "RoleUpdateDto priority lower than 1")
         Integer priority
 ) {
 
