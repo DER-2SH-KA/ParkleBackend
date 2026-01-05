@@ -23,7 +23,7 @@ public class RoleRestController {
      * **/
     @GetMapping
     public ResponseEntity<Set<RoleDto>> findRoles() {
-        Set<RoleDto> dtos = roleService.findRoles();
+        Set<RoleDto> dtos = roleService.findAll();
 
         return ResponseEntity.ok(dtos);
     }
@@ -35,7 +35,7 @@ public class RoleRestController {
      * **/
     @GetMapping("/{id}")
     public ResponseEntity<RoleDto> findRoleById(@PathVariable UUID id) {
-        RoleDto dto = roleService.findRoleById(id);
+        RoleDto dto = roleService.findById(id);
 
         return ResponseEntity.ok(dto);
     }
@@ -47,7 +47,7 @@ public class RoleRestController {
      * **/
     @GetMapping("/name/{name}")
     public ResponseEntity<RoleDto> findRoleByName(@PathVariable String name) {
-        RoleDto dto = roleService.findRoleByName(name);
+        RoleDto dto = roleService.findByName(name);
 
         return ResponseEntity.ok(dto);
     }
@@ -59,7 +59,7 @@ public class RoleRestController {
      * **/
     @PostMapping("/new")
     public ResponseEntity<RoleDto> createRole(@Valid @RequestBody RoleDto dto) {
-        RoleDto newDto = roleService.createRole(dto);
+        RoleDto newDto = roleService.create(dto);
 
         return ResponseEntity.ok(newDto);
     }
@@ -72,7 +72,7 @@ public class RoleRestController {
      * **/
     @PatchMapping("/update/{id}")
     public ResponseEntity<RoleDto> updateRoleById(@PathVariable UUID id, @Valid @RequestBody RoleDto dto) {
-        RoleDto newDto = roleService.updateRole(id, dto);
+        RoleDto newDto = roleService.update(id, dto);
 
         return ResponseEntity.ok(newDto);
     }
@@ -84,7 +84,7 @@ public class RoleRestController {
      * **/
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteRoleById(@PathVariable UUID id) {
-        boolean result = roleService.deleteRole(id);
+        boolean result = roleService.delete(id);
 
         return result
                 ? ResponseEntity.ok().build()
