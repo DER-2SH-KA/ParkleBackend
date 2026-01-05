@@ -8,11 +8,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.Arrays;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 public class UserUpdateDtoTest {
@@ -47,7 +45,7 @@ public class UserUpdateDtoTest {
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
         UserUpdateDto dto = new UserUpdateDto(ROLE_NAME, LOGIN, EMAIL, PASSWORD);
 
-        Assertions.assertNotEquals(dto, new RoleDto(null, null, null));
+        Assertions.assertNotEquals(dto, new RoleUpdateDto(null, null, null));
     }
 
     @DisplayName("equals - return false with objects which has different fields")
