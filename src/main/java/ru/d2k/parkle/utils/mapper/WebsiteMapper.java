@@ -9,13 +9,11 @@ import ru.d2k.parkle.entity.Website;
 @Mapper(componentModel = "spring")
 public interface WebsiteMapper {
 
-    @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "url", target = "url")
+    @Mapping(target = "userLogin", source = "user.login")
     WebsiteResponseDto toResponseDto(Website dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(source = "user", target = "user")
     @Mapping(source = "dto.url", target = "url")
     @Mapping(
             target = "description",
