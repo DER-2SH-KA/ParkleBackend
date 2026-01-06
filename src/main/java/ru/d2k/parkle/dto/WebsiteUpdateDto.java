@@ -8,8 +8,11 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 public record WebsiteUpdateDto(
-        @NotNull(message = "WebsiteUpdateDto userId can't be null")
-        UUID userId,
+        @NotNull(message = "WebsiteUpdateDto id can't be null!")
+        UUID id,
+
+        @NotBlank(message = "WebsiteUpdateDto userLogin can't be null or blank!")
+        String userLogin,
 
         @NotBlank(message = "WebsiteUpdateDto hexColorValue cannot be null or blank")
         @Pattern(
