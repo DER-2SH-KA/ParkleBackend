@@ -35,7 +35,7 @@ public class UserUpdateDto implements UserDto {
             max = 320,
             message = "UserUpdateDto email size must be lower then 320 symbols"
     )
-    @Email(message = "UserUpdateDto email is not valid")
+    @Pattern(regexp = "^(\\S+@\\S+\\.\\S+){1,320}$", message = "UserUpdateDto email isn't allowed by regexp pattern")
     private String email;
 
     @Size(
