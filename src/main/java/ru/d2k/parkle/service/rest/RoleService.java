@@ -135,7 +135,7 @@ public class RoleService {
                 return false;
             }
 
-            boolean isDeleted = roleDao.delete(id);
+            boolean isDeleted = roleDao.deleteById(id);
 
             if (isDeleted) {
                 log.info("Role by ID {} was deleted", id);
