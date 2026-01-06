@@ -118,9 +118,9 @@ public class WebsiteService {
 
         log.info("Website is not extremism");*/
 
-        User user = userRepository.findById(dto.userId())
+        User user = userRepository.findByLogin(dto.userLogin())
                 .orElseThrow(() ->
-                        new UserNotFoundException("User was not found with ID: " + dto.userId())
+                        new UserNotFoundException("User was not found with login: " + dto.userLogin())
         );
         Website website = Website.create(user, dto.hexColor(), dto.title(), dto.description(), dto.url());
         website = websiteRepository.save(website);
@@ -157,9 +157,9 @@ public class WebsiteService {
                 );
 
         User user = null;
-        if (udto.userId() != null) {
-            user = userRepository.findById(udto.userId()).orElseThrow(() ->
-                    new UserNotFoundException("User was not found with ID: " + udto.userId())
+        if (udto.userLogin() != null) {
+            user = userRepository.findByLogin(udto.userLogin()).orElseThrow(() ->
+                    new UserNotFoundException("User was not found with login: " + udto.userLogin())
             );
         }
 
