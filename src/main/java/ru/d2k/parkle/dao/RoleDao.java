@@ -29,11 +29,10 @@ public class RoleDao {
     public RoleCache create(RoleCreateDto dto) {
         Role entityToCreate = Role.create(dto.name(), dto.priority());
 
-        Role createdEntity = roleRepository.save(entityToCreate);
-
+        Role createdEntity = this.saveToDatabase(entityToCreate);
         RoleCache cache = roleMapper.toCache(createdEntity);
 
-        redisRoleTemplate.opsForValue().set(
+        this.setToCache(
                 RedisCacheKeys.ROLE_SLICE_KEY + cache.name(),
                 cache,
                 Duration.ofMinutes(15)
@@ -45,16 +44,21 @@ public class RoleDao {
     // Read.
     // TODO: Придумать и реализовать поиск списка ролей (возможно, по срезу ключей).
     public Set<RoleCache> getAll() {
-        List<Role> entities = roleRepository.findAll();
+        List<Role> entities = this.getAllFromDatabase();
 
         return entities.stream()
                 .map(roleMapper::toCache)
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Get {@link Role} entity from database or cache by ID as {@link RoleCache}.
+     * @param id ID of role.
+     * @return entity as {@link RoleCache} object.
+     * */
     // TODO: сделать поиск по ID (нюанс в том, что ключ состоит из Name).
     public Optional<RoleCache> getById(UUID id) {
-        Optional<Role> entityFromDb = roleRepository.findById(id);
+        Optional<Role> entityFromDb = this.getFromDatabaseById(id);
 
         if (entityFromDb.isPresent()) {
             return Optional.of(roleMapper.toCache(entityFromDb.get()));
@@ -63,24 +67,25 @@ public class RoleDao {
         return Optional.empty();
     }
 
+    /**
+     * Get {@link Role} entity from database or cache by name as {@link RoleCache}.
+     * @param name name of role.
+     * @return entity as {@link RoleCache} object.
+     * */
     public Optional<RoleCache> getByName(String name) {
-        Optional<RoleCache> cache = Optional.ofNullable(
-                redisRoleTemplate
-                        .opsForValue()
-                        .get(RedisCacheKeys.ROLE_SLICE_KEY + name)
-        );
+        Optional<RoleCache> cache = this.getFromCache(RedisCacheKeys.ROLE_SLICE_KEY + name);
 
         if (cache.isPresent()) {
             log.info("Role with name '{}' taken from cache!", name);
             return cache;
         }
         else {
-            Optional<Role> entityFromDb = roleRepository.findByName(name);
+            Optional<Role> entityFromDb = this.getFromDatabaseByName(name);
 
             if (entityFromDb.isPresent()) {
                 RoleCache cacheFromEntity = roleMapper.toCache(entityFromDb.get());
 
-                redisRoleTemplate.opsForValue().set(
+                this.setToCache(
                         RedisCacheKeys.ROLE_SLICE_KEY + cacheFromEntity.name(),
                         cacheFromEntity,
                         Duration.ofMinutes(15)
@@ -95,19 +100,25 @@ public class RoleDao {
     }
 
     // Update.
+    /**
+     * Update {@link Role} entity in database and cache.
+     * @param id ID of role.
+     * @param udto {@link RoleUpdateDto} DTO for update entity.
+     * @return updated entity as {@link RoleCache} object.
+     * */
     public Optional<RoleCache> update(UUID id, RoleUpdateDto udto) {
-        Optional<Role> entity = roleRepository.findById(id);
+        Optional<Role> entity = this.getFromDatabaseById(id);
 
         if (entity.isPresent()) {
             roleMapper.updateEntityByDto(entity.get(), udto);
 
-            Role updatedEntity = roleRepository.save(entity.get());
+            Role updatedEntity = this.saveToDatabase(entity.get());
             RoleCache cache = roleMapper.toCache(updatedEntity);
 
             // Delete old entity information from Redis cache.
-            redisRoleTemplate.opsForValue().getAndDelete(RedisCacheKeys.ROLE_SLICE_KEY + udto.name());
+            this.deleteFromCache(RedisCacheKeys.ROLE_SLICE_KEY + udto.name());
 
-            redisRoleTemplate.opsForValue().set(
+            this.setToCache(
                     RedisCacheKeys.ROLE_SLICE_KEY + cache.name(),
                     cache,
                     Duration.ofMinutes(15)
@@ -120,35 +131,90 @@ public class RoleDao {
     }
 
     // Delete.
-    public boolean delete(UUID id) {
-        Optional<Role> entityToDelete = roleRepository.findById(id);
+    /**
+     * Delete {@link Role} entity from database and cache by ID.
+     * @param id ID of role.
+     * @return is entity was deleted.
+     * */
+    public boolean deleteById(UUID id) {
+        Optional<Role> entityToDelete = this.getFromDatabaseById(id);
 
         if (entityToDelete.isPresent()) {
-            roleRepository.deleteById(id);
-            redisRoleTemplate.opsForValue().getAndDelete(RedisCacheKeys.ROLE_SLICE_KEY + entityToDelete.get().getName());
+            this.deleteFromCache(RedisCacheKeys.ROLE_SLICE_KEY + entityToDelete.get().getName());
+            this.deleteFromDatabaseById(id);
 
-            return !roleRepository.existsById(id);
+            return !this.existInDatabaseById(id);
         }
 
         return true;
     }
 
     // Exists.
+    /**
+     * Check is exist {@link Role} in database by ID (ONLY DATABASE AS SOURCE OF TRUTH).
+     * @param id ID of role.
+     * @return is role exist in database.
+     * */
     public boolean existById(UUID id) {
         Optional<RoleCache> entityFromCache = this.getById(id);
 
         if (entityFromCache.isPresent()) return true;
-        else {
-            return roleRepository.existsById(id);
-        }
+
+        return this.existInDatabaseById(id);
     }
 
+    /**
+     * Check is exist {@link Role} in database by name (ONLY DATABASE AS SOURCE OF TRUTH).
+     * @param name name of role.
+     * @return is role exist in database.
+     * */
     public boolean existByName(String name) {
         Optional<RoleCache> entityFromCache = this.getByName(name);
 
         if (entityFromCache.isPresent()) return true;
-        else {
-            return roleRepository.existsByName(name);
-        }
+
+        return this.existInDatabaseByName(name);
+    }
+
+    private void setToCache(String key, RoleCache value, Duration duration) {
+        redisRoleTemplate.opsForValue().set(key, value, duration);
+    }
+
+    private Optional<RoleCache> getFromCache(String key) {
+        return Optional.ofNullable(redisRoleTemplate.opsForValue().get(key));
+    }
+
+    private void deleteFromCache(String key) { redisRoleTemplate.delete(key); }
+
+    private boolean existInCache(String key) {
+        return this.getFromCache(key).isPresent();
+    }
+
+    private Role saveToDatabase(Role roleToSave) {
+        return roleRepository.save(roleToSave);
+    }
+
+    private List<Role> getAllFromDatabase() {
+        return roleRepository.findAll();
+    }
+
+    private Optional<Role> getFromDatabaseById(UUID id) {
+        return roleRepository.findById(id);
+    }
+
+    private Optional<Role> getFromDatabaseByName(String name) {
+        return roleRepository.findByName(name);
+    }
+
+    private void deleteFromDatabaseById(UUID id) {
+        roleRepository.deleteById(id);
+    }
+
+    private boolean existInDatabaseById(UUID id) {
+        return roleRepository.existsById(id);
+    }
+
+    private boolean existInDatabaseByName(String name) {
+        return roleRepository.existsByName(name);
     }
 }
