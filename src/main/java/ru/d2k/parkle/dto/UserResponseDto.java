@@ -4,7 +4,8 @@ import java.util.UUID;
 
 public record UserResponseDto(
         UUID id,
-        RoleResponseDto role,
+        String roleName,
+        Integer rolePriority,
         String login,
         String email
 ) { }
