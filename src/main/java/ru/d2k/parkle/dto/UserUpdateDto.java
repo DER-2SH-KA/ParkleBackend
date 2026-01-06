@@ -1,10 +1,9 @@
 package ru.d2k.parkle.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,6 +13,10 @@ import lombok.*;
 @AllArgsConstructor
 public class UserUpdateDto implements UserDto {
 
+    @NotNull(message = "UserUpdateDto id can't be null")
+    private UUID id;
+
+    @NotBlank(message = "UserUpdateDto roleName can't be null or blank!")
     @Size(
             max = 32,
             message = "UserUpdateDto roleName must be not grater than 32 symbols"
