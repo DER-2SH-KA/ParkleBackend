@@ -2,16 +2,12 @@ package ru.d2k.parkle.dto;
 
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-
-import java.util.UUID;
-
 public record WebsiteCreateDto(
-        @NotNull(message = "WebsiteCreateDto userId can't be null")
-        UUID userId,
+        @NotBlank(message = "WebsiteCreateDto userLogin can't be null or blank!")
+        String userLogin,
 
         @NotBlank(message = "WebsiteCreateDto hexColorValue cannot be null or blank")
         @Pattern(
