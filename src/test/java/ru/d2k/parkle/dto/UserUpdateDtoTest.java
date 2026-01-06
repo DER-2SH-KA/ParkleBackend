@@ -64,19 +64,25 @@ public class UserUpdateDtoTest {
     @DisplayName("validate - return true with objects which has correct field's values")
     @ParameterizedTest
     @MethodSource
-    public void shouldBeTrueWhenValidationObjectsHasCorrectFieldsValues(UserUpdateDto dto) {
+    public void shouldBeTrueWhenValidationObjectsHasCorrectFieldsValues(UserUpdateDto dto, String description) {
         Set<ConstraintViolation<UserUpdateDto>> violations = validator.validate(dto);
 
-        Assertions.assertTrue(violations.isEmpty(), "Violation founds: " + violations);
+        Assertions.assertTrue(
+                violations.isEmpty(),
+                "Violation in scenario '" + description + "': " + violations
+        );
     }
 
     @DisplayName("validate - return false with objects which has wrong field's values")
     @ParameterizedTest
     @MethodSource
-    public void shouldBeFalseWhenValidationObjectsHasWrongFieldsValues(UserUpdateDto roleDto) {
-        Set<ConstraintViolation<UserUpdateDto>> violations = validator.validate(roleDto);
+    public void shouldBeFalseWhenValidationObjectsHasWrongFieldsValues(UserUpdateDto dto, String description) {
+        Set<ConstraintViolation<UserUpdateDto>> violations = validator.validate(dto);
 
-        Assertions.assertFalse(violations.isEmpty());
+        Assertions.assertFalse(
+                violations.isEmpty(),
+                "Violation in scenario '" + description + "': " + violations
+        );
     }
 
     private static Stream<UserUpdateDto> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
