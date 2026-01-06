@@ -8,6 +8,9 @@ import ru.d2k.parkle.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+
+    @Mapping(target = "roleName", source = "role.name")
+    @Mapping(target = "rolePriority", source = "role.priority")
     UserResponseDto toResponseDto(User entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy =
