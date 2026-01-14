@@ -86,13 +86,14 @@ public class AuthRestController {
         return ResponseEntity.ok(responseDto);
     }
 
+    // TODO: Переделать с /{login} на /me
     /**
      * Delete user by ID.
      * @param login user's login.
      * @return OK status.
      * **/
     @DeleteMapping("/delete/{login}")
-    public ResponseEntity<?> deleteUserById(@PathVariable String login) {
+    public ResponseEntity<?> deleteUserByLogin(@PathVariable String login) {
         boolean result = userService.deleteUser(login);
 
         return result
