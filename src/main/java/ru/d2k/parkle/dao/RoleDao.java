@@ -26,6 +26,11 @@ public class RoleDao {
 
     // CRUD.
     // Create.
+    /**
+     * Create and save role in database and cache.
+     * @param dto {@link RoleCreateDto} object with info about new role.
+     * @return {@link RoleCache} object of created role.
+     * */
     public RoleCache create(RoleCreateDto dto) {
         Role entityToCreate = Role.create(dto.name(), dto.priority());
 
@@ -99,6 +104,10 @@ public class RoleDao {
         return Optional.empty();
     }
 
+    public Role getReferenceById(UUID id) {
+        return roleRepository.getReferenceById(id);
+    }
+
     // Update.
     /**
      * Update {@link Role} entity in database and cache.
@@ -116,7 +125,7 @@ public class RoleDao {
             RoleCache cache = roleMapper.toCache(updatedEntity);
 
             // Delete old entity information from Redis cache.
-            this.deleteFromCache(RedisCacheKeys.ROLE_SLICE_KEY + udto.name());
+            this.deleteFromCache(RedisCacheKeys.ROLE_SLICE_KEY + entity.get().getName());
 
             this.setToCache(
                     RedisCacheKeys.ROLE_SLICE_KEY + cache.name(),
@@ -155,7 +164,7 @@ public class RoleDao {
      * @param id ID of role.
      * @return is role exist in database.
      * */
-    public boolean existById(UUID id) {
+    public boolean existsById(UUID id) {
         Optional<RoleCache> entityFromCache = this.getById(id);
 
         if (entityFromCache.isPresent()) return true;
@@ -168,12 +177,8 @@ public class RoleDao {
      * @param name name of role.
      * @return is role exist in database.
      * */
-    public boolean existByName(String name) {
-        Optional<RoleCache> entityFromCache = this.getByName(name);
-
-        if (entityFromCache.isPresent()) return true;
-
-        return this.existInDatabaseByName(name);
+    public boolean existsByName(String name) {
+        return roleRepository.existsByName(name);
     }
 
     private void setToCache(String key, RoleCache value, Duration duration) {
@@ -190,8 +195,8 @@ public class RoleDao {
         return this.getFromCache(key).isPresent();
     }
 
-    private Role saveToDatabase(Role roleToSave) {
-        return roleRepository.save(roleToSave);
+    private Role saveToDatabase(Role entity) {
+        return roleRepository.save(entity);
     }
 
     private List<Role> getAllFromDatabase() {
