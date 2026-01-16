@@ -17,15 +17,15 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private String password;
     private Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 
-    private final ru.d2k.parkle.entity.User entity;
+    private final ru.d2k.parkle.entity.cache.UserCache cache;
 
-    public CustomUserDetails(ru.d2k.parkle.entity.User entity) {
-        this.entity = entity;
+    public CustomUserDetails(ru.d2k.parkle.entity.cache.UserCache cache) {
+        this.cache = cache;
 
-        this.username = entity.getLogin();
-        this.password = entity.getPassword();
+        this.username = cache.login();
+        this.password = cache.hashedPassword();
         this.grantedAuthorities = Stream
-                .of(entity.getRole().getName())
+                .of(cache.roleName())
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
     }
@@ -45,8 +45,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         return this.username;
     }
 
-    public ru.d2k.parkle.entity.User getEntity() {
-        return this.entity;
+    public ru.d2k.parkle.entity.cache.UserCache getCache() {
+        return this.cache;
     }
 
     @Override
