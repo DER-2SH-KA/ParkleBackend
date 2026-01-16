@@ -17,16 +17,19 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.d2k.parkle.dao.RoleDao;
+import ru.d2k.parkle.dao.UserDao;
 import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.cache.RoleCache;
+import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.exception.JwtNotExistInRequestException;
 import ru.d2k.parkle.exception.RoleNotFoundException;
 import ru.d2k.parkle.exception.UserNotFoundException;
@@ -43,8 +46,7 @@ import ru.d2k.parkle.utils.mapper.UserMapper;
 @Service
 public class UserService {
     private final RoleDao roleDao;
-    private final RoleRepository roleRepository;
-    private final UserRepository userRepository;
+    private final UserDao userDao;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -62,7 +64,7 @@ public class UserService {
     public Set<UserResponseDto> findUsers() {
         log.info("Getting all users...");
 
-        Set<UserResponseDto> dtos = userRepository.findAll().stream()
+        Set<UserResponseDto> dtos = userDao.getAll().stream()
                 .map(userMapper::toResponseDto)
                 .collect(Collectors.toSet());
 
@@ -82,7 +84,7 @@ public class UserService {
 
         if (id == null) return null;
 
-        User user = userRepository.findById(id)
+        UserCache user = userDao.getById(id)
                 .orElseThrow(() ->
                         new UserNotFoundException("User was not found with ID: " + id)
                 );
@@ -103,7 +105,7 @@ public class UserService {
 
         if (Objects.isNull(login)) return null;
 
-        User user = userRepository.findByLogin(login)
+        UserCache user = userDao.getByLogin(login)
                 .orElseThrow(() ->
                         new UserNotFoundException("User was not found with login: " + login)
                 );
@@ -123,13 +125,13 @@ public class UserService {
     public Optional<UserResponseDto> getUserByAuthDao(UserAuthDto uadto) {
         log.info("Authenticate user by login and password. Login: {}", uadto.getLogin());
 
-        User user = userRepository.findByLogin(uadto.getLogin())
+        UserCache user = userDao.getByLogin(uadto.getLogin())
                 .orElseThrow(() ->
                         new UserNotFoundException("User was not found with login: {} and password in repository" + uadto.getLogin())
                 );
 
-        if (!passwordEncoder.matches(uadto.getPassword(), user.getPassword())) {
-            throw new UserWrongPasswordException(
+        if (!passwordEncoder.matches(uadto.getPassword(), user.hashedPassword())) {
+            throw new BadCredentialsException(
                     String.format("For User with login: %s given wrong password", uadto.getLogin())
             );
         }
@@ -160,10 +162,10 @@ public class UserService {
                 dto.getEmail(),
                 passwordEncoder.encode(dto.getPassword())
         );
-        user = userRepository.save(user);
+        UserCache savedUser = userDao.create(user);
 
         log.info("User was created: {}", user);
-        return userMapper.toResponseDto(user);
+        return userMapper.toResponseDto(savedUser);
     }
 
     /**
@@ -178,11 +180,12 @@ public class UserService {
 
         if (Objects.isNull(login)) return null;
 
-        User user = userRepository.findByLogin(login)
+        UserCache user = userDao.getByLogin(login)
                 .orElseThrow(() ->
                         new UserNotFoundException("User was not found with login: " + login)
                 );
         Role role = null;
+
         if (udto.getRoleName() != null) {
             RoleCache roleCache = roleDao.getByName(udto.getRoleName())
                     .orElseThrow(() ->
@@ -192,11 +195,14 @@ public class UserService {
             role = new Role(roleCache.id(), roleCache.name(), roleCache.priority());
         }
 
-        userMapper.updateByDto( user, udto, role);
-        user = userRepository.save(user);
+        Optional<UserCache> updatedUser = userDao.update(login, udto);
+
+        UserResponseDto dto = userMapper.toResponseDto(updatedUser.orElseThrow(
+                () -> new UserNotFoundException("User with login '{}' not found and not updated!")
+        ));
 
         log.info("User with login = {} was updated", login);
-        return userMapper.toResponseDto(user);
+        return dto;
     }
 
     /**
@@ -209,14 +215,14 @@ public class UserService {
 
         if (Objects.nonNull(login)) {
 
-            if (!userRepository.existsByLogin(login)) {
+            if (!userDao.existsByLogin(login)) {
                 log.info("User with login = {} is already not exists", login);
                 return false;
             }
 
-            userRepository.deleteByLogin(login);
+            userDao.deleteByLogin(login);
 
-            if (!userRepository.existsByLogin(login)) {
+            if (!userDao.existsByLogin(login)) {
                 log.info("User with login = {} was deleted", login);
                 return true;
             }
@@ -242,7 +248,7 @@ public class UserService {
         ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-        return Optional.ofNullable(userMapper.toResponseDto(userDetails.getEntity()));
+        return Optional.ofNullable(userMapper.toResponseDto(userDetails.getCache()));
     }
 
     @Transactional
@@ -262,7 +268,7 @@ public class UserService {
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
         // TODO: Эксперементально взаимодействую с Redis. Удалить.
-        UserResponseDto dto = userMapper.toResponseDto(userDetails.getEntity());
+        UserResponseDto dto = userMapper.toResponseDto(userDetails.getCache());
 
         if (Objects.nonNull(dto)) {
 
