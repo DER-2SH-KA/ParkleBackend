@@ -25,7 +25,7 @@ public interface RoleMapper{
     /**
      * DTO => CACHE
      * */
-    RoleCache toCache(RoleUpdateDto dto);
+    RoleCache toCache(RoleResponseDto dto);
 
     /**
      * CACHE => DTO
