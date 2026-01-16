@@ -92,7 +92,7 @@ public class WebsiteService {
 
         log.info("Getting websites by user login: {}...", userDetails.getUsername());
 
-        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(userDetails.getEntity().getId());
+        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(userDetails.getCache().id());
 
         log.info("Websites was found: {}", websites.size());
         return websites.stream().map(websiteMapper::toResponseDto).toList();
