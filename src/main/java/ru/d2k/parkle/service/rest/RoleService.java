@@ -8,7 +8,6 @@ import ru.d2k.parkle.dao.RoleDao;
 import ru.d2k.parkle.dto.RoleCreateDto;
 import ru.d2k.parkle.dto.RoleResponseDto;
 import ru.d2k.parkle.dto.RoleUpdateDto;
-import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.exception.RoleNotFoundException;
 import ru.d2k.parkle.utils.mapper.RoleMapper;
@@ -85,7 +84,7 @@ public class RoleService {
     public RoleResponseDto create(RoleCreateDto cdto) {
         log.info("Creating role: {}...", cdto.toString());
 
-        if (roleDao.existByName( cdto.name() )) {
+        if (roleDao.existsByName( cdto.name() )) {
             throw new IllegalArgumentException("Role with this name is already exists");
         }
 
