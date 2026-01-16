@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import ru.d2k.parkle.entity.cache.RoleCache;
+import ru.d2k.parkle.entity.cache.UserCache;
 
 @Configuration
 public class RedisConfig {
@@ -45,6 +46,23 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, RoleCache> redisRoleTemplate(LettuceConnectionFactory connectionFactory) {
         RedisTemplate<String, RoleCache> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringSerializer);
+        template.setHashKeySerializer(stringSerializer);
+
+        GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
+        template.setValueSerializer(jsonSerializer);
+        template.setHashValueSerializer(jsonSerializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, UserCache> redisUserTemplate(LettuceConnectionFactory connectionFactory) {
+        RedisTemplate<String, UserCache> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
