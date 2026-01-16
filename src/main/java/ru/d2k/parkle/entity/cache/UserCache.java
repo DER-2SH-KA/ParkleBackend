@@ -4,7 +4,9 @@ import java.util.UUID;
 
 public record UserCache(
         UUID id,
+        UUID roleId,
         String roleName,
+        Integer rolePriority,
         String login,
         String email,
         String hashedPassword,
