@@ -309,7 +309,7 @@ public class UserService {
             response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
         }
         catch (Exception ex) {
-            log.error("Exception in getUserByJwt()!: {}", ex.getMessage());
+            log.error("Exception in getUserByJwt()!: {}", ex.toString());
             ResponseCookie expiredCookie = jwtUtil.createJwtExpiredCookie();
             response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
         }
