@@ -24,6 +24,7 @@ public interface UserMapper {
             NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "role", target = "role")
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "isBlocked", defaultValue = "false")
     @Mapping(target = "websites", ignore = true)
     User updateByDto(@MappingTarget User entity, UserUpdateDto dto, Role role);
 
