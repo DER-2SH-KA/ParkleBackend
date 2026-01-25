@@ -197,7 +197,7 @@ public class UserDao {
         return userRepository.findById(id);
     }
 
-    private Optional<User> getFromDatabaseByLogin(String login) {
+    public Optional<User> getFromDatabaseByLogin(String login) {
         return userRepository.findByLogin(login);
     }
 
