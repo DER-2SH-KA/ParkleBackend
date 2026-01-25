@@ -8,7 +8,9 @@ import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
 import ru.d2k.parkle.entity.cache.UserCache;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")
@@ -43,6 +45,10 @@ public interface UserMapper {
 
     @Named("fromWebsitesToUUID")
     default List<UUID> fromWebsitesToUUID(List<Website> websites) {
+        if (Objects.isNull(websites) || websites.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         return websites.stream()
                 .map(Website::getId)
                 .toList();
