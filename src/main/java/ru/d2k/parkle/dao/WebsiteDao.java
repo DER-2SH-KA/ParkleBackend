@@ -27,7 +27,7 @@ public class WebsiteDao {
 
     // CRUD.
     // Create.
-    public WebsiteCache create(Website entity) {
+    public WebsiteCache create(Website entity, String userLogin) {
         Website createdEntity = this.saveToDatabase(entity);
         WebsiteCache cache = websiteMapper.toCache(createdEntity);
 
@@ -37,39 +37,50 @@ public class WebsiteDao {
                 Duration.ofMinutes(15)
         );
 
+        userDao.refreshCacheByWebsiteCache(
+                RedisCacheKeys.USER_SLICE_KEY + createdEntity.getUser().getLogin(),
+                Duration.ofMinutes(15),
+                userLogin
+        );
+
         return cache;
     }
 
     // Read.
-    public List<WebsiteCache> getAll(String userLogin) {
-        Optional<UserCache> userCache = userDao.getByLogin(userLogin);
-        List<Website> websites = new ArrayList<>();
-
-        if (userCache.isPresent()) {
-            List<UUID> websiteIds = userCache.get().websiteIds();
-            Optional<Website> entity = Optional.empty();
-
-            for (UUID websiteId : websiteIds) {
-                entity = this.getFromDatabaseById(websiteId);
-
-                if (entity.isPresent()) {
-                    websites.add(entity.get());
-                }
-            }
-        }
-        else {
-            throw new UserNotFoundException(String.format("User not found by login '%s'!", userLogin));
-        }
-
-        return websites.stream()
+    public List<WebsiteCache> getAll() {
+        return websiteRepository.findAll().stream()
                 .map(websiteMapper::toCache)
                 .toList();
     }
 
-    public Optional<WebsiteCache> getById(UUID id) {
-        Optional<WebsiteCache> fromCahce = this.getFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id.toString());
+    public List<WebsiteCache> getAllByUserLogin(UserCache userCache) {
+        List<WebsiteCache> websiteCaches = new ArrayList<>();
 
-        if (fromCahce.isPresent()) return fromCahce;
+        List<UUID> websiteIds = userCache.websiteIds();
+        Optional<WebsiteCache> cache = Optional.empty();
+
+        System.out.println("Websites Ids: " + Arrays.toString(websiteCaches.toArray()));
+
+        for (UUID websiteId : websiteIds) {
+            cache = this.getById(websiteId);
+
+            if (cache.isPresent()) {
+                websiteCaches.add(cache.get());
+            }
+            else {
+                System.err.printf("Website not found by ID '%s'!%n", websiteId);
+            }
+        }
+
+        System.out.println("Websites taken from Cache: " + Arrays.toString(websiteCaches.toArray()));
+
+        return websiteCaches;
+    }
+
+    public Optional<WebsiteCache> getById(UUID id) {
+        Optional<WebsiteCache> fromCache = this.getFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id.toString());
+
+        if (fromCache.isPresent()) return fromCache;
 
         Optional<Website> fromDatabase = this.getFromDatabaseById(id);
 
@@ -85,9 +96,9 @@ public class WebsiteDao {
     }
 
     // Update.
-    public Optional<WebsiteCache> update(UUID id, WebsiteUpdateDto udto) {
+    public Optional<WebsiteCache> update(UUID id, WebsiteUpdateDto udto, String userLogin) {
         Optional<Website> entity = this.getFromDatabaseById(id);
-        Optional<User> userEntity = userDao.getFromDatabaseByLogin(udto.userLogin()); // TODO: переделать в будущем без публичного login метода.
+        Optional<User> userEntity = userDao.getFromDatabaseByLogin(userLogin); // TODO: переделать в будущем без публичного login метода.
 
 
         if (entity.isPresent() && userEntity.isPresent()) {
@@ -104,6 +115,12 @@ public class WebsiteDao {
                     Duration.ofMinutes(15)
             );
 
+            userDao.refreshCacheByWebsiteCache(
+                    RedisCacheKeys.USER_SLICE_KEY + updatedEntity.getUser().getLogin(),
+                    Duration.ofMinutes(15),
+                    userLogin
+            );
+
             return Optional.of(cache);
         }
         else {
@@ -117,11 +134,25 @@ public class WebsiteDao {
         return Optional.empty();
     }
 
-    public boolean deleteById(UUID id) {
+    public boolean deleteById(UUID id, String userLogin) {
+        Optional<WebsiteCache> cache = this.getFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id);
+
+        if (cache.isEmpty()) return true;
+
         this.deleteFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id);
         this.deleteFromDatabase(id);
 
+        userDao.refreshCacheByWebsiteCache(
+                RedisCacheKeys.USER_SLICE_KEY + userLogin,
+                Duration.ofMinutes(15),
+                userLogin
+        );
+
         return !this.existInDatabaseById(id);
+    }
+
+    public boolean existsById(UUID id) {
+        return this.existInDatabaseById(id);
     }
 
     private void setToCache(String key, WebsiteCache cache, Duration duration) {
