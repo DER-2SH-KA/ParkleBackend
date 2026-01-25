@@ -10,6 +10,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.entity.cache.UserCache;
+import ru.d2k.parkle.entity.cache.WebsiteCache;
 
 @Configuration
 public class RedisConfig {
@@ -72,6 +73,23 @@ public class RedisConfig {
         GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
         template.setValueSerializer(jsonSerializer);
         template.setHashValueSerializer(jsonSerializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, WebsiteCache> redisWebsiteTemplate(LettuceConnectionFactory connectionFactory) {
+        RedisTemplate<String, WebsiteCache> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringRedisSerializer);
+        template.setHashKeySerializer(stringRedisSerializer);
+
+        GenericJackson2JsonRedisSerializer jsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
+        template.setValueSerializer(jsonRedisSerializer);
+        template.setHashValueSerializer(jsonRedisSerializer);
 
         template.afterPropertiesSet();
         return template;
