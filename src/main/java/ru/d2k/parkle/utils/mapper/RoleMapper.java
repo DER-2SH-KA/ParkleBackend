@@ -23,11 +23,6 @@ public interface RoleMapper{
     );
 
     /**
-     * DTO => CACHE
-     * */
-    RoleCache toCache(RoleResponseDto dto);
-
-    /**
      * CACHE => DTO
      * */
     RoleResponseDto toResponseDto(RoleCache cache);
