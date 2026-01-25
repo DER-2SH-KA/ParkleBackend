@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.dto.RoleUpdateDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
-import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
-import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.entity.cache.UserCache;
+import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.redis.RedisCacheKeys;
 import ru.d2k.parkle.repository.UserRepository;
 import ru.d2k.parkle.utils.mapper.UserMapper;
@@ -160,6 +158,17 @@ public class UserDao {
         }
 
         return true;
+    }
+
+    public void refreshCacheByWebsiteCache(String key, Duration duration, String userLogin) {
+        this.deleteFromCache(RedisCacheKeys.USER_SLICE_KEY + userLogin);
+
+        UserCache newUserCache = this.getByLogin(userLogin)
+                .orElseThrow(() ->
+                        new UserNotFoundException(String.format("User not found by login '%s'!", userLogin))
+                );
+
+        this.setToCache(key, newUserCache, duration);
     }
 
     /**
