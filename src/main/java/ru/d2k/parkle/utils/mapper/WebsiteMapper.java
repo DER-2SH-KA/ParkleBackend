@@ -5,6 +5,7 @@ import ru.d2k.parkle.dto.WebsiteResponseDto;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
+import ru.d2k.parkle.entity.cache.WebsiteCache;
 
 @Mapper(componentModel = "spring")
 public interface WebsiteMapper {
@@ -22,4 +23,13 @@ public interface WebsiteMapper {
     )
     Website updateByDto(@MappingTarget Website entity, WebsiteUpdateDto dto, User user);
 
+    /**
+     * CACHE => DTO
+     * */
+    WebsiteResponseDto toResponseDto(WebsiteCache cahce);
+
+    /**
+     * ENTITY => CACHE
+     * */
+    WebsiteCache toCache(Website entity);
 }
