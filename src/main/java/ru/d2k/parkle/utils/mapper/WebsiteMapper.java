@@ -26,10 +26,13 @@ public interface WebsiteMapper {
     /**
      * CACHE => DTO
      * */
-    WebsiteResponseDto toResponseDto(WebsiteCache cahce);
+    @Mapping(target = "userLogin", source = "userLogin")
+    WebsiteResponseDto toResponseDto(WebsiteCache cache);
 
     /**
      * ENTITY => CACHE
      * */
+    @Mapping(target = "userLogin", source = "user.login")
+    @Mapping(target = "userId", source = "user.id")
     WebsiteCache toCache(Website entity);
 }
