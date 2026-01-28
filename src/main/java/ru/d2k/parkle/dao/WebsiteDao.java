@@ -72,7 +72,7 @@ public class WebsiteDao {
             }
         }
 
-        System.out.println("Websites taken from Cache: " + Arrays.toString(websiteCaches.toArray()));
+        System.out.println("Websites taken: " + Arrays.toString(websiteCaches.toArray()));
 
         return websiteCaches;
     }
@@ -80,15 +80,28 @@ public class WebsiteDao {
     public Optional<WebsiteCache> getById(UUID id) {
         Optional<WebsiteCache> fromCache = this.getFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id.toString());
 
-        if (fromCache.isPresent()) return fromCache;
+        if (fromCache.isPresent()) {
+            System.out.println("Get website from Cache by ID: " + id);
+            return fromCache;
+        }
 
         Optional<Website> fromDatabase = this.getFromDatabaseById(id);
 
         if (fromDatabase.isEmpty()) {
             throw new WebsiteNotFoundException(String.format("Website not found by ID '%s'!", id));
         }
+        else {
+            WebsiteCache cache = websiteMapper.toCache(fromDatabase.get());
 
-        return Optional.ofNullable(websiteMapper.toCache(fromDatabase.get()));
+            this.setToCache(
+                    RedisCacheKeys.WEBSITE_SLICE_KEY + id,
+                    cache,
+                    Duration.ofMinutes(15)
+            );
+
+            System.out.println("Get website from Database by ID: " + id);
+            return Optional.ofNullable(cache);
+        }
     }
 
     public Website getReferenceById(UUID id) {
