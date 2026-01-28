@@ -1,6 +1,7 @@
 package ru.d2k.parkle.utils.safety.extremism;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -9,7 +10,8 @@ import java.util.*;
 import java.util.regex.*;
 
 @Getter
-public class ExtremismCSVLoader extends ExtremismMaterialLoader {
+@Slf4j
+public class ExtremismCSVLoader implements ExtremismMaterialLoader {
     private final String filePath;
     private final Charset charset;
     private final String divider;
@@ -66,10 +68,10 @@ public class ExtremismCSVLoader extends ExtremismMaterialLoader {
             }
         }
         catch (IOException ioex) {
-            System.err.println("Can't load CSV file with path '" + filePath + "':" + ioex.getMessage());
+            log.error("Can't load CSV file with path '" + filePath + "':" + ioex.getMessage());
         }
         catch (Exception ex) {
-            System.err.println("Some Exception in CSV Loader: " + ex);
+            log.error("Some Exception in CSV Loader: " + ex);
         }
 
         return links;
