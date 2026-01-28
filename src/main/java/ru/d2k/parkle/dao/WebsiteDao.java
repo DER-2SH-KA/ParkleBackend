@@ -38,7 +38,7 @@ public class WebsiteDao {
         );
 
         userDao.refreshCacheByWebsiteCache(
-                RedisCacheKeys.USER_SLICE_KEY + createdEntity.getUser().getLogin(),
+                RedisCacheKeys.USER_SLICE_KEY + userLogin,
                 Duration.ofMinutes(15),
                 userLogin
         );
@@ -110,11 +110,13 @@ public class WebsiteDao {
 
     // Update.
     public Optional<WebsiteCache> update(UUID id, WebsiteUpdateDto udto, String userLogin) {
+        System.out.println("Start updating website with ID: " + id);
         Optional<Website> entity = this.getFromDatabaseById(id);
         Optional<User> userEntity = userDao.getFromDatabaseByLogin(userLogin); // TODO: переделать в будущем без публичного login метода.
 
 
         if (entity.isPresent() && userEntity.isPresent()) {
+            System.out.println("Entity and website is present");
             websiteMapper.updateByDto(entity.get(), udto, userEntity.get());
 
             Website updatedEntity = this.saveToDatabase(entity.get());
@@ -129,21 +131,26 @@ public class WebsiteDao {
             );
 
             userDao.refreshCacheByWebsiteCache(
-                    RedisCacheKeys.USER_SLICE_KEY + updatedEntity.getUser().getLogin(),
+                    RedisCacheKeys.USER_SLICE_KEY + userLogin,
                     Duration.ofMinutes(15),
                     userLogin
             );
 
+            System.out.println("Website with ID was updated: " + id);
             return Optional.of(cache);
         }
         else {
-            if (entity.isEmpty())
+            if (entity.isEmpty()) {
+                System.out.println("Website not found with ID: " + id);
                 throw new WebsiteNotFoundException(String.format("Website not found by ID '%s'!", id));
+            }
             else if (userEntity.isEmpty()) {
+                System.out.println("User not found with login: " + userLogin);
                 throw new UserNotFoundException(String.format("User not found by login '%s'!", udto.userLogin()));
             }
         }
 
+        System.out.println("Website wasn't updated with ID: " + id);
         return Optional.empty();
     }
 
