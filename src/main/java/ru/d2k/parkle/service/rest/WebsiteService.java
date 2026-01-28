@@ -28,7 +28,7 @@ public class WebsiteService {
     private final UserDao userDao;
     private final WebsiteDao websiteDao;
     private final WebsiteMapper websiteMapper;
-    // private final ExtremismUtil extremismUtil;
+    private final ExtremismUtil extremismUtil;
 
     /**
      * Return all websites by all users from DB as DTO.
@@ -94,16 +94,7 @@ public class WebsiteService {
     public WebsiteResponseDto createWebsite(WebsiteCreateDto dto) {
         log.info("Creating website: {}...", dto.toString());
 
-        /*log.info("Checking website on extremism...");
-
-        boolean isExtremism = this.isExtremism(dto.getUrl());
-
-        if (isExtremism) {
-            log.info("Website URL is extremism!");
-            throw new WebsiteIsExtremismSourceException("Website '" + dto.getUrl() + "' is extremism!");
-        }
-
-        log.info("Website is not extremism");*/
+        this.checkOnExtremism(dto.url());
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication()
@@ -118,8 +109,8 @@ public class WebsiteService {
         );
         WebsiteCache savedWebsite = websiteDao.create(website, userDetails.getUsername());
 
-        log.info("Website was created: {}", website);
-        return websiteMapper.toResponseDto(website);
+        log.info("Website was created: {}", savedWebsite);
+        return websiteMapper.toResponseDto(savedWebsite);
     }
 
     /**
@@ -133,16 +124,7 @@ public class WebsiteService {
 
         if (id == null) return null;
 
-        /*log.info("Checking website on extremism...");
-
-        boolean isExtremism = this.isExtremism(udto.getUrl());
-
-        if (isExtremism) {
-            log.info("Website URL is extremism!");
-            throw new WebsiteIsExtremismSourceException("Website '" + udto.getUrl() + "' is extremism!");
-        }
-
-        log.info("Website is not extremism");*/
+        this.checkOnExtremism(udto.url());
 
         String userLogin = ((CustomUserDetails)
                 SecurityContextHolder
@@ -186,7 +168,22 @@ public class WebsiteService {
         return false;
     }
 
-    /*private boolean isExtremism(String websiteUrl) {
+    private void checkOnExtremism(String url) {
+        log.info("Checking website with url '{}' on extremism...", url);
+
+        boolean isExtremism = this.isExtremism(url);
+
+        if (isExtremism) {
+            log.info("Website URL is extremism!");
+            throw new WebsiteIsExtremismSourceException("Website '" + url + "' is extremism!");
+        }
+
+        log.info("Website is not extremism");
+    }
+
+    private boolean isExtremism(String websiteUrl) {
+
+
         return extremismUtil.checkOnExtremism(websiteUrl);
-    }*/
+    }
 }
