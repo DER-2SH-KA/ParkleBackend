@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
-// @Component
+@Component
 public class ExtremismUtil {
     private final ExtremismMaterialLoader extremismLoader;
     private final Set<String> links = new HashSet<>();
