@@ -2,31 +2,33 @@ package ru.d2k.parkle.service.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.d2k.parkle.dao.UserDao;
+import ru.d2k.parkle.dao.WebsiteDao;
 import ru.d2k.parkle.dto.*;
-import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
-import ru.d2k.parkle.exception.UserNotFoundException;
+import ru.d2k.parkle.entity.cache.WebsiteCache;
 import ru.d2k.parkle.exception.WebsiteIsExtremismSourceException;
 import ru.d2k.parkle.exception.WebsiteNotFoundException;
-import ru.d2k.parkle.repository.UserRepository;
-import ru.d2k.parkle.repository.WebsiteRepository;
+import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
 import ru.d2k.parkle.utils.safety.extremism.ExtremismUtil;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class WebsiteService {
-    private final UserRepository userRepository;
-    private final WebsiteRepository websiteRepository;
+    private final UserDao userDao;
+    private final WebsiteDao websiteDao;
     private final WebsiteMapper websiteMapper;
-    // private final ExtremismUtil extremismUtil;
+    private final ExtremismUtil extremismUtil;
 
     /**
      * Return all websites by all users from DB as DTO.
@@ -36,7 +38,7 @@ public class WebsiteService {
     public List<WebsiteResponseDto> findWebsites() {
         log.info("Getting all websites...");
 
-        List<WebsiteResponseDto> dtos = websiteRepository.findAll().stream()
+        List<WebsiteResponseDto> dtos = websiteDao.getAll().stream()
                 .map(websiteMapper::toResponseDto)
                 .toList();
 
@@ -53,45 +55,31 @@ public class WebsiteService {
     public WebsiteResponseDto findWebsiteById(UUID id) {
         log.info("Getting website by ID: {}...", id);
 
-        Website website = websiteRepository.findById(id)
+        WebsiteCache website = websiteDao.getById(id)
                 .orElseThrow(() ->
                         new WebsiteNotFoundException("Website was not found with ID: " + id)
                 );
 
-        log.info("Website with ID = {} was founded", id);
+        log.info("Website with ID '{}' was founded", id);
         return websiteMapper.toResponseDto(website);
     }
 
     /**
-     * Return websites by user ID as DTO.
-     * @param userId user ID.
-     * @return {@link WebsiteResponseDto} dto.
-     * **/
-    @Transactional(readOnly = true)
-    public List<WebsiteResponseDto> findWebsiteByUserId(UUID userId) {
-        log.info("Getting websites by user ID: {}...", userId);
-
-        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(userId);
-
-        log.info("Websites was found: {}", websites.size());
-        return websites.stream().map(websiteMapper::toResponseDto).toList();
-    }
-
-    /**
      * Return websites by user login as DTO.
-     * @param login user login.
      * @return {@link WebsiteResponseDto} dto.
      * **/
     @Transactional(readOnly = true)
-    public List<WebsiteResponseDto> findWebsiteByUserLogin(String login) {
-        log.info("Getting websites by user login: {}...", login);
+    public List<WebsiteResponseDto> findWebsiteByUserLogin() {
 
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User not found with login: " + login)
-                );
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
 
-        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(user.getId());
+        log.info("Getting websites by user login: {}...", userDetails.getUsername());
+
+        List<WebsiteCache> websites = websiteDao.getAllByUserLogin(
+                userDetails.getCache()
+        );
 
         log.info("Websites was found: {}", websites.size());
         return websites.stream().map(websiteMapper::toResponseDto).toList();
@@ -106,26 +94,23 @@ public class WebsiteService {
     public WebsiteResponseDto createWebsite(WebsiteCreateDto dto) {
         log.info("Creating website: {}...", dto.toString());
 
-        /*log.info("Checking website on extremism...");
+        this.checkOnExtremism(dto.url());
 
-        boolean isExtremism = this.isExtremism(dto.getUrl());
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
 
-        if (isExtremism) {
-            log.info("Website URL is extremism!");
-            throw new WebsiteIsExtremismSourceException("Website '" + dto.getUrl() + "' is extremism!");
-        }
-
-        log.info("Website is not extremism");*/
-
-        User user = userRepository.findById(dto.userId())
-                .orElseThrow(() ->
-                        new UserNotFoundException("User was not found with ID: " + dto.userId())
+        Website website = Website.create(
+                userDao.getReferenceById(userDetails.getCache().id()),
+                dto.hexColor(),
+                dto.title(),
+                dto.description(),
+                dto.url()
         );
-        Website website = Website.create(user, dto.hexColor(), dto.title(), dto.description(), dto.url());
-        website = websiteRepository.save(website);
+        WebsiteCache savedWebsite = websiteDao.create(website, userDetails.getUsername());
 
-        log.info("Website was created: {}", website);
-        return websiteMapper.toResponseDto(website);
+        log.info("Website was created: {}", savedWebsite);
+        return websiteMapper.toResponseDto(savedWebsite);
     }
 
     /**
@@ -135,38 +120,27 @@ public class WebsiteService {
      * **/
     @Transactional
     public WebsiteResponseDto updateWebsite(UUID id, WebsiteUpdateDto udto) {
-        log.info("Updating website by ID: {}...", id);
+        log.info("Updating website by ID '{}'...", id);
 
         if (id == null) return null;
 
-        /*log.info("Checking website on extremism...");
+        this.checkOnExtremism(udto.url());
 
-        boolean isExtremism = this.isExtremism(udto.getUrl());
+        String userLogin = ((CustomUserDetails)
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getPrincipal()
+        ).getUsername();
 
-        if (isExtremism) {
-            log.info("Website URL is extremism!");
-            throw new WebsiteIsExtremismSourceException("Website '" + udto.getUrl() + "' is extremism!");
-        }
+        Optional<WebsiteCache> updatedWebsite = websiteDao.update(id, udto, userLogin);
 
-        log.info("Website is not extremism");*/
-
-        Website website = websiteRepository.findById(id)
-                .orElseThrow(() ->
-                        new WebsiteNotFoundException("Website was not found with ID: " + id)
-                );
-
-        User user = null;
-        if (udto.userId() != null) {
-            user = userRepository.findById(udto.userId()).orElseThrow(() ->
-                    new UserNotFoundException("User was not found with ID: " + udto.userId())
-            );
-        }
-
-        websiteMapper.updateByDto( website, udto, user );
-        website = websiteRepository.save(website);
-
-        log.info("Website with ID = {} was updated", id);
-        return websiteMapper.toResponseDto(website);
+        log.info("Website with ID '{}' was updated", id);
+        return websiteMapper.toResponseDto(
+                updatedWebsite.orElseThrow(() ->
+                        new WebsiteNotFoundException(String.format("Website with ID '%s' not found and not updated!", id))
+                )
+        );
     }
 
     /**
@@ -174,31 +148,42 @@ public class WebsiteService {
      * @param id Website's ID.
      * **/
     public boolean deleteWebsite(UUID id) {
-        log.info("Deleting website by ID: {}", id);
+        log.info("Deleting website by ID '{}'", id);
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
 
         if (Objects.nonNull(id)) {
-
-            if (!websiteRepository.existsById(id)) {
-                log.info("Website with ID = {} is already not exists", id);
-                return false;
-            }
-
-            websiteRepository.deleteById(id);
-
-            if (!websiteRepository.existsById(id)) {
-                log.info("Website with ID = {} was deleted", id);
+            if (websiteDao.deleteById(id, userDetails.getUsername())) {
+                log.info("Website with ID  '{}' was deleted", id);
                 return true;
             }
             else {
-                log.info("Website with ID = {} wasn't deleted", id);
+                log.info("Website with ID '{}' wasn't deleted", id);
             }
         }
-        else { log.info("Website's ID equals null and now was deleted"); }
+        else { log.info("Website's ID equals null"); }
 
         return false;
     }
 
-    /*private boolean isExtremism(String websiteUrl) {
+    private void checkOnExtremism(String url) {
+        log.info("Checking website with url '{}' on extremism...", url);
+
+        boolean isExtremism = this.isExtremism(url);
+
+        if (isExtremism) {
+            log.info("Website URL is extremism!");
+            throw new WebsiteIsExtremismSourceException("Website '" + url + "' is extremism!");
+        }
+
+        log.info("Website is not extremism");
+    }
+
+    private boolean isExtremism(String websiteUrl) {
+
+
         return extremismUtil.checkOnExtremism(websiteUrl);
-    }*/
+    }
 }

@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.d2k.parkle.controller.ApiPaths;
-import ru.d2k.parkle.dto.RoleDto;
+import ru.d2k.parkle.dto.RoleCreateDto;
+import ru.d2k.parkle.dto.RoleResponseDto;
+import ru.d2k.parkle.dto.RoleUpdateDto;
 import ru.d2k.parkle.service.rest.RoleService;
 
 import java.util.Set;
@@ -19,11 +21,11 @@ public class RoleRestController {
 
     /**
      * Get all roles from database.
-     * @return {@link ResponseEntity} with Set of {@link RoleDto}.
+     * @return {@link ResponseEntity} with Set of {@link RoleUpdateDto}.
      * **/
     @GetMapping
-    public ResponseEntity<Set<RoleDto>> findRoles() {
-        Set<RoleDto> dtos = roleService.findRoles();
+    public ResponseEntity<Set<RoleResponseDto>> findAll() {
+        Set<RoleResponseDto> dtos = roleService.findAll();
 
         return ResponseEntity.ok(dtos);
     }
@@ -31,11 +33,11 @@ public class RoleRestController {
     /**
      * Get role by ID.
      * @param id ID of role.
-     * @return {@link ResponseEntity} with {@link RoleDto}.
+     * @return {@link ResponseEntity} with {@link RoleUpdateDto}.
      * **/
     @GetMapping("/{id}")
-    public ResponseEntity<RoleDto> findRoleById(@PathVariable UUID id) {
-        RoleDto dto = roleService.findRoleById(id);
+    public ResponseEntity<RoleResponseDto> findById(@PathVariable UUID id) {
+        RoleResponseDto dto = roleService.findById(id);
 
         return ResponseEntity.ok(dto);
     }
@@ -43,11 +45,11 @@ public class RoleRestController {
     /**
      * Get role by name.
      * @param name name of role.
-     * @return {@link ResponseEntity} with {@link RoleDto}.
+     * @return {@link ResponseEntity} with {@link RoleUpdateDto}.
      * **/
     @GetMapping("/name/{name}")
-    public ResponseEntity<RoleDto> findRoleByName(@PathVariable String name) {
-        RoleDto dto = roleService.findRoleByName(name);
+    public ResponseEntity<RoleResponseDto> findByName(@PathVariable String name) {
+        RoleResponseDto dto = roleService.findByName(name);
 
         return ResponseEntity.ok(dto);
     }
@@ -55,11 +57,11 @@ public class RoleRestController {
     /**
      * Create new {@link ru.d2k.parkle.entity.Role}.
      * @param dto DTO of new role.
-     * @return {@link ResponseEntity} with {@link RoleDto}.
+     * @return {@link ResponseEntity} with {@link RoleUpdateDto}.
      * **/
     @PostMapping("/new")
-    public ResponseEntity<RoleDto> createRole(@Valid @RequestBody RoleDto dto) {
-        RoleDto newDto = roleService.createRole(dto);
+    public ResponseEntity<RoleResponseDto> create(@Valid @RequestBody RoleCreateDto dto) {
+        RoleResponseDto newDto = roleService.create(dto);
 
         return ResponseEntity.ok(newDto);
     }
@@ -68,11 +70,11 @@ public class RoleRestController {
      * Update role by ID.
      * @param id ID of role.
      * @param dto DTO witn new data for role.
-     * @return {@link ResponseEntity} with {@link RoleDto}.
+     * @return {@link ResponseEntity} with {@link RoleUpdateDto}.
      * **/
     @PatchMapping("/update/{id}")
-    public ResponseEntity<RoleDto> updateRoleById(@PathVariable UUID id, @Valid @RequestBody RoleDto dto) {
-        RoleDto newDto = roleService.updateRole(id, dto);
+    public ResponseEntity<RoleResponseDto> updateById(@PathVariable UUID id, @Valid @RequestBody RoleUpdateDto dto) {
+        RoleResponseDto newDto = roleService.update(id, dto);
 
         return ResponseEntity.ok(newDto);
     }
@@ -83,8 +85,8 @@ public class RoleRestController {
      * @return {@link ResponseEntity} with ok() status.
      * **/
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteRoleById(@PathVariable UUID id) {
-        boolean result = roleService.deleteRole(id);
+    public ResponseEntity<?> deleteById(@PathVariable UUID id) {
+        boolean result = roleService.delete(id);
 
         return result
                 ? ResponseEntity.ok().build()

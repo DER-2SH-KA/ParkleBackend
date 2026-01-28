@@ -4,6 +4,11 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
+  data:
+    redis:
+      host: redis_parkle
+      port: 6379
+
   security:
     bcrypt:
       strength: ${SPRING_SECURITY_BCRYPT_STRENGTH}

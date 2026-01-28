@@ -11,7 +11,7 @@
 
 	<groupId>ru.d2k</groupId>
 	<artifactId>parkle</artifactId>
-	<version>0.0.6</version>
+	<version>0.0.7</version>
 	<name>Parkle Project Jun 2025</name>
 	<description>This is backend for Parkle Project</description>
 	<url/>
@@ -43,10 +43,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<!--<dependency>
+
+		<!--Redis -->
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency>-->
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -62,11 +65,6 @@
 			<artifactId>liquibase-core</artifactId>
 			<version>4.33.0</version>
 		</dependency>
-
-		<!--<dependency>
-			<groupId>org.springframework.session</groupId>
-			<artifactId>spring-session-data-redis</artifactId>
-		</dependency>-->
 
 		<!-- Databases -->
 		<dependency>

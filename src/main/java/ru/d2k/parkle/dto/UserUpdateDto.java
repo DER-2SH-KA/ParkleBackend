@@ -1,10 +1,9 @@
 package ru.d2k.parkle.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,6 +13,10 @@ import lombok.*;
 @AllArgsConstructor
 public class UserUpdateDto implements UserDto {
 
+    @NotNull(message = "UserUpdateDto id can't be null")
+    private UUID id;
+
+    @NotBlank(message = "UserUpdateDto roleName can't be null or blank!")
     @Size(
             max = 32,
             message = "UserUpdateDto roleName must be not grater than 32 symbols"
@@ -32,7 +35,7 @@ public class UserUpdateDto implements UserDto {
             max = 320,
             message = "UserUpdateDto email size must be lower then 320 symbols"
     )
-    @Email(message = "UserUpdateDto email is not valid")
+    @Pattern(regexp = "^(\\S+@\\S+\\.\\S+){1,320}$", message = "UserUpdateDto email isn't allowed by regexp pattern")
     private String email;
 
     @Size(

@@ -11,7 +11,7 @@ import java.util.Arrays;
 @Slf4j
 @Aspect
 @Component
-public class LoggingAspect {
+public class ControllerLoggingAspect {
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping)")
     public void logGetMethods() {}
