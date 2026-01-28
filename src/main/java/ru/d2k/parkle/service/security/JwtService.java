@@ -11,6 +11,7 @@ import ru.d2k.parkle.dao.UserDao;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.cache.UserCache;
+import ru.d2k.parkle.exception.JwtNotExistInRequestException;
 import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.repository.UserRepository;
 import ru.d2k.parkle.utils.jwt.JwtUtil;
@@ -36,17 +37,20 @@ public class JwtService {
         if (hasJwtInCookie(request)) {
             System.out.println("HttpServletRequest has JWT!");
 
-            final Optional<String> jwt = JwtUtil.extractJwtFromCookie(request);
+            final String jwt = JwtUtil.extractJwtFromCookie(request)
+                    .orElseThrow(() ->
+                                    new NullPointerException("Trying extract username from null JWT is false")
+                    );
 
-            String username = jwtUtil.extractUsername(
-                    jwt.orElseThrow(() -> new NullPointerException("Trying extract username from null JWT is false"))
-            );
+            if (jwt.isBlank()) throw new JwtNotExistInRequestException();
+
+            String username = jwtUtil.extractUsername(jwt);
 
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
                     .getAuthentication()
                     .getPrincipal();
 
-            System.out.println("Is JWT Valid?: " + jwtUtil.isTokenValid(jwt.get(), userDetails));
+            System.out.println("Is JWT Valid?: " + jwtUtil.isTokenValid(jwt, userDetails));
 
             UserCache userByLogin = userDao.getByLogin(username)
                     .orElseThrow(() ->
@@ -55,7 +59,7 @@ public class JwtService {
 
             UserResponseDto dto = userMapper.toResponseDto(userByLogin);
 
-            return jwtUtil.isTokenValid(jwt.get(), userDetails) ?
+            return jwtUtil.isTokenValid(jwt, userDetails) ?
                     Optional.ofNullable( dto) :
                     Optional.empty();
         }
