@@ -47,6 +47,8 @@ public class UserDao {
     public Set<UserCache> getAll() {
         List<User> entities = this.getAllFromDatabase();
 
+        log.info("Users was taken from database!");
+
         return entities.stream()
                 .map(userMapper::toCache)
                 .collect(Collectors.toSet());
@@ -62,6 +64,8 @@ public class UserDao {
         Optional<User> entityFromDb = this.getFromDatabaseById(id);
 
         if (entityFromDb.isPresent()) {
+            log.info("User by id {} was taken from database!", id);
+
             return Optional.of(userMapper.toCache(entityFromDb.get()));
         }
 
@@ -157,6 +161,7 @@ public class UserDao {
             return !this.existInDatabaseByLogin(login);
         }
 
+        log.error("User to delete with login '{}' not exist!", login);
         return true;
     }
 
@@ -169,6 +174,8 @@ public class UserDao {
                 );
 
         this.setToCache(key, newUserCache, duration);
+
+        log.debug("User's cache with login '{}' was refreshed!", userLogin);
     }
 
     /**

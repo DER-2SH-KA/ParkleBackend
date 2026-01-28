@@ -60,7 +60,7 @@ public class WebsiteService {
                         new WebsiteNotFoundException("Website was not found with ID: " + id)
                 );
 
-        log.info("Website with ID = {} was founded", id);
+        log.info("Website with ID '{}' was founded", id);
         return websiteMapper.toResponseDto(website);
     }
 
@@ -129,7 +129,7 @@ public class WebsiteService {
      * **/
     @Transactional
     public WebsiteResponseDto updateWebsite(UUID id, WebsiteUpdateDto udto) {
-        log.info("Updating website by ID: {}...", id);
+        log.info("Updating website by ID '{}'...", id);
 
         if (id == null) return null;
 
@@ -153,7 +153,7 @@ public class WebsiteService {
 
         Optional<WebsiteCache> updatedWebsite = websiteDao.update(id, udto, userLogin);
 
-        log.info("Website with ID = {} was updated", id);
+        log.info("Website with ID '{}' was updated", id);
         return websiteMapper.toResponseDto(
                 updatedWebsite.orElseThrow(() ->
                         new WebsiteNotFoundException(String.format("Website with ID '%s' not found and not updated!", id))
@@ -166,28 +166,22 @@ public class WebsiteService {
      * @param id Website's ID.
      * **/
     public boolean deleteWebsite(UUID id) {
-        log.info("Deleting website by ID: {}", id);
+        log.info("Deleting website by ID '{}'", id);
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();
 
         if (Objects.nonNull(id)) {
-
-            if (!websiteDao.existsById(id)) {
-                log.info("Website with ID = {} is already not exists", id);
-                return false;
-            }
-
             if (websiteDao.deleteById(id, userDetails.getUsername())) {
-                log.info("Website with ID = {} was deleted", id);
+                log.info("Website with ID  '{}' was deleted", id);
                 return true;
             }
             else {
-                log.info("Website with ID = {} wasn't deleted", id);
+                log.info("Website with ID '{}' wasn't deleted", id);
             }
         }
-        else { log.info("Website's ID equals null and now was deleted"); }
+        else { log.info("Website's ID equals null"); }
 
         return false;
     }

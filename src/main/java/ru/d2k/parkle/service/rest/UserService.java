@@ -80,7 +80,7 @@ public class UserService {
      * **/
     @Transactional(readOnly = true)
     public UserResponseDto findUserById(UUID id) {
-        log.info("Getting user by ID: {}...", id);
+        log.info("Getting user by ID {}...", id);
 
         if (id == null) return null;
 
@@ -89,7 +89,7 @@ public class UserService {
                         new UserNotFoundException("User was not found with ID: " + id)
                 );
 
-        log.info("User with ID = {} was founded", id);
+        log.info("User with ID {} was founded", id);
         return userMapper.toResponseDto(user);
     }
 
@@ -101,7 +101,7 @@ public class UserService {
      * */
     @Transactional(readOnly = true)
     public UserResponseDto findUserByLogin(String login) {
-        log.info("Getting user by login: {}...", login);
+        log.info("Getting user by login '{}'...", login);
 
         if (Objects.isNull(login)) return null;
 
@@ -110,7 +110,7 @@ public class UserService {
                         new UserNotFoundException("User was not found with login: " + login)
                 );
 
-        log.info("User with login = {} was founded", login);
+        log.info("User with login '{}' was founded", login);
         return userMapper.toResponseDto(user);
     }
 
@@ -123,7 +123,7 @@ public class UserService {
     // TODO: Удалить.
     @Transactional(readOnly = true)
     public Optional<UserResponseDto> getUserByAuthDao(UserAuthDto uadto) {
-        log.info("Authenticate user by login and password. Login: {}", uadto.getLogin());
+        log.info("Authenticate user by login '{}' and password", uadto.getLogin());
 
         UserCache user = userDao.getByLogin(uadto.getLogin())
                 .orElseThrow(() ->
@@ -176,7 +176,7 @@ public class UserService {
      * **/
     @Transactional
     public UserResponseDto updateUser(String login, UserUpdateDto udto) {
-        log.info("Updating user by login: {}...", login);
+        log.info("Updating user by login '{}'...", login);
 
         if (Objects.isNull(login)) return null;
 
@@ -201,7 +201,7 @@ public class UserService {
                 () -> new UserNotFoundException("User with login '{}' not found and not updated!")
         ));
 
-        log.info("User with login = {} was updated", login);
+        log.info("User with login '{}' was updated", login);
         return dto;
     }
 
@@ -211,24 +211,18 @@ public class UserService {
      * **/
     @Transactional
     public boolean deleteUser(String login) {
-        log.info("Deleting user by login: {}...", login);
+        log.info("Deleting user by login '{}'...", login);
 
         if (Objects.nonNull(login)) {
 
-            if (!userDao.existsByLogin(login)) {
-                log.info("User with login = {} is already not exists", login);
-                return false;
-            }
-
-            userDao.deleteByLogin(login);
-
-            if (!userDao.existsByLogin(login)) {
-                log.info("User with login = {} was deleted", login);
+            if (userDao.deleteByLogin(login)) {
+                log.info("User with login '{}' was deleted", login);
                 return true;
             }
-            else log.info("User with login = {} wasn't deleted", login);
+            else log.info("User with login '{}' wasn't deleted", login);
+
         }
-        else log.info("User login equals null and not was deleted");
+        else log.error("User login equals null");
 
         return false;
     }
@@ -248,6 +242,7 @@ public class UserService {
         ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
+        log.info("User was taken in getUserByUserAuthDto(): {}", uadto);
         return Optional.ofNullable(userMapper.toResponseDto(userDetails.getCache()));
     }
 
@@ -257,6 +252,7 @@ public class UserService {
             HttpServletResponse response
 
     ) {
+        log.info("Start to getUserByUserCreateDto(): {}", cdto);
         this.createUser(cdto);
 
         Authentication signedAuthentication = this.createAuthenticationByDto(cdto);
@@ -267,19 +263,7 @@ public class UserService {
         ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-        // TODO: Эксперементально взаимодействую с Redis. Удалить.
-        UserResponseDto dto = userMapper.toResponseDto(userDetails.getCache());
-
-        if (Objects.nonNull(dto)) {
-
-            final String sliceKey = "users:";
-            final String key = sliceKey + dto.id();
-
-            redisTemplate.opsForValue().set(key, dto, Duration.ofHours(1));
-
-            return Optional.ofNullable(dto);
-        }
-
+        log.info("User was taken in getUserByUserCreateDto(): {}", cdto);
         return Optional.empty();
     }
 

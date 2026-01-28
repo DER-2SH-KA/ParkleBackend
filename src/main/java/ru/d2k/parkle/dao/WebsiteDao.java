@@ -1,6 +1,7 @@
 package ru.d2k.parkle.dao;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
@@ -19,6 +20,7 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class WebsiteDao {
     private final WebsiteRepository websiteRepository;
     private final RedisTemplate<String, WebsiteCache> redisWebsiteTemplate;
@@ -48,6 +50,8 @@ public class WebsiteDao {
 
     // Read.
     public List<WebsiteCache> getAll() {
+        log.info("Websites was taken from database!");
+
         return websiteRepository.findAll().stream()
                 .map(websiteMapper::toCache)
                 .toList();
@@ -59,8 +63,6 @@ public class WebsiteDao {
         List<UUID> websiteIds = userCache.websiteIds();
         Optional<WebsiteCache> cache = Optional.empty();
 
-        System.out.println("Websites Ids: " + Arrays.toString(websiteCaches.toArray()));
-
         for (UUID websiteId : websiteIds) {
             cache = this.getById(websiteId);
 
@@ -68,11 +70,9 @@ public class WebsiteDao {
                 websiteCaches.add(cache.get());
             }
             else {
-                System.err.printf("Website not found by ID '%s'!%n", websiteId);
+                log.error("Website not found by ID {}!", websiteId);
             }
         }
-
-        System.out.println("Websites taken: " + Arrays.toString(websiteCaches.toArray()));
 
         return websiteCaches;
     }
@@ -81,7 +81,8 @@ public class WebsiteDao {
         Optional<WebsiteCache> fromCache = this.getFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id.toString());
 
         if (fromCache.isPresent()) {
-            System.out.println("Get website from Cache by ID: " + id);
+            log.debug("Website by id '{}' was taken from cache!", id);
+
             return fromCache;
         }
 
@@ -99,7 +100,7 @@ public class WebsiteDao {
                     Duration.ofMinutes(15)
             );
 
-            System.out.println("Get website from Database by ID: " + id);
+            log.debug("Website by id '{}' was taken from database!", id);
             return Optional.ofNullable(cache);
         }
     }
@@ -110,13 +111,12 @@ public class WebsiteDao {
 
     // Update.
     public Optional<WebsiteCache> update(UUID id, WebsiteUpdateDto udto, String userLogin) {
-        System.out.println("Start updating website with ID: " + id);
         Optional<Website> entity = this.getFromDatabaseById(id);
         Optional<User> userEntity = userDao.getFromDatabaseByLogin(userLogin); // TODO: переделать в будущем без публичного login метода.
 
 
         if (entity.isPresent() && userEntity.isPresent()) {
-            System.out.println("Entity and website is present");
+            log.debug("Entity and website is present");
             websiteMapper.updateByDto(entity.get(), udto, userEntity.get());
 
             Website updatedEntity = this.saveToDatabase(entity.get());
@@ -136,7 +136,7 @@ public class WebsiteDao {
                     userLogin
             );
 
-            System.out.println("Website with ID was updated: " + id);
+            log.info("Website with id {} was updated", id);
             return Optional.of(cache);
         }
         else {
@@ -150,7 +150,7 @@ public class WebsiteDao {
             }
         }
 
-        System.out.println("Website wasn't updated with ID: " + id);
+        log.error("Website with id {} wasn't updated", id);
         return Optional.empty();
     }
 

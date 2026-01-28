@@ -66,6 +66,7 @@ public class RoleDao {
         Optional<Role> entityFromDb = this.getFromDatabaseById(id);
 
         if (entityFromDb.isPresent()) {
+            log.info("Role with id '{}' taken from database!", id);
             return Optional.of(roleMapper.toCache(entityFromDb.get()));
         }
 
@@ -155,6 +156,7 @@ public class RoleDao {
             return !this.existInDatabaseById(id);
         }
 
+        log.error("Role to delete with id '{}' not exist!", id);
         return true;
     }
 

@@ -25,9 +25,7 @@ public class ExtremismCSVLoader extends ExtremismMaterialLoader {
 
     @Override
     public Set<String> getExtremismLinks() {
-        return new HashSet<>(
-                this.loadLinksFromFile(this.filePath, this.charset)
-        );
+        return new HashSet<>(this.loadLinksFromFile(this.filePath, this.charset));
     }
 
     private List<String> loadLinksFromFile(String filePath, Charset charset) {
