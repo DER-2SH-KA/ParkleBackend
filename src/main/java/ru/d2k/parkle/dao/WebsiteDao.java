@@ -2,8 +2,9 @@ package ru.d2k.parkle.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import ru.d2k.parkle.dao.cache.website.WebsiteCacheSource;
+import ru.d2k.parkle.dao.database.website.WebsiteDatabaseSource;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
@@ -12,7 +13,6 @@ import ru.d2k.parkle.entity.cache.WebsiteCache;
 import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.exception.WebsiteNotFoundException;
 import ru.d2k.parkle.redis.RedisCacheKeys;
-import ru.d2k.parkle.repository.WebsiteRepository;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
 
 import java.time.Duration;
@@ -22,8 +22,8 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class WebsiteDao {
-    private final WebsiteRepository websiteRepository;
-    private final RedisTemplate<String, WebsiteCache> redisWebsiteTemplate;
+    private final WebsiteDatabaseSource websiteDatabase;
+    private final WebsiteCacheSource websiteCache;
     private final WebsiteMapper websiteMapper;
     private final UserDao userDao;
 
@@ -52,7 +52,7 @@ public class WebsiteDao {
     public List<WebsiteCache> getAll() {
         log.info("Websites was taken from database!");
 
-        return websiteRepository.findAll().stream()
+        return websiteDatabase.getAll().stream()
                 .map(websiteMapper::toCache)
                 .toList();
     }
@@ -106,7 +106,7 @@ public class WebsiteDao {
     }
 
     public Website getReferenceById(UUID id) {
-        return websiteRepository.getReferenceById(id);
+        return websiteDatabase.getReferenceById(id);
     }
 
     // Update.
@@ -176,40 +176,34 @@ public class WebsiteDao {
     }
 
     private void setToCache(String key, WebsiteCache cache, Duration duration) {
-        redisWebsiteTemplate.opsForValue().set(key, cache, duration);
+        websiteCache.set(key, cache, duration);
     }
 
     private Optional<WebsiteCache> getFromCache(String key) {
-        return Optional.ofNullable(
-                redisWebsiteTemplate.opsForValue().get(key)
-        );
+        return websiteCache.get(key);
     }
 
     private void deleteFromCache(String key) {
-        redisWebsiteTemplate.delete(key);
-    }
-
-    private boolean existsInCacheById(UUID id) {
-        return getFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id.toString()).isPresent();
+        websiteCache.delete(key);
     }
 
     private Website saveToDatabase(Website entity) {
-        return websiteRepository.save(entity);
+        return websiteDatabase.save(entity);
     }
 
     private Optional<Website> getFromDatabaseById(UUID id) {
-        return websiteRepository.findById(id);
+        return websiteDatabase.getById(id);
     }
 
     private List<Website> getFromDatabaseByUserIdSortedByTitleAsc(UUID userId) {
-        return websiteRepository.findByUserIdOrderByTitleAsc(userId);
+        return websiteDatabase.getByUserIdSortedByTitleAsc(userId);
     }
 
     private void deleteFromDatabase(UUID id) {
-        websiteRepository.deleteById(id);
+        websiteDatabase.deleteById(id);
     }
 
     private boolean existInDatabaseById(UUID id) {
-        return websiteRepository.existsById(id);
+        return websiteDatabase.existsById(id);
     }
 }
