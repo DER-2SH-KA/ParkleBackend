@@ -1,6 +1,7 @@
 package ru.d2k.parkle.dao.database.role;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.repository.RoleRepository;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@Primary
 @RequiredArgsConstructor
 public class RolePostgresDatabase implements RoleDatabaseSource {
     private final RoleRepository roleRepository;
