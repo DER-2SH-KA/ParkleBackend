@@ -264,7 +264,7 @@ public class UserService {
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
         log.info("User was taken in getUserByUserCreateDto(): {}", cdto);
-        return Optional.empty();
+        return Optional.ofNullable(userMapper.toResponseDto(userDetails.getCache()));
     }
 
     public Optional<UserResponseDto> getUserByJwt(
