@@ -2,14 +2,14 @@ package ru.d2k.parkle.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import ru.d2k.parkle.dao.cache.role.RoleCacheSource;
+import ru.d2k.parkle.dao.database.role.RoleDatabaseSource;
 import ru.d2k.parkle.dto.RoleCreateDto;
 import ru.d2k.parkle.dto.RoleUpdateDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.redis.RedisCacheKeys;
-import ru.d2k.parkle.repository.RoleRepository;
 import ru.d2k.parkle.utils.mapper.RoleMapper;
 
 import java.time.Duration;
@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class RoleDao {
-    private final RoleRepository roleRepository;
-    private final RedisTemplate<String, RoleCache> redisRoleTemplate;
+    private final RoleDatabaseSource roleDatabase;
+    private final RoleCacheSource roleCache;
     private final RoleMapper roleMapper;
 
     // CRUD.
@@ -106,7 +106,7 @@ public class RoleDao {
     }
 
     public Role getReferenceById(UUID id) {
-        return roleRepository.getReferenceById(id);
+        return roleDatabase.getReferenceById(id);
     }
 
     // Update.
@@ -180,48 +180,40 @@ public class RoleDao {
      * @return is role exist in database.
      * */
     public boolean existsByName(String name) {
-        return roleRepository.existsByName(name);
+        return roleDatabase.existsByName(name);
     }
 
     private void setToCache(String key, RoleCache value, Duration duration) {
-        redisRoleTemplate.opsForValue().set(key, value, duration);
+        roleCache.set(key, value, duration);
     }
 
     private Optional<RoleCache> getFromCache(String key) {
-        return Optional.ofNullable(redisRoleTemplate.opsForValue().get(key));
+        return roleCache.get(key);
     }
 
-    private void deleteFromCache(String key) { redisRoleTemplate.delete(key); }
-
-    private boolean existInCache(String key) {
-        return this.getFromCache(key).isPresent();
-    }
+    private void deleteFromCache(String key) { roleCache.delete(key); }
 
     private Role saveToDatabase(Role entity) {
-        return roleRepository.save(entity);
+        return roleDatabase.save(entity);
     }
 
     private List<Role> getAllFromDatabase() {
-        return roleRepository.findAll();
+        return roleDatabase.getAll();
     }
 
     private Optional<Role> getFromDatabaseById(UUID id) {
-        return roleRepository.findById(id);
+        return roleDatabase.getById(id);
     }
 
     private Optional<Role> getFromDatabaseByName(String name) {
-        return roleRepository.findByName(name);
+        return roleDatabase.getByName(name);
     }
 
     private void deleteFromDatabaseById(UUID id) {
-        roleRepository.deleteById(id);
+        roleDatabase.deleteById(id);
     }
 
     private boolean existInDatabaseById(UUID id) {
-        return roleRepository.existsById(id);
-    }
-
-    private boolean existInDatabaseByName(String name) {
-        return roleRepository.existsByName(name);
+        return roleDatabase.existsById(id);
     }
 }
