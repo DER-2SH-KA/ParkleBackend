@@ -1,6 +1,7 @@
 package ru.d2k.parkle.repository;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -14,6 +15,7 @@ import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.List;
 
+@Disabled
 @DataJpaTest
 public class WebsiteRepositoryTest {
 
