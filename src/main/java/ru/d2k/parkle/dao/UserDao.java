@@ -2,14 +2,14 @@ package ru.d2k.parkle.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import ru.d2k.parkle.dao.cache.user.UserCacheSource;
+import ru.d2k.parkle.dao.database.user.UserDatabaseSource;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.redis.RedisCacheKeys;
-import ru.d2k.parkle.repository.UserRepository;
 import ru.d2k.parkle.utils.mapper.UserMapper;
 
 import java.time.Duration;
@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class UserDao {
-    private final UserRepository userRepository;
-    private final RedisTemplate<String, UserCache> redisUserTemplate;
+    private final UserDatabaseSource userDatabase;
+    private final UserCacheSource userCache;
     private final UserMapper userMapper;
 
     // CRUD.
@@ -105,7 +105,7 @@ public class UserDao {
     }
 
     public User getReferenceById(UUID id) {
-        return userRepository.getReferenceById(id);
+        return userDatabase.getReferenceById(id);
     }
 
     // Update.
@@ -184,52 +184,40 @@ public class UserDao {
      * @return is user exist in database.
      * */
     public boolean existsByLogin(String login) {
-        return this.userRepository.existsByLogin(login);
+        return this.userDatabase.existsByLogin(login);
     }
 
     private void setToCache(String key, UserCache value, Duration duration) {
-        redisUserTemplate.opsForValue().set(key, value, duration);
+        userCache.set(key, value, duration);
     }
 
     private Optional<UserCache> getFromCache(String key) {
-        return Optional.ofNullable(redisUserTemplate.opsForValue().get(key));
+        return userCache.get(key);
     }
 
-    private void deleteFromCache(String key) { redisUserTemplate.delete(key); }
-
-    private boolean existInCache(String key) {
-        return this.getFromCache(key).isPresent();
-    }
+    private void deleteFromCache(String key) { userCache.delete(key); }
 
     private User saveToDatabase(User entity) {
-        return userRepository.save(entity);
+        return userDatabase.save(entity);
     }
 
     private List<User> getAllFromDatabase() {
-        return userRepository.findAll();
+        return userDatabase.getAll();
     }
 
     private Optional<User> getFromDatabaseById(UUID id) {
-        return userRepository.findById(id);
+        return userDatabase.getById(id);
     }
 
     public Optional<User> getFromDatabaseByLogin(String login) {
-        return userRepository.findByLogin(login);
-    }
-
-    private void deleteFromDatabaseById(UUID id) {
-        userRepository.deleteById(id);
+        return userDatabase.getByLogin(login);
     }
 
     private void deleteFromDatabaseByLogin(String login) {
-        userRepository.deleteByLogin(login);
-    }
-
-    private boolean existInDatabaseById(UUID id) {
-        return userRepository.existsById(id);
+        userDatabase.deleteByLogin(login);
     }
 
     private boolean existInDatabaseByLogin(String login) {
-        return userRepository.existsByLogin(login);
+        return userDatabase.existsByLogin(login);
     }
 }
