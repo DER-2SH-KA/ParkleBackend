@@ -15,7 +15,7 @@ import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.List;
 
-@Disabled
+// @Disabled
 @DataJpaTest
 public class WebsiteRepositoryTest {
 

@@ -14,7 +14,7 @@ import java.util.Optional;
 import org.assertj.core.api.Assertions.*;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
-@Disabled
+// @Disabled
 @DataJpaTest
 public class UserRepositoryTest {
 

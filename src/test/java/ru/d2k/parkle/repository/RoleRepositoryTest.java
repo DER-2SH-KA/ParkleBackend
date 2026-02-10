@@ -13,7 +13,7 @@ import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 import java.util.Optional;
 
-@Disabled
+// @Disabled
 @DataJpaTest
 public class RoleRepositoryTest {
 
