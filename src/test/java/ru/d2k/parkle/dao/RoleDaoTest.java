@@ -311,4 +311,62 @@ class RoleDaoTest {
 
         assertTrue(actualResult);
     }
+
+    @Test
+    @DisplayName("existsById(UUID id) - Should return true when entity is present in cache")
+    void existsById_shouldReturnTrueWhenPresentFromCache() {
+        Optional<Role> entity = Optional.of(new Role(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
+        Optional<RoleCache> cache = Optional.of(new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
+
+        // Get entity from database (in roleDao getById() method).
+        when(roleDatabase.getById(ROLE_ID))
+                .thenReturn(entity);
+
+        // Convert entity from database to cache.
+        when(roleMapper.toCache(entity.get()))
+                .thenReturn(cache.get());
+
+        // Test method.
+        boolean actualResult = roleDao.existsById(ROLE_ID);
+
+        assertTrue(actualResult);
+    }
+
+    @Test
+    @DisplayName("existsById(UUID id) - Should return true when entity is present in database")
+    void existsById_shouldReturnTrueWhenPresentFromDatabase() {
+        Optional<Role> entity = Optional.of(new Role(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
+        Optional<RoleCache> cache = Optional.of(new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
+
+        // Get entity from database (in roleDao getById() method).
+        when(roleDatabase.getById(ROLE_ID))
+                .thenReturn(entity);
+
+        // Convert entity from database to cache.
+        when(roleMapper.toCache(entity.get()))
+                .thenReturn(cache.get());
+
+        // Test method.
+        boolean actualResult = roleDao.existsById(ROLE_ID);
+
+        assertTrue(actualResult);
+    }
+
+    @Test
+    @DisplayName("existsById(UUID id) - Should return false when entity isn't present nor in cache or in database")
+    void existsById_shouldReturnFalseWhenNotPresent() {
+
+        // Get entity from database (in roleDao getById() method).
+        when(roleDatabase.getById(ROLE_ID))
+                .thenReturn(Optional.empty());
+
+        // Check entity exists in database.
+        when(roleDatabase.existsById(ROLE_ID))
+                .thenReturn(false);
+
+        // Test method.
+        boolean actualResult = roleDao.existsById(ROLE_ID);
+
+        assertFalse(actualResult);
+    }
 }
