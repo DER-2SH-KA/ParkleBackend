@@ -369,4 +369,32 @@ class RoleDaoTest {
 
         assertFalse(actualResult);
     }
+
+    @Test
+    @DisplayName("existsByName(String name) - Should return true when entity is present")
+    void existsByName_shouldReturnTrueWhenPresent() {
+
+        // Check entity exists in database.
+        when(roleDatabase.existsByName(ROLE_NAME))
+                .thenReturn(true);
+
+        // Test method.
+        boolean actualResult = roleDao.existsByName(ROLE_NAME);
+
+        assertTrue(actualResult);
+    }
+
+    @Test
+    @DisplayName("existsByName(String name) - Should return false when entity isn't present")
+    void existsByName_shouldReturnFalseWhenNotPresent() {
+
+        // Check entity exists in database.
+        when(roleDatabase.existsByName(ROLE_NAME))
+                .thenReturn(false);
+
+        // Test method.
+        boolean actualResult = roleDao.existsByName(ROLE_NAME);
+
+        assertFalse(actualResult);
+    }
 }
