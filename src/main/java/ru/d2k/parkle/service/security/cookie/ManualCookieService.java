@@ -13,7 +13,6 @@ import java.util.Optional;
 
 @Service
 @Primary
-@RequiredArgsConstructor
 public class ManualCookieService extends CustomCookieService {
     @Override
     public Optional<Cookie> fetchCookie(String name, HttpServletRequest request) {
