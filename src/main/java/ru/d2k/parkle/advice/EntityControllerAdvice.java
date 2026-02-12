@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.d2k.parkle.dto.ErrorResponseDto;
 import ru.d2k.parkle.exception.*;
 
+import org.postgresql.util.PSQLException;
+
+import java.sql.SQLException;
+
 @Slf4j
 @RestControllerAdvice
 public class EntityControllerAdvice {
@@ -67,4 +71,16 @@ public class EntityControllerAdvice {
                 .body(new ErrorResponseDto("Данная ссылка находится в списке экстремистских материалов!", ex.getMessage()));
     }
 
+    @ExceptionHandler(PSQLException.class)
+    public ResponseEntity<ErrorResponseDto> handlePSQLException(SQLException ex) {
+        log.error("PostgreSQL exception. Message: {}", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new ErrorResponseDto(
+                        "Переданны некорректные данные!",
+                        ex.getMessage()
+                        )
+                );
+    }
 }
