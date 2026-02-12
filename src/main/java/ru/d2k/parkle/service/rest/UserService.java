@@ -1,12 +1,9 @@
 package ru.d2k.parkle.service.rest;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -16,10 +13,9 @@ import java.util.stream.Collectors;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,29 +26,27 @@ import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.entity.cache.UserCache;
-import ru.d2k.parkle.exception.JwtNotExistInRequestException;
 import ru.d2k.parkle.exception.RoleNotFoundException;
 import ru.d2k.parkle.exception.UserNotFoundException;
-import ru.d2k.parkle.exception.UserWrongPasswordException;
 import ru.d2k.parkle.model.CustomUserDetails;
-import ru.d2k.parkle.repository.RoleRepository;
-import ru.d2k.parkle.repository.UserRepository;
 import ru.d2k.parkle.service.security.JwtService;
+import ru.d2k.parkle.service.security.authentication.CustomAuthenticationManagerService;
 import ru.d2k.parkle.utils.jwt.JwtUtil;
 import ru.d2k.parkle.utils.mapper.UserMapper;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
+// TODO: Удалить дублирующие функционал методы.
+// TODO: Убрать ручное логирование, заменив их AOP и аннотациями.
 public class UserService {
     private final RoleDao roleDao;
     private final UserDao userDao;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    private final AuthenticationManager authenticationManager;
+    private final CustomAuthenticationManagerService authenticationManagerService;
     private final JwtUtil jwtUtil;
-    private final JwtService jwtService;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -234,7 +228,9 @@ public class UserService {
     ) {
         log.info("Start to getUserByUserAuthDto(): {}", uadto);
 
-        Authentication signedAuthentication = this.createAuthenticationByDto(uadto);
+        // TODO: Перенести отдельно в класс управлением авторизации.
+        Authentication signedAuthentication =
+                authenticationManagerService.createHttpUnauthorizedAuthentication(uadto);
         CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
         String jwtToken = jwtUtil.generateToken(userDetails);
@@ -255,7 +251,9 @@ public class UserService {
         log.info("Start to getUserByUserCreateDto(): {}", cdto);
         this.createUser(cdto);
 
-        Authentication signedAuthentication = this.createAuthenticationByDto(cdto);
+        // TODO: Перенести отдельно в класс управлением авторизации.
+        Authentication signedAuthentication =
+                authenticationManagerService.createHttpUnauthorizedAuthentication(cdto);
         CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
         String jwtToken = jwtUtil.generateToken(userDetails);
@@ -267,52 +265,19 @@ public class UserService {
         return Optional.ofNullable(userMapper.toResponseDto(userDetails.getCache()));
     }
 
-    public Optional<UserResponseDto> getUserByJwt(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) {
+    public Optional<UserResponseDto> getUserByJwt(String jwt) {
         Optional<UserResponseDto> dto = Optional.empty();
 
-        try {
-            Optional<String> jwt = JwtUtil.extractJwtFromCookie(request);
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
 
-            if (jwt.isPresent()) {
-                dto = jwtService.getUserUuidByJwtToken(request);
+        UserCache userCache =
+                ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                        .getCache();
 
-                log.info(dto.isPresent() ? dto.get().toString() : "DTO None!");
-
-                ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwt.get());
-                response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-            }
-            else throw new JwtNotExistInRequestException("JWT token in Cookie is empty or null!");
-        }
-        catch (ExpiredJwtException ex) {
-            log.error("User's JWT is expired!");
-
-            ResponseCookie expiredCookie = jwtUtil.createJwtExpiredCookie();
-            response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
-        }
-        catch (Exception ex) {
-            log.error("Exception in getUserByJwt()!: {}", ex.toString());
-            ResponseCookie expiredCookie = jwtUtil.createJwtExpiredCookie();
-            response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
+        if (Objects.nonNull(userCache)) {
+            dto = Optional.of(userMapper.toResponseDto(userCache));
         }
 
         return dto;
-    }
-
-    public void userLogout(HttpServletResponse response) {
-        ResponseCookie logoutCookie = jwtUtil.createJwtExpiredCookie();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, logoutCookie.toString());
-    }
-
-    public Authentication createAuthenticationByDto(UserDto uadto) {
-        return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        uadto.getLogin(),
-                        uadto.getPassword()
-                )
-        );
     }
 }
