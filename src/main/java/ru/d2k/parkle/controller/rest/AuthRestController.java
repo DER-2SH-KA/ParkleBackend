@@ -4,28 +4,43 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.d2k.parkle.controller.ApiPaths;
 import ru.d2k.parkle.dto.*;
+import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.service.rest.UserService;
+import ru.d2k.parkle.service.security.authentication.CustomAuthenticationManagerService;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
-import ru.d2k.parkle.service.security.cookie.CustomCookieService;
+import ru.d2k.parkle.utils.jwt.JwtUtil;
 
 import java.util.Optional;
 
 @RestController
 @RequestMapping(value = ApiPaths.AUTH_API)
 @RequiredArgsConstructor
+// TODO: Вынести логику авторизации вне контроллера в отдельный класс.
 public class AuthRestController {
     private final UserService userService;
-    private final CustomCookieService cookieService;
+    private final CustomAuthenticationManagerService authenticationManagerService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<?> authentication(
             @Valid @RequestBody UserAuthDto uadto,
             HttpServletResponse response
     ) {
-        Optional<UserResponseDto> dto = userService.getUserByUserAuthDto(uadto, response);
+        Authentication signedAuthentication =
+                authenticationManagerService.createHttpUnauthorizedAuthentication(uadto);
+
+        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
+
+        String jwtToken = jwtUtil.generateToken(userDetails);
+
+        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwtToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+
+        Optional<UserResponseDto> dto = userService.getUserByUserCache(userDetails.getCache());
 
         return dto.isPresent() ?
                 ResponseEntity.ok(dto.get()) :
@@ -37,22 +52,37 @@ public class AuthRestController {
             @Valid @RequestBody UserCreateDto cdto,
             HttpServletResponse response
     ) {
-        Optional<UserResponseDto> dto = userService.getUserByUserCreateDto(cdto, response);
+        UserResponseDto dto = userService.createUser(cdto);
 
-        return dto.isPresent() ?
-                ResponseEntity.status(HttpStatus.CREATED).body(dto.get()) :
-                new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        Authentication signedAuthentication =
+                authenticationManagerService.createHttpUnauthorizedAuthentication(cdto);
+        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
+
+        String jwtToken = jwtUtil.generateToken(userDetails);
+
+        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwtToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+
+        return new ResponseEntity(dto, HttpStatus.CREATED);
     }
 
     // TODO: Переделать с /{login} на /me
     @PatchMapping("/update/{login}")
     public ResponseEntity<UserResponseDto> updateUserById(
             @PathVariable String login,
-            @Valid @RequestBody UserUpdateDto dto
+            @Valid @RequestBody UserUpdateDto dto,
+            HttpServletResponse response
     ) {
         UserResponseDto responseDto = userService.updateUser(login, dto);
 
-        // TODO: Сделать здесь обновление токена пользователя (перевыпуск с обновлёнными данными)!
+        Authentication signedAuthentication =
+                authenticationManagerService.createHttpUnauthorizedAuthentication(dto);
+        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
+
+        String jwtToken = jwtUtil.generateToken(userDetails);
+
+        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwtToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
         return ResponseEntity.ok(responseDto);
     }
@@ -78,7 +108,6 @@ public class AuthRestController {
         if (!jwt.isBlank()) {
             Optional<UserResponseDto> dto = userService.getUserByJwt(jwt);
 
-            // TODO: Перепроверить содержание messageForDev.
             return dto.isPresent() ?
                     ResponseEntity.ok(dto.get()) :
                     new ResponseEntity<>(
@@ -101,13 +130,7 @@ public class AuthRestController {
 
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        ResponseCookie emptyCookie = cookieService.createEmptyResponseCookie(
-                CookieNames.JwtToken,
-                true,
-                false,
-                "/",
-                "Lax"
-        );
+        ResponseCookie emptyCookie = jwtUtil.createJwtExpiredCookie();
         response.addHeader(HttpHeaders.SET_COOKIE, emptyCookie.toString());
 
         return ResponseEntity.ok().build();
