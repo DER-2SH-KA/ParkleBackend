@@ -1,6 +1,5 @@
 package ru.d2k.parkle.controller.rest;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.d2k.parkle.controller.ApiPaths;
 import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.service.rest.UserService;
-import ru.d2k.parkle.service.security.JwtService;
+import ru.d2k.parkle.service.security.cookie.CookieNames;
+import ru.d2k.parkle.service.security.cookie.CustomCookieService;
 
 import java.util.Optional;
 
@@ -18,27 +18,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthRestController {
     private final UserService userService;
+    private final CustomCookieService cookieService;
 
-    /**
-     * Check user is authorized in system by JWT.
-     * @param request
-     * @param response
-     * @return {@link ResponseEntity} with {@link UserResponseDto} or error 401.
-     */
-    @GetMapping("/isAuthed")
-    public ResponseEntity<?> isAuthed(HttpServletRequest request, HttpServletResponse response) {
-        Optional<UserResponseDto> dto = userService.getUserByJwt(request, response);
-
-        return dto.isPresent() ?
-                ResponseEntity.ok(dto.get()) :
-                new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }
-
-    /**
-     * Authentication user in system by login and password in body.
-     * @param uadto {@link UserAuthDto} object for login.
-     * @return {@link UserResponseDto} object of authenticated user.
-     * **/
     @PostMapping("/login")
     public ResponseEntity<?> authentication(
             @Valid @RequestBody UserAuthDto uadto,
@@ -51,11 +32,6 @@ public class AuthRestController {
                 new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    /**
-     * Registration of new user in system.
-     * @param cdto {@link UserCreateDto} object of new user.
-     * @return {@link UserResponseDto} object of created user.
-     * **/
     @PostMapping("/registration")
     public ResponseEntity<?> createUser(
             @Valid @RequestBody UserCreateDto cdto,
@@ -68,12 +44,7 @@ public class AuthRestController {
                 new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    /**
-     * Update user information.
-     * @param login user's login.
-     * @param dto {@link UserUpdateDto} object for update user.
-     * @return {@link UserResponseDto} object of updated user.
-     * **/
+    // TODO: Переделать с /{login} на /me
     @PatchMapping("/update/{login}")
     public ResponseEntity<UserResponseDto> updateUserById(
             @PathVariable String login,
@@ -87,14 +58,11 @@ public class AuthRestController {
     }
 
     // TODO: Переделать с /{login} на /me
-    /**
-     * Delete user by ID.
-     * @param login user's login.
-     * @return OK status.
-     * **/
     @DeleteMapping("/delete/{login}")
-    public ResponseEntity<?> deleteUserByLogin(@PathVariable String login) {
+    public ResponseEntity<?> deleteUserByLogin(@PathVariable String login, HttpServletResponse response) {
         boolean result = userService.deleteUser(login);
+
+        this.logout(response);
 
         return result
                 ? ResponseEntity.ok().build()
@@ -103,9 +71,44 @@ public class AuthRestController {
                     .body("User was not deleted or not exists!");
     }
 
+    @GetMapping("/isAuthed")
+    public ResponseEntity<?> isAuthed(
+            @CookieValue(name = CookieNames.JwtToken, defaultValue = "") String jwt
+    ) {
+        if (!jwt.isBlank()) {
+            Optional<UserResponseDto> dto = userService.getUserByJwt(jwt);
+
+            // TODO: Перепроверить содержание messageForDev.
+            return dto.isPresent() ?
+                    ResponseEntity.ok(dto.get()) :
+                    new ResponseEntity<>(
+                            new ErrorResponseDto(
+                                    "Пользователь не авторизован в системе",
+                                    "User not exists in system by jwt in request"
+                            ),
+                            HttpStatus.UNAUTHORIZED
+                    );
+        }
+
+        return new ResponseEntity<>(
+                new ErrorResponseDto(
+                        "Пользователь не авторизован в системе",
+                        "User's request hasn't jwt cookie for authentication"
+                ),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        userService.userLogout(response);
+        ResponseCookie emptyCookie = cookieService.createEmptyResponseCookie(
+                CookieNames.JwtToken,
+                true,
+                false,
+                "/",
+                "Lax"
+        );
+        response.addHeader(HttpHeaders.SET_COOKIE, emptyCookie.toString());
 
         return ResponseEntity.ok().build();
     }
