@@ -89,13 +89,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         catch (Exception ex) {
             log.error("Exception when JWT filter authentication process: {}", ex);
 
-            ResponseCookie responseCookie = cookieService.createEmptyResponseCookie(
-                    CookieNames.JwtToken,
-                    true,
-                    false,
-                    "/",
-                    "Lax"
-            );
+            ResponseCookie responseCookie = jwtUtil.createJwtExpiredCookie();
             response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
         }
         finally {
