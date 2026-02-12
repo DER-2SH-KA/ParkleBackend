@@ -22,10 +22,6 @@ public class RoleService {
     private final RoleDao roleDao;
     private final RoleMapper roleMapper;
 
-    /**
-     * Return all roles from DB as DTO.
-     * @return Set of dto.
-     * **/
     @Transactional(readOnly = true)
     public Set<RoleResponseDto> findAll() {
         log.info("Getting all roles...");
@@ -38,11 +34,6 @@ public class RoleService {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Return role by ID as DTO.
-     * @param id ID of role.
-     * @return {@link RoleUpdateDto} dto.
-     * **/
     @Transactional(readOnly = true)
     public RoleResponseDto findById(UUID id) {
         log.info("Getting role by ID: {}...", id);
@@ -56,11 +47,6 @@ public class RoleService {
         return roleMapper.toResponseDto(role);
     }
 
-    /**
-     * Return role as {@link RoleUpdateDto} by name.
-     * @param name Name of role.
-     * @return {@link RoleUpdateDto} object.
-     * **/
     @Transactional(readOnly = true)
     public RoleResponseDto findByName(String name) {
         log.info("Getting roles by Name '{}'...", name);
@@ -75,11 +61,6 @@ public class RoleService {
         return roleMapper.toResponseDto(role);
     }
 
-    /**
-     * Create new role.
-     * @param cdto new {@code RoleUpdateDto} to create.
-     * @return {@code RoleUpdateDto} role as DTO which was saved.
-     * **/
     @Transactional
     public RoleResponseDto create(RoleCreateDto cdto) {
         log.info("Creating role '{}'...", cdto.toString());
@@ -95,11 +76,6 @@ public class RoleService {
         return roleMapper.toResponseDto(role);
     }
 
-    /**
-     * Update role.
-     * @param udto {@code RoleUpdateDto} to update.
-     * @return {@code RoleUpdateDto} role as DTO which was saved.
-     * **/
     @Transactional
     public RoleResponseDto update(UUID id, RoleUpdateDto udto) {
         log.info("Updating role by id '{}'...", id);
@@ -117,10 +93,6 @@ public class RoleService {
         return roleMapper.toResponseDto(updatedRole);
     }
 
-    /**
-     * Delete role by ID.
-     * @param id role ID for delete.
-     * **/
     @Transactional
     public boolean delete(UUID id) {
         log.info("Delete role by ID {}...", id);
