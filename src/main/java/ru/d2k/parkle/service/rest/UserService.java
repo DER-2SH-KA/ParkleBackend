@@ -29,7 +29,6 @@ import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.exception.RoleNotFoundException;
 import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.model.CustomUserDetails;
-import ru.d2k.parkle.service.security.JwtService;
 import ru.d2k.parkle.service.security.authentication.CustomAuthenticationManagerService;
 import ru.d2k.parkle.utils.jwt.JwtUtil;
 import ru.d2k.parkle.utils.mapper.UserMapper;
