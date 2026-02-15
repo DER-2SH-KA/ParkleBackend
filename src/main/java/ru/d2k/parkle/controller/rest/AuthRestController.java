@@ -4,16 +4,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.d2k.parkle.controller.ApiPaths;
 import ru.d2k.parkle.dto.*;
-import ru.d2k.parkle.model.CustomUserDetails;
-import ru.d2k.parkle.service.rest.UserService;
-import ru.d2k.parkle.service.security.authentication.CustomAuthenticationManagerService;
+import ru.d2k.parkle.service.rest.AuthService;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.utils.jwt.JwtUtil;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -21,26 +19,22 @@ import java.util.Optional;
 @RequiredArgsConstructor
 // TODO: Вынести логику авторизации вне контроллера в отдельный класс.
 public class AuthRestController {
-    private final UserService userService;
-    private final CustomAuthenticationManagerService authenticationManagerService;
     private final JwtUtil jwtUtil;
+    private final AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<?> authentication(
             @Valid @RequestBody UserAuthDto uadto,
             HttpServletResponse response
     ) {
-        Authentication signedAuthentication =
-                authenticationManagerService.createHttpUnauthorizedAuthentication(uadto);
+        Map.Entry<String, Optional<UserResponseDto>> jwtAndDto = authService.login(uadto);
 
-        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
+        String jwt = jwtAndDto.getKey();
+        Optional<UserResponseDto> dto = jwtAndDto.getValue();
 
-        String jwtToken = jwtUtil.generateToken(userDetails);
-
-        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwtToken);
+        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwt);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-        Optional<UserResponseDto> dto = userService.getUserByUserCache(userDetails.getCache());
 
         return dto.isPresent() ?
                 ResponseEntity.ok(dto.get()) :
@@ -52,15 +46,12 @@ public class AuthRestController {
             @Valid @RequestBody UserCreateDto cdto,
             HttpServletResponse response
     ) {
-        UserResponseDto dto = userService.createUser(cdto);
+        Map.Entry<String, UserResponseDto> jwtAndDto = authService.registration(cdto);
 
-        Authentication signedAuthentication =
-                authenticationManagerService.createHttpUnauthorizedAuthentication(cdto);
-        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
+        String jwt = jwtAndDto.getKey();
+        UserResponseDto dto = jwtAndDto.getValue();
 
-        String jwtToken = jwtUtil.generateToken(userDetails);
-
-        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwtToken);
+        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwt);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
         return new ResponseEntity(dto, HttpStatus.CREATED);
@@ -70,35 +61,32 @@ public class AuthRestController {
     @PatchMapping("/update/{login}")
     public ResponseEntity<UserResponseDto> updateUserById(
             @PathVariable String login,
-            @Valid @RequestBody UserUpdateDto dto,
+            @Valid @RequestBody UserUpdateDto udto,
             HttpServletResponse response
     ) {
-        UserResponseDto responseDto = userService.updateUser(login, dto);
+        Map.Entry<String, UserResponseDto> jwtAndDto = authService.update(login, udto);
 
-        Authentication signedAuthentication =
-                authenticationManagerService.createHttpUnauthorizedAuthentication(dto);
-        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
+        String jwt = jwtAndDto.getKey();
+        UserResponseDto dto = jwtAndDto.getValue();
 
-        String jwtToken = jwtUtil.generateToken(userDetails);
-
-        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwtToken);
+        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwt);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(dto);
     }
 
     // TODO: Переделать с /{login} на /me
     @DeleteMapping("/delete/{login}")
     public ResponseEntity<?> deleteUserByLogin(@PathVariable String login, HttpServletResponse response) {
-        boolean result = userService.deleteUser(login);
+        boolean result = authService.delete(login);
 
         this.logout(response);
 
         return result
                 ? ResponseEntity.ok().build()
                 : ResponseEntity
-                    .internalServerError()
-                    .body("User was not deleted or not exists!");
+                .internalServerError()
+                .body("User was not deleted!");
     }
 
     @GetMapping("/isAuthed")
@@ -106,7 +94,7 @@ public class AuthRestController {
             @CookieValue(name = CookieNames.JwtToken, defaultValue = "") String jwt
     ) {
         if (!jwt.isBlank()) {
-            Optional<UserResponseDto> dto = userService.getUserByJwt(jwt);
+            Optional<UserResponseDto> dto = authService.getUserIfJwtPresent(jwt);
 
             return dto.isPresent() ?
                     ResponseEntity.ok(dto.get()) :
