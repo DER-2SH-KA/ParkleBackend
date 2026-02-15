@@ -205,7 +205,7 @@ public class RoleDao {
         return roleDatabase.getById(id);
     }
 
-    private Optional<Role> getFromDatabaseByName(String name) {
+    public Optional<Role> getFromDatabaseByName(String name) {
         return roleDatabase.getByName(name);
     }
 
