@@ -1,6 +1,9 @@
 package ru.d2k.parkle.utils.mapper;
 
 import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.Role;
@@ -14,23 +17,28 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+@Component
+public abstract class UserMapper {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Mapping(target = "roleName", source = "role.name")
     @Mapping(target = "rolePriority", source = "role.priority")
-    UserResponseDto toResponseDto(User entity);
+    public abstract UserResponseDto toResponseDto(User entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy =
             NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "role", target = "role")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "websites", ignore = true)
-    User updateByDto(@MappingTarget User entity, UserUpdateDto dto, Role role);
+    @Mapping(target = "password", source = "dto.password", qualifiedByName = "hashPassword")
+    public abstract User updateByDto(@MappingTarget User entity, UserUpdateDto dto, Role role);
 
     /**
      * CACHE => DTO
      * */
-    UserResponseDto toResponseDto(UserCache userCache);
+    public abstract UserResponseDto toResponseDto(UserCache userCache);
 
     /**
      * ENTITY => CACHE
@@ -41,10 +49,10 @@ public interface UserMapper {
     @Mapping(target = "hashedPassword", source = "password")
     @Mapping(target = "isBlocked", source = "isBlocked")
     @Mapping(target = "websiteIds", source = "websites", qualifiedByName = "fromWebsitesToUUID")
-    UserCache toCache(User entity);
+    public abstract UserCache toCache(User entity);
 
     @Named("fromWebsitesToUUID")
-    default List<UUID> fromWebsitesToUUID(List<Website> websites) {
+    List<UUID> fromWebsitesToUUID(List<Website> websites) {
         if (Objects.isNull(websites) || websites.isEmpty()) {
             return new ArrayList<>();
         }
@@ -52,5 +60,10 @@ public interface UserMapper {
         return websites.stream()
                 .map(Website::getId)
                 .toList();
+    }
+
+    @Named("hashPassword")
+    String hashPassword(String password) {
+        return passwordEncoder.encode(password);
     }
 }
