@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dao.cache.user.UserCacheSource;
 import ru.d2k.parkle.dao.database.user.UserDatabaseSource;
 import ru.d2k.parkle.dto.UserUpdateDto;
+import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
+import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.redis.RedisCacheKeys;
@@ -26,6 +28,8 @@ public class UserDao {
     private final UserDatabaseSource userDatabase;
     private final UserCacheSource userCache;
     private final UserMapper userMapper;
+
+    private final RoleDao roleDao;
 
     // CRUD.
     // Create.
@@ -119,8 +123,10 @@ public class UserDao {
     public Optional<UserCache> update(String login, UserUpdateDto udto) {
         Optional<User> entity = this.getFromDatabaseByLogin(login);
 
-        if (entity.isPresent()) {
-            userMapper.updateByDto(entity.get(), udto, entity.get().getRole());
+        Optional<Role> role = roleDao.getFromDatabaseByName(udto.getRoleName());
+
+        if (entity.isPresent() && role.isPresent()) {
+            userMapper.updateByDto(entity.get(), udto, role.get());
 
             User updatedEntity = this.saveToDatabase(entity.get());
             UserCache cache = userMapper.toCache(updatedEntity);
