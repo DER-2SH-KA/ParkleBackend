@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.d2k.parkle.dao.cache.role.RoleCacheSource;
 import ru.d2k.parkle.dao.database.role.RoleDatabaseSource;
