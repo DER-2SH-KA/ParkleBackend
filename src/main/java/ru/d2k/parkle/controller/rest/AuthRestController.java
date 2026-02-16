@@ -10,8 +10,8 @@ import ru.d2k.parkle.dto.*;
 import ru.d2k.parkle.service.rest.AuthService;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.utils.jwt.JwtUtil;
+import ru.d2k.parkle.utils.type.Pair;
 
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -27,7 +27,7 @@ public class AuthRestController {
             @Valid @RequestBody UserAuthDto uadto,
             HttpServletResponse response
     ) {
-        Map.Entry<String, Optional<UserResponseDto>> jwtAndDto = authService.login(uadto);
+        Pair<String, Optional<UserResponseDto>> jwtAndDto = authService.login(uadto);
 
         String jwt = jwtAndDto.getKey();
         Optional<UserResponseDto> dto = jwtAndDto.getValue();
@@ -46,7 +46,7 @@ public class AuthRestController {
             @Valid @RequestBody UserCreateDto cdto,
             HttpServletResponse response
     ) {
-        Map.Entry<String, UserResponseDto> jwtAndDto = authService.registration(cdto);
+        Pair<String, UserResponseDto> jwtAndDto = authService.registration(cdto);
 
         String jwt = jwtAndDto.getKey();
         UserResponseDto dto = jwtAndDto.getValue();
@@ -64,7 +64,7 @@ public class AuthRestController {
             @Valid @RequestBody UserUpdateDto udto,
             HttpServletResponse response
     ) {
-        Map.Entry<String, UserResponseDto> jwtAndDto = authService.update(login, udto);
+        Pair<String, UserResponseDto> jwtAndDto = authService.update(login, udto);
 
         String jwt = jwtAndDto.getKey();
         UserResponseDto dto = jwtAndDto.getValue();

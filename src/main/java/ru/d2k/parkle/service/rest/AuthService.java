@@ -11,8 +11,8 @@ import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.service.security.authentication.CustomAuthenticationManagerService;
 import ru.d2k.parkle.utils.jwt.JwtUtil;
+import ru.d2k.parkle.utils.type.Pair;
 
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,7 +23,7 @@ public class AuthService {
     private final CustomAuthenticationManagerService authenticationManagerService;
     private final JwtUtil jwtUtil;
 
-    public Map.Entry<String, Optional<UserResponseDto>> login(UserAuthDto adto) {
+    public Pair<String, Optional<UserResponseDto>> login(UserAuthDto adto) {
         Authentication signedAuthentication =
                 authenticationManagerService.createHttpUnauthorizedAuthentication(adto);
 
@@ -33,10 +33,10 @@ public class AuthService {
 
         Optional<UserResponseDto> dto = userService.getUserByUserCache(userDetails.getCache());
 
-        return Map.entry(jwtToken, dto);
+        return new Pair<>(jwtToken, dto);
     }
 
-    public Map.Entry<String, UserResponseDto> registration(UserCreateDto cdto) {
+    public Pair<String, UserResponseDto> registration(UserCreateDto cdto) {
         UserResponseDto dto = userService.createUser(cdto);
 
         Authentication signedAuthentication =
@@ -45,10 +45,10 @@ public class AuthService {
 
         String jwtToken = jwtUtil.generateToken(userDetails);
 
-        return Map.entry(jwtToken, dto);
+        return new Pair(jwtToken, dto);
     }
 
-    public Map.Entry<String, UserResponseDto> update(String login, UserUpdateDto udto) {
+    public Pair<String, UserResponseDto> update(String login, UserUpdateDto udto) {
         UserResponseDto dto = userService.updateUser(login, udto);
 
         Authentication signedAuthentication =
@@ -57,7 +57,7 @@ public class AuthService {
 
         String jwtToken = jwtUtil.generateToken(userDetails);
 
-        return Map.entry(jwtToken, dto);
+        return new Pair(jwtToken, dto);
     }
 
     public boolean delete(String login) {
