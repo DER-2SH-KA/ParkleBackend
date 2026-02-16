@@ -18,6 +18,10 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
 
+  threads:
+    virtual:
+      enabled: true
+
 springdoc:
   api-docs:
     path: /api-docs
