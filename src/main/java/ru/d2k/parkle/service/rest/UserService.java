@@ -1,25 +1,14 @@
 package ru.d2k.parkle.service.rest;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,36 +19,21 @@ import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.entity.cache.UserCache;
-import ru.d2k.parkle.exception.JwtNotExistInRequestException;
 import ru.d2k.parkle.exception.RoleNotFoundException;
 import ru.d2k.parkle.exception.UserNotFoundException;
-import ru.d2k.parkle.exception.UserWrongPasswordException;
 import ru.d2k.parkle.model.CustomUserDetails;
-import ru.d2k.parkle.repository.RoleRepository;
-import ru.d2k.parkle.repository.UserRepository;
-import ru.d2k.parkle.service.security.JwtService;
-import ru.d2k.parkle.utils.jwt.JwtUtil;
 import ru.d2k.parkle.utils.mapper.UserMapper;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
+// TODO: Убрать ручное логирование, заменив их AOP и аннотациями.
 public class UserService {
     private final RoleDao roleDao;
     private final UserDao userDao;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
-    private final JwtService jwtService;
-
-    private final RedisTemplate<String, Object> redisTemplate;
-
-    /**
-     * Return all users from DB as DTO.
-     * @return Set of {@link UserResponseDto}.
-     * **/
     @Transactional(readOnly = true)
     public Set<UserResponseDto> findUsers() {
         log.info("Getting all users...");
@@ -72,33 +46,6 @@ public class UserService {
         return dtos;
     }
 
-    /**
-     * Return user by ID as DTO.
-     * @param id ID of user.
-     * @return {@link UserResponseDto} dto.
-     * @throws UserNotFoundException if user was not found by ID.
-     * **/
-    @Transactional(readOnly = true)
-    public UserResponseDto findUserById(UUID id) {
-        log.info("Getting user by ID {}...", id);
-
-        if (id == null) return null;
-
-        UserCache user = userDao.getById(id)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User was not found with ID: " + id)
-                );
-
-        log.info("User with ID {} was founded", id);
-        return userMapper.toResponseDto(user);
-    }
-
-    /**
-     * Return user by login as DTO.
-     * @param login User's login.
-     * @return {@link UserResponseDto} dto.
-     * @throws UserNotFoundException if user not found by login.
-     * */
     @Transactional(readOnly = true)
     public UserResponseDto findUserByLogin(String login) {
         log.info("Getting user by login '{}'...", login);
@@ -114,40 +61,6 @@ public class UserService {
         return userMapper.toResponseDto(user);
     }
 
-    /**
-     * Authentication user by login and password.
-     * @param uadto {@link UserAuthDto} object with login and password data.
-     * @return {@link UserResponseDto} object. Can be null.
-     * @throws UserNotFoundException if user with given login and password was not found.
-     * **/
-    // TODO: Удалить.
-    @Transactional(readOnly = true)
-    public Optional<UserResponseDto> getUserByAuthDao(UserAuthDto uadto) {
-        log.info("Authenticate user by login '{}' and password", uadto.getLogin());
-
-        UserCache user = userDao.getByLogin(uadto.getLogin())
-                .orElseThrow(() ->
-                        new UserNotFoundException("User was not found with login: {} and password in repository" + uadto.getLogin())
-                );
-
-        if (!passwordEncoder.matches(uadto.getPassword(), user.hashedPassword())) {
-            throw new BadCredentialsException(
-                    String.format("For User with login: %s given wrong password", uadto.getLogin())
-            );
-        }
-
-        Optional<UserResponseDto> dto = Optional.ofNullable(userMapper.toResponseDto(user));
-
-        log.info("Authenticated user with DTO: {}", dto);
-
-        return dto;
-    }
-
-    /**
-     * Create user from DTO and return as DTO.
-     * @param dto {@link UserCreateDto} of new user.
-     * @return {@link UserResponseDto} dto.
-     * **/
     @Transactional
     public UserResponseDto createUser(UserCreateDto dto) {
         log.info("Creating user: {}...", dto.toString());
@@ -168,32 +81,9 @@ public class UserService {
         return userMapper.toResponseDto(savedUser);
     }
 
-    /**
-     * Update user from DTO and return as DTO.
-     * @param login User's login.
-     * @param udto {@link UserUpdateDto} dto of user to update.
-     * @return {@link UserResponseDto} dto.
-     * **/
     @Transactional
     public UserResponseDto updateUser(String login, UserUpdateDto udto) {
         log.info("Updating user by login '{}'...", login);
-
-        if (Objects.isNull(login)) return null;
-
-        UserCache user = userDao.getByLogin(login)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User was not found with login: " + login)
-                );
-        Role role = null;
-
-        if (udto.getRoleName() != null) {
-            RoleCache roleCache = roleDao.getByName(udto.getRoleName())
-                    .orElseThrow(() ->
-                            new RoleNotFoundException("Role was not found with name: " + udto.getRoleName())
-                    );
-
-            role = new Role(roleCache.id(), roleCache.name(), roleCache.priority());
-        }
 
         Optional<UserCache> updatedUser = userDao.update(login, udto);
 
@@ -205,10 +95,6 @@ public class UserService {
         return dto;
     }
 
-    /**
-     * Delete user by ID.
-     * @param login User's login to delete.
-     * **/
     @Transactional
     public boolean deleteUser(String login) {
         log.info("Deleting user by login '{}'...", login);
@@ -227,92 +113,30 @@ public class UserService {
         return false;
     }
 
-    @Transactional
-    public Optional<UserResponseDto> getUserByUserAuthDto(
-            UserAuthDto uadto,
-            HttpServletResponse response
+    public Optional<UserResponseDto> getUserByUserCache(
+            UserCache cache
     ) {
-        log.info("Start to getUserByUserAuthDto(): {}", uadto);
+        log.info("Start to getUserByUserCache() (login): {}", cache.login());
 
-        Authentication signedAuthentication = this.createAuthenticationByDto(uadto);
-        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
+        UserResponseDto dto = userMapper.toResponseDto(cache);
 
-        String jwtToken = jwtUtil.generateToken(userDetails);
-
-        ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
-        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-
-        log.info("User was taken in getUserByUserAuthDto(): {}", uadto);
-        return Optional.ofNullable(userMapper.toResponseDto(userDetails.getCache()));
+        log.info("User was taken in getUserByUserCache() (login): {}", cache.login());
+        return Optional.ofNullable(dto);
     }
 
-    @Transactional
-    public Optional<UserResponseDto> getUserByUserCreateDto(
-            UserCreateDto cdto,
-            HttpServletResponse response
-
-    ) {
-        log.info("Start to getUserByUserCreateDto(): {}", cdto);
-        this.createUser(cdto);
-
-        Authentication signedAuthentication = this.createAuthenticationByDto(cdto);
-        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
-
-        String jwtToken = jwtUtil.generateToken(userDetails);
-
-        ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwtToken);
-        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-
-        log.info("User was taken in getUserByUserCreateDto(): {}", cdto);
-        return Optional.ofNullable(userMapper.toResponseDto(userDetails.getCache()));
-    }
-
-    public Optional<UserResponseDto> getUserByJwt(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) {
+    public Optional<UserResponseDto> getUserByJwt(String jwt) {
         Optional<UserResponseDto> dto = Optional.empty();
 
-        try {
-            Optional<String> jwt = JwtUtil.extractJwtFromCookie(request);
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
 
-            if (jwt.isPresent()) {
-                dto = jwtService.getUserUuidByJwtToken(request);
+        UserCache userCache =
+                ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                        .getCache();
 
-                log.info(dto.isPresent() ? dto.get().toString() : "DTO None!");
-
-                ResponseCookie jwtCookie = jwtUtil.getResponseCookieWithJwt(jwt.get());
-                response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-            }
-            else throw new JwtNotExistInRequestException("JWT token in Cookie is empty or null!");
-        }
-        catch (ExpiredJwtException ex) {
-            log.error("User's JWT is expired!");
-
-            ResponseCookie expiredCookie = jwtUtil.createJwtExpiredCookie();
-            response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
-        }
-        catch (Exception ex) {
-            log.error("Exception in getUserByJwt()!: {}", ex.toString());
-            ResponseCookie expiredCookie = jwtUtil.createJwtExpiredCookie();
-            response.addHeader( HttpHeaders.SET_COOKIE, expiredCookie.toString());
+        if (Objects.nonNull(userCache)) {
+            dto = Optional.of(userMapper.toResponseDto(userCache));
         }
 
         return dto;
-    }
-
-    public void userLogout(HttpServletResponse response) {
-        ResponseCookie logoutCookie = jwtUtil.createJwtExpiredCookie();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, logoutCookie.toString());
-    }
-
-    public Authentication createAuthenticationByDto(UserDto uadto) {
-        return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        uadto.getLogin(),
-                        uadto.getPassword()
-                )
-        );
     }
 }

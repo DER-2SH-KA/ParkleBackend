@@ -70,7 +70,6 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
@@ -230,6 +229,11 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<jvmArguments>
+						-Xms50m -Xmx100m
+						-XX:MaxMetaspaceSize=128m
+						-XX:+UseSerialGC
+					</jvmArguments>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -246,22 +250,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<!--<profiles>
-		<profile>
-			<id>dev</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<activatedProperties>dev</activatedProperties>
-			</properties>
-		</profile>
-		<profile>
-			<id>docker</id>
-			<properties>
-				<activatedProperties>docker</activatedProperties>
-			</properties>
-		</profile>
-	</profiles>-->
-
 </project>

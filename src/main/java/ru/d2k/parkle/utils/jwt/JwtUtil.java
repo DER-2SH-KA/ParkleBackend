@@ -6,18 +6,24 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
+import ru.d2k.parkle.service.security.cookie.CookieNames;
+import ru.d2k.parkle.service.security.cookie.CustomCookieService;
 
 import javax.crypto.SecretKey;
 import java.util.*;
 import java.util.function.Function;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
+    private final CustomCookieService cookieService;
+
     @Value("${jwt.secret-key}")
     private String secretKey;
 
@@ -88,25 +94,29 @@ public class JwtUtil {
     }
 
     public static Optional<String> extractJwtFromCookie(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, "jwt-token");
+        Cookie cookie = WebUtils.getCookie(request, CookieNames.JwtToken);
         return Objects.nonNull(cookie) ? Optional.of(cookie.getValue()) : Optional.empty();
     }
 
-    public ResponseCookie getResponseCookieWithJwt(String jwt) {
-        return ResponseCookie.from("jwt-token", jwt)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge((int) (jwtTokenExpiration / 1000))
-                .build();
+    public ResponseCookie createJwtCookie(String jwt) {
+        return cookieService.createResponseCookie(
+                CookieNames.JwtToken,
+                jwt,
+                true,
+                false,
+                "/",
+                (int) (jwtTokenExpiration / 1000),
+                "Lax"
+        );
     }
 
     public ResponseCookie createJwtExpiredCookie() {
-        return ResponseCookie.from("jwt-token", "")
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(this.jwtTokenExpiration / 1000)
-                .build();
+        return cookieService.createEmptyResponseCookie(
+                CookieNames.JwtToken,
+                true,
+                false,
+                "/",
+                "Lax"
+        );
     }
 }

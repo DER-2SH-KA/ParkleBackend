@@ -30,10 +30,6 @@ public class WebsiteService {
     private final WebsiteMapper websiteMapper;
     private final ExtremismUtil extremismUtil;
 
-    /**
-     * Return all websites by all users from DB as DTO.
-     * @return List of {@link WebsiteResponseDto}.
-     * **/
     @Transactional(readOnly = true)
     public List<WebsiteResponseDto> findWebsites() {
         log.info("Getting all websites...");
@@ -46,11 +42,6 @@ public class WebsiteService {
         return dtos;
     }
 
-    /**
-     * Return website by ID as DTO.
-     * @param id ID of website.
-     * @return {@link WebsiteResponseDto} dto.
-     * **/
     @Transactional(readOnly = true)
     public WebsiteResponseDto findWebsiteById(UUID id) {
         log.info("Getting website by ID: {}...", id);
@@ -64,10 +55,6 @@ public class WebsiteService {
         return websiteMapper.toResponseDto(website);
     }
 
-    /**
-     * Return websites by user login as DTO.
-     * @return {@link WebsiteResponseDto} dto.
-     * **/
     @Transactional(readOnly = true)
     public List<WebsiteResponseDto> findWebsiteByUserLogin() {
 
@@ -85,11 +72,6 @@ public class WebsiteService {
         return websites.stream().map(websiteMapper::toResponseDto).toList();
     }
 
-    /**
-     * Create website from DTO and return as DTO.
-     * @param dto {@link WebsiteCreateDto} of new website.
-     * @return {@link WebsiteResponseDto} dto.
-     * **/
     @Transactional
     public WebsiteResponseDto createWebsite(WebsiteCreateDto dto) {
         log.info("Creating website: {}...", dto.toString());
@@ -113,11 +95,6 @@ public class WebsiteService {
         return websiteMapper.toResponseDto(savedWebsite);
     }
 
-    /**
-     * Update website from DTO and return as DTO.
-     * @param udto {@link WebsiteUpdateDto} dto of website to update.
-     * @return {@link WebsiteResponseDto} dto.
-     * **/
     @Transactional
     public WebsiteResponseDto updateWebsite(UUID id, WebsiteUpdateDto udto) {
         log.info("Updating website by ID '{}'...", id);
@@ -143,10 +120,6 @@ public class WebsiteService {
         );
     }
 
-    /**
-     * Delete website by ID.
-     * @param id Website's ID.
-     * **/
     public boolean deleteWebsite(UUID id) {
         log.info("Deleting website by ID '{}'", id);
 
