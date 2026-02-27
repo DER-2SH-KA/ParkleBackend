@@ -25,6 +25,12 @@ services:
       redis:
         condition: service_healthy
 
+  scraper:
+    build: ./ext/scraper
+    container_name: parkle_scraper_go
+    expose:
+      - "9001"
+
   postgres:
     image: postgres:16.9
     container_name: postgres_parkle
@@ -56,6 +62,7 @@ services:
       # - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - spring
+      - scraper
 
   redis:
     image: redis:alpine3.22
