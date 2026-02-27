@@ -1,0 +1,1 @@
+start windows-go-build-to-linux-amd64.bat&& docker build -t parkle_scraper .

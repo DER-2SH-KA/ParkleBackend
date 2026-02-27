@@ -1,0 +1,1 @@
+docker run -p 9001:9001 --name parkle_scraper_container -d parkle_scraper
