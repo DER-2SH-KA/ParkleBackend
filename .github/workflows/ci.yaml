@@ -56,6 +56,9 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /root/Parkle/ParkleBackend
+            
+            echo ${{ secrets.ENV_FILE }} > .env
+            
             chmod +x mvnw *.sh
             
             ./linux-docker-down.sh
