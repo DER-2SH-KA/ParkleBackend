@@ -47,7 +47,7 @@ jobs:
           ARGS: "-rlgoDzvc -i --delete"
           REMOTE_HOST: ${{ secrets.VPS_HOST }}
           REMOTE_USER: ${{ secrets.VPS_USER }}
-          TARGET: "/parkle/ParkleBackend"
+          TARGET: "/root/Parkle/ParkleBackend"
           EXCLUDE: "/.git/, /.github/, /ext/**"
 
       - name: Executing remote ssh commands
@@ -57,7 +57,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /parkle/ParkleBackend
+            cd /root/Parkle/ParkleBackend
             chmod +x mvnw *.sh
             
             ./linux-docker-down.sh
