@@ -1,5 +1,6 @@
-nginx:
-  ports:
-    - "80:80"
-  volumes:
-    - ./nginx/nginx-dev.conf:/etc/nginx/nginx.conf:ro # for nginx configuration
+services:
+  nginx:
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx-dev.conf:/etc/nginx/nginx.conf:ro # for nginx configuration
