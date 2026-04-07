@@ -1,1 +1,1 @@
-docker-compose -p parkle up -d --build
+docker compose -p parkle up -d --build
