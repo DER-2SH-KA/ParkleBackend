@@ -57,7 +57,11 @@ jobs:
           script: |
             cd /root/Parkle/ParkleBackend
             
-            echo ${{ secrets.ENV_FILE }} > .env
+            cat << 'EOF' > .env
+            ${{ secrets.ENV_FILE }}
+            EOF
+            
+            ls -la .env
             
             chmod +x mvnw *.sh
             
