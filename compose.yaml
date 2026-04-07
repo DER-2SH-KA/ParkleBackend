@@ -54,12 +54,6 @@ services:
     image: nginx:mainline-alpine3.23
     container_name: nginx_parkle
     restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx-dev.conf:/etc/nginx/nginx.conf:ro # for nginx configuration
-      # - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - spring
       - scraper
