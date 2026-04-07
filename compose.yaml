@@ -25,11 +25,11 @@ services:
       redis:
         condition: service_healthy
 
-  scraper:
-    build: ./ext/scraper
-    container_name: parkle_scraper_go
-    expose:
-      - "9001"
+  #scraper:
+  #  build: ./ext/scraper
+  #  container_name: parkle_scraper_go
+  #  expose:
+  #    - "9001"
 
   postgres:
     image: postgres:16.9
@@ -56,7 +56,7 @@ services:
     restart: unless-stopped
     depends_on:
       - spring
-      - scraper
+      # - scraper
 
   redis:
     image: redis:alpine3.22

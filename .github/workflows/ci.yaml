@@ -26,9 +26,7 @@ jobs:
           cache: 'maven'
 
       - name: Build and Test
-        run: |
-          chmod +x mvnw
-          ./mvnw clean package
+        run: mvn clean package
 
   deploy:
     name: Deploy to VPS
@@ -48,7 +46,7 @@ jobs:
           REMOTE_HOST: ${{ secrets.VPS_HOST }}
           REMOTE_USER: ${{ secrets.VPS_USER }}
           TARGET: "/root/Parkle/ParkleBackend"
-          EXCLUDE: "/.git/, /.github/, /ext/**"
+          EXCLUDE: "/.github/, /ext/**"
 
       - name: Executing remote ssh commands
         uses: appleboy/ssh-action@master
