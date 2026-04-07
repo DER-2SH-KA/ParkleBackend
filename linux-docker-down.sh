@@ -1,1 +1,1 @@
-docker-compose -p parkle down
+docker compose -p parkle down
