@@ -3,10 +3,7 @@ services:
     build: .
     # image: parkle
     container_name: spring_parkle
-    deploy:
-      resources:
-        limits:
-          memory: 400m
+    hostname: spring_parkle
     expose:
       - "8080"
     environment:
@@ -19,11 +16,28 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
+    networks:
+      - nginx_network
+      - backend_network
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/api/auth/ping || exit 1" ]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 500m
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 30s
 
   #scraper:
   #  build: ./ext/scraper
@@ -34,41 +48,111 @@ services:
   postgres:
     image: postgres:16.9
     container_name: postgres_parkle
+    hostname: postgres_parkle
+    expose:
+      - "5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    expose:
-      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
+      interval: 20s
       retries: 5
-      start_period: 30s
       timeout: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 100m
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 10s
 
   
   nginx:
     image: nginx:mainline-alpine3.23
     container_name: nginx_parkle
-    restart: unless-stopped
+    hostname: nginx_parkle
+    networks:
+      - nginx_network
     depends_on:
-      - spring
+      spring:
+        condition: service_healthy
       # - scraper
+      dozzle:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 20m
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 10s
 
   redis:
     image: redis:alpine3.22
     container_name: redis_parkle
+    hostname: redis_parkle
     expose:
       - "6379"
+    networks:
+      - backend_network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
+      interval: 20s
       timeout: 5s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 100m
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 10s
+
+  dozzle:
+    image: amir20/dozzle:v10
+    container_name: dozzle_parkle
+    hostname: dozzle_parkle
+    expose:
+      - "8080"
+    environment:
+      DOZZLE_BASE: /dozzle/ui
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - nginx_network
+    healthcheck:
+      test: ["CMD", "/dozzle", "healthcheck"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 100m
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 10s
 
 volumes:
   postgres_data:
   nginx_data:
+
+networks:
+  nginx_network:
+    driver: bridge
+  backend_network:
+    driver: bridge
