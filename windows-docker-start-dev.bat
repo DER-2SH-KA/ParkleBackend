@@ -1,0 +1,1 @@
+docker compose -p parkle -f compose.yaml -f compose.dev.yaml up -d --build
