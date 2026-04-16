@@ -4,8 +4,8 @@ services:
     # image: parkle
     container_name: spring_parkle
     hostname: spring_parkle
-    expose:
-      - "8080"
+    ports:
+      - "8388:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_SECURITY_BCRYPT_STRENGTH: ${SPRING_SECURITY_BCRYPT_STRENGTH}
@@ -17,7 +17,6 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
     networks:
-      - nginx_network
       - backend_network
     depends_on:
       postgres:
@@ -74,29 +73,6 @@ services:
         max_attempts: 3
         window: 10s
 
-  
-  nginx:
-    image: nginx:mainline-alpine3.23
-    container_name: nginx_parkle
-    hostname: nginx_parkle
-    networks:
-      - nginx_network
-    depends_on:
-      spring:
-        condition: service_healthy
-      # - scraper
-      dozzle:
-        condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          memory: 100m
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 10s
-
   redis:
     image: redis:alpine3.22
     container_name: redis_parkle
@@ -124,14 +100,12 @@ services:
     image: amir20/dozzle:v10
     container_name: dozzle_parkle
     hostname: dozzle_parkle
-    expose:
-      - "8080"
+    ports:
+      - "9999:8080"
     environment:
       DOZZLE_BASE: /dozzle/ui
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - nginx_network
     healthcheck:
       test: ["CMD", "/dozzle", "healthcheck"]
       interval: 20s
@@ -149,10 +123,7 @@ services:
 
 volumes:
   postgres_data:
-  nginx_data:
 
 networks:
-  nginx_network:
-    driver: bridge
   backend_network:
     driver: bridge
