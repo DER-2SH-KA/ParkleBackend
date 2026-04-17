@@ -1,11 +1,28 @@
+# Anchors.
+x-restart-policies-long: &restart-policy-long
+  condition: on-failure
+  delay: 5s
+  max_attempts: 3
+  window: 30s
+
+x-restart-policies-default: &restart-policy-default
+  condition: on-failure
+  delay: 5s
+  max_attempts: 3
+  window: 10s
+
+x-logging: &logging-default
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   spring:
     build: .
     # image: parkle
     container_name: spring_parkle
     hostname: spring_parkle
-    expose:
-      - "8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_SECURITY_BCRYPT_STRENGTH: ${SPRING_SECURITY_BCRYPT_STRENGTH}
@@ -16,9 +33,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
-    networks:
-      - backend_network
-      - nginx_network
     depends_on:
       postgres:
         condition: service_healthy
@@ -33,11 +47,8 @@ services:
       resources:
         limits:
           memory: 500m
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 30s
+      restart_policy: *restart-policy-long
+    logging: *logging-default
 
   #scraper:
   #  build: ./ext/scraper
@@ -68,11 +79,8 @@ services:
       resources:
         limits:
           memory: 200m
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 10s
+      restart_policy: *restart-policy-default
+    logging: *logging-default
 
   redis:
     image: redis:alpine3.22
@@ -91,22 +99,15 @@ services:
       resources:
         limits:
           memory: 200m
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 10s
+      restart_policy: *restart-policy-default
+    logging: *logging-default
 
   dozzle:
     image: amir20/dozzle:v10
     container_name: dozzle_parkle
     hostname: dozzle_parkle
-    expose:
-      - "8080"
     environment:
       DOZZLE_BASE: /dozzle/ui
-    networks:
-      - nginx_network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     healthcheck:
@@ -118,17 +119,8 @@ services:
       resources:
         limits:
           memory: 200m
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 10s
+      restart_policy: *restart-policy-default
+    logging: *logging-default
 
 volumes:
   postgres_data:
-
-networks:
-  backend_network:
-    driver: bridge
-  nginx_network:
-    external: true

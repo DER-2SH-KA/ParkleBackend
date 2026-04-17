@@ -1,0 +1,19 @@
+services:
+  spring:
+    expose:
+      - "8080"
+    networks:
+      - backend_network
+      - nginx_network
+
+  dozzle:
+    expose:
+      - "8080"
+    networks:
+      - nginx_network
+
+networks:
+  backend_network:
+    driver: bridge
+  nginx_network:
+    external: true
