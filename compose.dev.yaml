@@ -1,0 +1,14 @@
+services:
+  spring:
+    ports:
+      - "8080:8080"
+    networks:
+      - backend_network
+
+  dozzle:
+    ports:
+      - "9999:8080"
+
+networks:
+  backend_network:
+    driver: bridge
