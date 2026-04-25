@@ -11,5 +11,4 @@ class ParkleProjectJun2025ApplicationTests {
 	//@Test
 	void contextLoads() {
 	}
-
 }

@@ -1,19 +1,17 @@
 package ru.d2k.parkle.dto;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record WebsiteCreateDto(
+
         @NotBlank(message = "WebsiteCreateDto userLogin can't be null or blank!")
         String userLogin,
 
         @NotBlank(message = "WebsiteCreateDto hexColorValue cannot be null or blank")
-        @Pattern(
-                regexp = "^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$",
-                message = "WebsiteCreateDto hexColor must be type as #fff or #FFFFFF"
-        )
+        @Pattern(regexp = "^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$",
+                message = "WebsiteCreateDto hexColor must be type as #fff or #FFFFFF")
         String hexColor,
 
         @NotBlank(message = "WebsiteCreateDto title can't be null or blank")

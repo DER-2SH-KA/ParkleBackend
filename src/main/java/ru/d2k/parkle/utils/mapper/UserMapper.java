@@ -1,6 +1,11 @@
 package ru.d2k.parkle.utils.mapper;
 
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -10,7 +15,6 @@ import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
 import ru.d2k.parkle.entity.cache.UserCache;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,8 +31,7 @@ public abstract class UserMapper {
     @Mapping(target = "rolePriority", source = "role.priority")
     public abstract UserResponseDto toResponseDto(User entity);
 
-    @BeanMapping(nullValuePropertyMappingStrategy =
-            NullValuePropertyMappingStrategy.IGNORE)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(source = "role", target = "role")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "websites", ignore = true)

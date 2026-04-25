@@ -8,18 +8,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
-
 import java.util.UUID;
 import java.util.stream.Stream;
 
 public class UserResponseDtoTest {
-    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     private static final UUID UUID = Uuid7Generator.generateNewUUID();
     private static final String ROLE_NAME = "role";
     private static final Integer ROLE_PRIORITY = 1;
     private static final String LOGIN = "login";
     private static final String EMAIL = "email@email.ru";
+
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @DisplayName("equals/hashCode - Should be True with similar objects")
     @Test
@@ -61,7 +61,6 @@ public class UserResponseDtoTest {
                 new UserResponseDto(Uuid7Generator.generateNewUUID(), ROLE_NAME, ROLE_PRIORITY, LOGIN, EMAIL),
                 new UserResponseDto(UUID, "role2", 2, LOGIN, EMAIL),
                 new UserResponseDto(UUID, ROLE_NAME, ROLE_PRIORITY, "login2", EMAIL),
-                new UserResponseDto(UUID, ROLE_NAME, ROLE_PRIORITY, LOGIN, "email2@mail.ru")
-        );
+                new UserResponseDto(UUID, ROLE_NAME, ROLE_PRIORITY, LOGIN, "email2@mail.ru"));
     }
 }

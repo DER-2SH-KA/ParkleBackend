@@ -1,11 +1,11 @@
 package ru.d2k.parkle.dao.database.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.repository.UserRepository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +14,8 @@ import java.util.UUID;
 @Primary
 @RequiredArgsConstructor
 public class UserPostgresDatabase implements UserDatabaseSource{
+
+    @Autowired
     private final UserRepository userRepository;
 
     @Override

@@ -1,43 +1,46 @@
 package ru.d2k.parkle.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /** Entity for user. **/
 @Entity
-@Table(
-        name = "users",
-        indexes = { @Index(columnList = "role_id") }
-)
-
+@Table(name = "users", indexes = { @Index(columnList = "role_id") })
 @Getter
 @Setter
 @ToString(of = {"id", "role", "login", "email"})
 @EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
+
     @Id
-    @Column(
-            name = "id",
-            nullable = false,
-            updatable = false,
-            columnDefinition = "UUID"
-    )
+    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
     private UUID id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @Column(
-            name = "login",
-            unique = true,
-            nullable = false,
-            length = 50
-    )
+    @Column(name = "login", unique = true, nullable = false, length = 50)
     private String login;
 
     @Column(name = "email", unique = true, length = 320)
@@ -49,12 +52,7 @@ public class User {
     @Column(name = "is_blocked", nullable = false)
     private Boolean isBlocked;
 
-    @OneToMany(
-            mappedBy = "user",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Website> websites = new ArrayList<>();
 
     private User(Role role, String login, String email, String password, boolean isBlocked) {

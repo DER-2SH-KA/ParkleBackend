@@ -7,14 +7,22 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.Stream;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class RoleUpdateDtoTest {
+
     private static final UUID uuid = Uuid7Generator.generateNewUUID();
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -24,8 +32,8 @@ public class RoleUpdateDtoTest {
         RoleUpdateDto roleUpdateDto1 = new RoleUpdateDto(uuid, "Role", 1);
         RoleUpdateDto roleUpdateDto2 = new RoleUpdateDto(uuid, "Role", 1);
 
-        Assertions.assertEquals(roleUpdateDto1.hashCode(), roleUpdateDto2.hashCode());
-        Assertions.assertEquals(roleUpdateDto1, roleUpdateDto2);
+        assertEquals(roleUpdateDto1.hashCode(), roleUpdateDto2.hashCode());
+        assertEquals(roleUpdateDto1, roleUpdateDto2);
     }
 
     @DisplayName("equals - return false with null")
@@ -33,7 +41,7 @@ public class RoleUpdateDtoTest {
     public void shouldBeFalseWhenEqualsWithNull() {
         RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "Role", 1);
 
-        Assertions.assertFalse(roleUpdateDto.equals(null));
+        assertFalse(roleUpdateDto == null);
     }
 
     @DisplayName("equals - return false with object which has null fields")
@@ -41,25 +49,27 @@ public class RoleUpdateDtoTest {
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
         RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "Role", 1);
 
-        Assertions.assertNotEquals(roleUpdateDto, new RoleUpdateDto(null, null, null));
+        assertNotEquals(roleUpdateDto, new RoleUpdateDto(null, null, null));
     }
 
     @DisplayName("equals - return false with objects which has different fields")
     @ParameterizedTest
-    @MethodSource
+    @MethodSource("shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields")
     public void shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields(RoleUpdateDto roleUpdateDto2) {
         RoleUpdateDto roleUpdateDto1 = new RoleUpdateDto(uuid, "Role1", 1);
 
-        Assertions.assertNotEquals(roleUpdateDto1, roleUpdateDto2);
+        assertNotEquals(roleUpdateDto1, roleUpdateDto2);
     }
 
     @DisplayName("validate - return false with objects which has wrong field's values")
     @ParameterizedTest
-    @MethodSource
-    public void shouldBeFalseWhenValidationObjectHasWrongFieldsValues(RoleUpdateDto roleUpdateDto) {
+    @MethodSource("shouldBeFalseWhenValidationObjectHasWrongFieldsValues")
+    public void shouldBeFalseWhenValidationObjectHasWrongFieldsValues(RoleUpdateDto roleUpdateDto,
+                                                                      String testDescription) {
         Set<ConstraintViolation<RoleUpdateDto>> violations = validator.validate(roleUpdateDto);
 
-        Assertions.assertFalse(violations.isEmpty());
+        assertFalse(violations.isEmpty(), String.format("Violations in test '%s': %s%n", testDescription,
+                Arrays.toString(violations.toArray())));
     }
 
     @DisplayName("validate - return true with objects which has correct field's values")
@@ -68,25 +78,24 @@ public class RoleUpdateDtoTest {
         RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "Developer", 1);
         Set<ConstraintViolation<RoleUpdateDto>> violations = validator.validate(roleUpdateDto);
 
-        Assertions.assertTrue(violations.isEmpty());
+        assertTrue(violations.isEmpty());
     }
 
-    private static Stream<RoleUpdateDto> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
+    private static Stream<Arguments> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
         return Stream.of(
-                new RoleUpdateDto(Uuid7Generator.generateNewUUID(), "Role1", 1),
-                new RoleUpdateDto(uuid, "Role2", 1),
-                new RoleUpdateDto(uuid, "Role1", 2)
-        );
+                Arguments.of(new RoleUpdateDto(Uuid7Generator.generateNewUUID(), "Role1", 1)),
+                Arguments.of(new RoleUpdateDto(uuid, "Role2", 1)),
+                Arguments.of(new RoleUpdateDto(uuid, "Role1", 2)));
     }
 
-    private static Stream<RoleUpdateDto> shouldBeFalseWhenValidationObjectHasWrongFieldsValues() {
+    private static Stream<Arguments> shouldBeFalseWhenValidationObjectHasWrongFieldsValues() {
         return Stream.of(
-                new RoleUpdateDto(uuid, null, 1),
-                new RoleUpdateDto(uuid, "", 1),
-                new RoleUpdateDto(uuid, "12345123451234512345123451234512345", 1),
-                new RoleUpdateDto(uuid, "Role", null),
-                new RoleUpdateDto(uuid, "Role", -1),
-                new RoleUpdateDto(uuid, "Role", 0)
-        );
+                Arguments.of(new RoleUpdateDto(uuid, null, 1), "Name is null test"),
+                Arguments.of(new RoleUpdateDto(uuid, "", 1), "Name is blank test"),
+                Arguments.of(new RoleUpdateDto(uuid, "12345123451234512345123451234512345", 1),
+                        "Name is too long test"),
+                Arguments.of(new RoleUpdateDto(uuid, "Role", null), "Priority is null test"),
+                Arguments.of(new RoleUpdateDto(uuid, "Role", -1), "Priority is negative test"),
+                Arguments.of(new RoleUpdateDto(uuid, "Role", 0), "Priority equals zero test"));
     }
 }

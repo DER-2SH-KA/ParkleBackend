@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import ru.d2k.parkle.entity.Role;
-
-import org.assertj.core.api.Assertions.*;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
-
 import java.util.Optional;
 
 // @Disabled
@@ -31,12 +28,8 @@ public class RoleRepositoryTest {
 
         Optional<Role> savedRole = roleRepository.findByName("Test");
 
-        Assertions
-                .assertThat(savedRole)
-                .isPresent();
-        Assertions
-                .assertThat(savedRole.get().getName())
-                .isEqualTo("Test");
+        Assertions.assertThat(savedRole).isPresent();
+        Assertions.assertThat(savedRole.get().getName()).isEqualTo("Test");
     }
 
     @Test
@@ -47,9 +40,7 @@ public class RoleRepositoryTest {
 
         Optional<Role> savedRole = roleRepository.findByName("Test");
 
-        Assertions
-                .assertThat(savedRole)
-                .isEmpty();
+        Assertions.assertThat(savedRole).isEmpty();
     }
 
     @Test
@@ -60,9 +51,7 @@ public class RoleRepositoryTest {
 
         boolean isRoleExists = roleRepository.existsByName("Test");
 
-        Assertions
-                .assertThat(isRoleExists)
-                .isTrue();
+        Assertions.assertThat(isRoleExists).isTrue();
     }
 
     @Test
@@ -73,9 +62,7 @@ public class RoleRepositoryTest {
 
         boolean isRoleExists = roleRepository.existsByName("Test");
 
-        Assertions
-                .assertThat(isRoleExists)
-                .isFalse();
+        Assertions.assertThat(isRoleExists).isFalse();
     }
 
     @Test
@@ -86,9 +73,7 @@ public class RoleRepositoryTest {
 
         boolean isRoleExists = roleRepository.existsById(newRole.getId());
 
-        Assertions
-                .assertThat(isRoleExists)
-                .isTrue();
+        Assertions.assertThat(isRoleExists).isTrue();
     }
 
     @Test
@@ -99,8 +84,6 @@ public class RoleRepositoryTest {
 
         boolean isRoleExists = roleRepository.existsById(Uuid7Generator.generateNewUUID());
 
-        Assertions
-                .assertThat(isRoleExists)
-                .isFalse();
+        Assertions.assertThat(isRoleExists).isFalse();
     }
 }

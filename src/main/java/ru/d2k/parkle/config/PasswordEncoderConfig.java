@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PasswordEncoderConfig {
+
     @Value("${spring.security.bcrypt.strength}")
     private int passwordEncoderStrength;
 

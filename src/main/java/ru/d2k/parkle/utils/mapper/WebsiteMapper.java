@@ -1,6 +1,10 @@
 package ru.d2k.parkle.utils.mapper;
 
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.d2k.parkle.dto.WebsiteResponseDto;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
 import ru.d2k.parkle.entity.User;
@@ -16,11 +20,7 @@ public interface WebsiteMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "dto.url", target = "url")
-    @Mapping(
-            target = "description",
-            nullValuePropertyMappingStrategy =
-                    NullValuePropertyMappingStrategy.SET_TO_NULL
-    )
+    @Mapping(target = "description", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     Website updateByDto(@MappingTarget Website entity, WebsiteUpdateDto dto, User user);
 
     /**

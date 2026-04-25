@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,15 +15,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.service.security.cookie.CustomCookieService;
-
 import javax.crypto.SecretKey;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
-    private final CustomCookieService cookieService;
 
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -30,12 +32,16 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private Long jwtTokenExpiration;
 
+    @Autowired
+    private final CustomCookieService cookieService;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsFunction) {
-        final Claims claims = extractAllClaims(token);
+        Claims claims = extractAllClaims(token);
+
         return claimsFunction.apply(claims);
     }
 
@@ -51,15 +57,11 @@ public class JwtUtil {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    public String generateToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails
-    ) {
-        extraClaims.put(
-                "roles",
-                userDetails.getAuthorities().stream()
-                        .map(grantedAuthority -> grantedAuthority.getAuthority().replace("ROLE_", ""))
-                        .toList()
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        extraClaims.put("roles", userDetails.getAuthorities().stream()
+                .map(grantedAuthority ->
+                        grantedAuthority.getAuthority().replace("ROLE_", ""))
+                .toList()
         );
 
         long currentTimeMillis = System.currentTimeMillis();
@@ -90,33 +92,23 @@ public class JwtUtil {
 
     private SecretKey getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public static Optional<String> extractJwtFromCookie(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, CookieNames.JwtToken);
-        return Objects.nonNull(cookie) ? Optional.of(cookie.getValue()) : Optional.empty();
+
+        return cookie != null ? Optional.of(cookie.getValue()) : Optional.empty();
     }
 
     public ResponseCookie createJwtCookie(String jwt) {
-        return cookieService.createResponseCookie(
-                CookieNames.JwtToken,
-                jwt,
-                true,
-                false,
-                "/",
-                (int) (jwtTokenExpiration / 1000),
-                "Lax"
-        );
+        return cookieService.createResponseCookie(CookieNames.JwtToken, jwt, true, false, "/",
+                (int) (jwtTokenExpiration / 1000), "Lax");
     }
 
     public ResponseCookie createJwtExpiredCookie() {
-        return cookieService.createEmptyResponseCookie(
-                CookieNames.JwtToken,
-                true,
-                false,
-                "/",
-                "Lax"
-        );
+        return cookieService.createEmptyResponseCookie(CookieNames.JwtToken, true, false, "/",
+                "Lax");
     }
 }

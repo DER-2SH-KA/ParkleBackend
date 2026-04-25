@@ -1,15 +1,18 @@
 package ru.d2k.parkle.dao;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
-
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.d2k.parkle.dao.cache.role.RoleCacheSource;
 import ru.d2k.parkle.dao.database.role.RoleDatabaseSource;
 import ru.d2k.parkle.dto.RoleCreateDto;
@@ -19,21 +22,35 @@ import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.redis.RedisCacheKeys;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
 import ru.d2k.parkle.utils.mapper.RoleMapper;
-
 import java.time.Duration;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RoleDaoTest {
-    @Mock private RoleDatabaseSource roleDatabase;
-    @Mock private RoleCacheSource roleCache;
-    @Mock private RoleMapper roleMapper;
 
-    @InjectMocks private RoleDao roleDao;
+    private static final Logger log = LoggerFactory.getLogger(RoleDaoTest.class);
 
     private final UUID ROLE_ID = Uuid7Generator.generateNewUUID();
     private final String ROLE_NAME = "USER";
     private final Integer ROLE_PRIORITY = 10;
+
+    @Mock
+    private RoleDatabaseSource roleDatabase;
+
+    @Mock
+    private RoleCacheSource roleCache;
+
+    @Mock
+    private RoleMapper roleMapper;
+
+    @InjectMocks
+    private RoleDao roleDao;
 
     @Test
     @DisplayName("create(RoleCreateDto cdto) - Should return correct RoleCache")
@@ -44,34 +61,26 @@ class RoleDaoTest {
         RoleCache expectedCache = new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY);
 
         try (MockedStatic<Role> roleMock = mockStatic(Role.class)) {
-
             // Create entity from RoleCreateDto object.
-            roleMock.when(() -> Role.create(ROLE_NAME, ROLE_PRIORITY))
-                    .thenReturn(entity);
+            roleMock.when(() -> Role.create(ROLE_NAME, ROLE_PRIORITY)).thenReturn(entity);
 
             // Save entity to database.
-            when(roleDatabase.save(entity))
-                    .thenReturn(entity);
+            when(roleDatabase.save(entity)).thenReturn(entity);
 
             // Convert from entity to cache object.
-            when(roleMapper.toCache(entity))
-                    .thenReturn(expectedCache);
+            when(roleMapper.toCache(entity)).thenReturn(expectedCache);
 
             // Set cache object of saved entity to cache.
-            doNothing().when(roleCache)
-                    .set(
-                            RedisCacheKeys.ROLE_SLICE_KEY + expectedCache.name(),
-                            expectedCache,
-                            Duration.ofMinutes(15)
-                    );
+            doNothing().when(roleCache).set(RedisCacheKeys.ROLE_SLICE_KEY + expectedCache.name(), expectedCache,
+                    Duration.ofMinutes(15));
 
             // Test method.
             RoleCache actualCache = roleDao.create(cdto);
 
             assertEquals(expectedCache, actualCache);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
+            log.error("Exception of testing saving role into database", ex);
+
             fail();
         }
     }
@@ -89,39 +98,30 @@ class RoleDaoTest {
         Set<RoleCache> expectedCaches = Set.of(cache1, cache2);
 
         // Find all entities from database.
-        when(roleDatabase.getAll())
-                .thenReturn(entitiesToFindAll);
+        when(roleDatabase.getAll()).thenReturn(entitiesToFindAll);
 
         // Convert entities to caches.
-        when(roleMapper.toCache(role1))
-                .thenReturn(cache1);
-        when(roleMapper.toCache(role2))
-                .thenReturn(cache2);
+        when(roleMapper.toCache(role1)).thenReturn(cache1);
+        when(roleMapper.toCache(role2)).thenReturn(cache2);
 
         // Test method.
         Set<RoleCache> actualCaches = roleDao.getAll();
 
-        assertTrue(
-                actualCaches.containsAll(expectedCaches) &&
-                        actualCaches.size() == expectedCaches.size()
-        );
+        assertTrue(actualCaches.containsAll(expectedCaches) && actualCaches.size() == expectedCaches.size());
     }
 
     @Test
     @DisplayName("getById(UUID id) - Should return list of RoleCache objects by ID")
     void getById_shouldReturnRoleCacheById() {
         Role entity = new Role(ROLE_ID, ROLE_NAME, ROLE_PRIORITY);
-        Optional<RoleCache> expectedCache = Optional.of(
-                new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY)
-        );
+
+        Optional<RoleCache> expectedCache = Optional.of(new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
 
         // Get entity from database by ID.
-        when(roleDatabase.getById(ROLE_ID))
-                .thenReturn(Optional.of(entity));
+        when(roleDatabase.getById(ROLE_ID)).thenReturn(Optional.of(entity));
 
         // Convert from entity to cache.
-        when(roleMapper.toCache(entity))
-                .thenReturn(expectedCache.get());
+        when(roleMapper.toCache(entity)).thenReturn(expectedCache.get());
 
         // Test method.
         Optional<RoleCache> actualCache = roleDao.getById(ROLE_ID);
@@ -133,13 +133,11 @@ class RoleDaoTest {
     @DisplayName("getByName(String name) - Should return RoleCache objects by name from cache")
     void getByName_shouldReturnRoleCacheByNameFromCache() {
         Role entity = new Role(ROLE_ID, ROLE_NAME, ROLE_PRIORITY);
-        Optional<RoleCache> expectedCache = Optional.of(
-                new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY)
-        );
+
+        Optional<RoleCache> expectedCache = Optional.of(new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
 
         // Get cache object from cache.
-        when(roleCache.get(RedisCacheKeys.ROLE_SLICE_KEY + entity.getName()))
-                .thenReturn(expectedCache);
+        when(roleCache.get(RedisCacheKeys.ROLE_SLICE_KEY + entity.getName())).thenReturn(expectedCache);
 
         // Test method.
         Optional<RoleCache> actualCache = roleDao.getByName(ROLE_NAME);
@@ -151,29 +149,21 @@ class RoleDaoTest {
     @DisplayName("getByName(String name) - Should return RoleCache objects by name from database")
     void getByName_shouldReturnRoleCacheByNameFromDatabase() {
         Role entity = new Role(ROLE_ID, ROLE_NAME, ROLE_PRIORITY);
-        Optional<RoleCache> expectedCache = Optional.of(
-                new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY)
-        );
+
+        Optional<RoleCache> expectedCache = Optional.of(new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
 
         // Get empty from cache.
-        when(roleCache.get(RedisCacheKeys.ROLE_SLICE_KEY + entity.getName()))
-                .thenReturn(Optional.empty());
+        when(roleCache.get(RedisCacheKeys.ROLE_SLICE_KEY + entity.getName())).thenReturn(Optional.empty());
 
         // Get entity from database.
-        when(roleDatabase.getByName(entity.getName()))
-                .thenReturn(Optional.of(entity));
+        when(roleDatabase.getByName(entity.getName())).thenReturn(Optional.of(entity));
 
         // Convert entity from database to cache.
-        when(roleMapper.toCache(entity))
-                .thenReturn(expectedCache.get());
+        when(roleMapper.toCache(entity)).thenReturn(expectedCache.get());
 
         // Set to cache.
-        doNothing().when(roleCache)
-                .set(
-                        RedisCacheKeys.ROLE_SLICE_KEY + expectedCache.get().name(),
-                        expectedCache.get(),
-                        Duration.ofMinutes(15)
-                );
+        doNothing().when(roleCache).set(RedisCacheKeys.ROLE_SLICE_KEY + expectedCache.get().name(),
+                expectedCache.get(), Duration.ofMinutes(15));
 
         // Test method.
         Optional<RoleCache> actualCache = roleDao.getByName(ROLE_NAME);
@@ -185,17 +175,14 @@ class RoleDaoTest {
     @DisplayName("getByName(String name) - Should return empty by name")
     void getByName_shouldReturnEmptyByName() {
         Role entity = new Role(ROLE_ID, ROLE_NAME, ROLE_PRIORITY);
-        Optional<RoleCache> expectedCache = Optional.of(
-                new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY)
-        );
+
+        Optional<RoleCache> expectedCache = Optional.of(new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
 
         // Get empty from cache.
-        when(roleCache.get(RedisCacheKeys.ROLE_SLICE_KEY + entity.getName()))
-                .thenReturn(Optional.empty());
+        when(roleCache.get(RedisCacheKeys.ROLE_SLICE_KEY + entity.getName())).thenReturn(Optional.empty());
 
         // Get entity from database.
-        when(roleDatabase.getByName(entity.getName()))
-                .thenReturn(Optional.empty());
+        when(roleDatabase.getByName(entity.getName())).thenReturn(Optional.empty());
 
         // Test method.
         Optional<RoleCache> actualCache = roleDao.getByName(ROLE_NAME);
@@ -211,40 +198,27 @@ class RoleDaoTest {
         Role entityOld = new Role(ROLE_ID, ROLE_NAME, ROLE_PRIORITY);
         Role entityUpdated = new Role(udto.id(), udto.name(), udto.priority());
 
-        Optional<RoleCache> cache = Optional.of(
-                new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY)
-        );
-        Optional<RoleCache> expectedCache = Optional.of(
-                new RoleCache(udto.id(), udto.name(), udto.priority())
-        );
+        Optional<RoleCache> cache = Optional.of(new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
+        Optional<RoleCache> expectedCache = Optional.of(new RoleCache(udto.id(), udto.name(), udto.priority()));
 
         // Get entity from database by ID.
-        when(roleDatabase.getById(ROLE_ID))
-                .thenReturn(Optional.of(entityOld));
+        when(roleDatabase.getById(ROLE_ID)).thenReturn(Optional.of(entityOld));
 
         // Update entity by dto.
-        when(roleMapper.updateEntityByDto(entityOld, udto))
-                .thenReturn(entityUpdated);
+        when(roleMapper.updateEntityByDto(entityOld, udto)).thenReturn(entityUpdated);
 
         // Update entity in database.
-        when(roleDatabase.save(entityUpdated))
-                .thenReturn(entityUpdated);
+        when(roleDatabase.save(entityUpdated)).thenReturn(entityUpdated);
 
         // Convert from entity to cache.
-        when(roleMapper.toCache(entityUpdated))
-                .thenReturn(expectedCache.get());
+        when(roleMapper.toCache(entityUpdated)).thenReturn(expectedCache.get());
 
         // Delete cache of old entity.
-        doNothing().when(roleCache)
-                .delete(RedisCacheKeys.ROLE_SLICE_KEY + entityOld.getName());
+        doNothing().when(roleCache).delete(RedisCacheKeys.ROLE_SLICE_KEY + entityOld.getName());
 
         // Set cache of updated entity.
-        doNothing().when(roleCache)
-                .set(
-                        RedisCacheKeys.ROLE_SLICE_KEY + expectedCache.get().name(),
-                        expectedCache.get(),
-                        Duration.ofMinutes(15)
-                );
+        doNothing().when(roleCache).set(RedisCacheKeys.ROLE_SLICE_KEY + expectedCache.get().name(),
+                expectedCache.get(), Duration.ofMinutes(15));
 
         // Test method.
         Optional<RoleCache> actualCache = roleDao.update(ROLE_ID, udto);
@@ -257,11 +231,8 @@ class RoleDaoTest {
     void update_shouldReturnEmptyWhenNotPresent() {
         RoleUpdateDto udto = new RoleUpdateDto(ROLE_ID, "USER1", ROLE_PRIORITY);
 
-        Role entityOld = new Role(ROLE_ID, ROLE_NAME, ROLE_PRIORITY);
-
         // Get entity from database by ID.
-        when(roleDatabase.getById(ROLE_ID))
-                .thenReturn(Optional.empty());
+        when(roleDatabase.getById(ROLE_ID)).thenReturn(Optional.empty());
 
         // Test method.
         Optional<RoleCache> actualCache = roleDao.update(ROLE_ID, udto);
@@ -275,22 +246,17 @@ class RoleDaoTest {
         Optional<Role> entity = Optional.of(new Role(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
 
         // Get entity from database by ID.
-        when(roleDatabase.getById(ROLE_ID))
-                .thenReturn(entity);
+        when(roleDatabase.getById(ROLE_ID)).thenReturn(entity);
 
         // Delete from cache.
-        doNothing().when(roleCache)
-                .delete(RedisCacheKeys.ROLE_SLICE_KEY + entity.get().getName());
+        doNothing().when(roleCache).delete(RedisCacheKeys.ROLE_SLICE_KEY + entity.get().getName());
 
         // Delete from database.
-        doNothing().when(roleDatabase)
-                .deleteById(ROLE_ID);
+        doNothing().when(roleDatabase).deleteById(ROLE_ID);
 
         // Check is exist in database now.
-        when(roleDatabase.existsById(ROLE_ID))
-                .thenReturn(false);
+        when(roleDatabase.existsById(ROLE_ID)).thenReturn(false);
 
-        // Test method.
         boolean actualResult = roleDao.deleteById(ROLE_ID);
 
         assertTrue(actualResult);
@@ -302,10 +268,8 @@ class RoleDaoTest {
         Optional<Role> entity = Optional.of(new Role(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
 
         // Get entity from database by ID.
-        when(roleDatabase.getById(ROLE_ID))
-                .thenReturn(Optional.empty());
+        when(roleDatabase.getById(ROLE_ID)).thenReturn(Optional.empty());
 
-        // Test method.
         boolean actualResult = roleDao.deleteById(ROLE_ID);
 
         assertTrue(actualResult);
@@ -318,14 +282,11 @@ class RoleDaoTest {
         Optional<RoleCache> cache = Optional.of(new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
 
         // Get entity from database (in roleDao getById() method).
-        when(roleDatabase.getById(ROLE_ID))
-                .thenReturn(entity);
+        when(roleDatabase.getById(ROLE_ID)).thenReturn(entity);
 
         // Convert entity from database to cache.
-        when(roleMapper.toCache(entity.get()))
-                .thenReturn(cache.get());
+        when(roleMapper.toCache(entity.get())).thenReturn(cache.get());
 
-        // Test method.
         boolean actualResult = roleDao.existsById(ROLE_ID);
 
         assertTrue(actualResult);
@@ -338,14 +299,11 @@ class RoleDaoTest {
         Optional<RoleCache> cache = Optional.of(new RoleCache(ROLE_ID, ROLE_NAME, ROLE_PRIORITY));
 
         // Get entity from database (in roleDao getById() method).
-        when(roleDatabase.getById(ROLE_ID))
-                .thenReturn(entity);
+        when(roleDatabase.getById(ROLE_ID)).thenReturn(entity);
 
         // Convert entity from database to cache.
-        when(roleMapper.toCache(entity.get()))
-                .thenReturn(cache.get());
+        when(roleMapper.toCache(entity.get())).thenReturn(cache.get());
 
-        // Test method.
         boolean actualResult = roleDao.existsById(ROLE_ID);
 
         assertTrue(actualResult);
@@ -354,16 +312,12 @@ class RoleDaoTest {
     @Test
     @DisplayName("existsById(UUID id) - Should return false when entity isn't present nor in cache or in database")
     void existsById_shouldReturnFalseWhenNotPresent() {
-
         // Get entity from database (in roleDao getById() method).
-        when(roleDatabase.getById(ROLE_ID))
-                .thenReturn(Optional.empty());
+        when(roleDatabase.getById(ROLE_ID)).thenReturn(Optional.empty());
 
         // Check entity exists in database.
-        when(roleDatabase.existsById(ROLE_ID))
-                .thenReturn(false);
+        when(roleDatabase.existsById(ROLE_ID)).thenReturn(false);
 
-        // Test method.
         boolean actualResult = roleDao.existsById(ROLE_ID);
 
         assertFalse(actualResult);
@@ -372,12 +326,10 @@ class RoleDaoTest {
     @Test
     @DisplayName("existsByName(String name) - Should return true when entity is present")
     void existsByName_shouldReturnTrueWhenPresent() {
-
         // Check entity exists in database.
         when(roleDatabase.existsByName(ROLE_NAME))
                 .thenReturn(true);
 
-        // Test method.
         boolean actualResult = roleDao.existsByName(ROLE_NAME);
 
         assertTrue(actualResult);
@@ -386,12 +338,10 @@ class RoleDaoTest {
     @Test
     @DisplayName("existsByName(String name) - Should return false when entity isn't present")
     void existsByName_shouldReturnFalseWhenNotPresent() {
-
         // Check entity exists in database.
         when(roleDatabase.existsByName(ROLE_NAME))
                 .thenReturn(false);
 
-        // Test method.
         boolean actualResult = roleDao.existsByName(ROLE_NAME);
 
         assertFalse(actualResult);

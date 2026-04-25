@@ -14,6 +14,7 @@ import ru.d2k.parkle.entity.cache.WebsiteCache;
 
 @Configuration
 public class RedisConfig {
+
     @Value("${spring.data.redis.host}")
     private String host;
 
@@ -41,6 +42,7 @@ public class RedisConfig {
         template.setHashValueSerializer(jsonSerializer);
 
         template.afterPropertiesSet();
+
         return template;
     }
 
@@ -58,6 +60,7 @@ public class RedisConfig {
         template.setHashValueSerializer(jsonSerializer);
 
         template.afterPropertiesSet();
+
         return template;
     }
 
@@ -75,6 +78,7 @@ public class RedisConfig {
         template.setHashValueSerializer(jsonSerializer);
 
         template.afterPropertiesSet();
+
         return template;
     }
 
@@ -92,6 +96,7 @@ public class RedisConfig {
         template.setHashValueSerializer(jsonRedisSerializer);
 
         template.afterPropertiesSet();
+
         return template;
     }
 }

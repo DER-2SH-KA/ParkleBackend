@@ -2,9 +2,12 @@ package ru.d2k.parkle.aspect;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
-
 import java.util.Arrays;
 
 
@@ -30,14 +33,14 @@ public class ControllerLoggingAspect {
         String methodName = joinPoint.getSignature().getName();
         Object[] agrs = joinPoint.getArgs();
 
-        log.info("GET method {} taken with args {}...", methodName, Arrays.toString(agrs));
+        log.debug("GET method {} taken with args {}...", methodName, Arrays.toString(agrs));
     }
 
     @AfterReturning("logGetMethods()")
     public void logGetMethodAfterReturning(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
 
-        log.info("GET method {} was served", methodName);
+        log.debug("GET method {} was served", methodName);
     }
 
     @AfterThrowing(pointcut = "logGetMethods()", throwing = "ex")
@@ -52,14 +55,14 @@ public class ControllerLoggingAspect {
         String methodName = joinPoint.getSignature().getName();
         Object[] agrs = joinPoint.getArgs();
 
-        log.info("POST method {} taken with args {}...", methodName, Arrays.toString(agrs));
+        log.debug("POST method {} taken with args {}...", methodName, Arrays.toString(agrs));
     }
 
     @AfterReturning("logPostMethods()")
     public void logPostMethodAfterReturning(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
 
-        log.info("POST method {} was served", methodName);
+        log.debug("POST method {} was served", methodName);
     }
 
     @AfterThrowing(pointcut = "logPostMethods()", throwing = "ex")
@@ -74,14 +77,14 @@ public class ControllerLoggingAspect {
         String methodName = joinPoint.getSignature().getName();
         Object[] agrs = joinPoint.getArgs();
 
-        log.info("PUT method {} taken with args {}...", methodName, Arrays.toString(agrs));
+        log.debug("PUT method {} taken with args {}...", methodName, Arrays.toString(agrs));
     }
 
     @AfterReturning("logPutMethods()")
     public void logPutMethodAfterReturning(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
 
-        log.info("PUT method {} was served", methodName);
+        log.debug("PUT method {} was served", methodName);
     }
 
     @AfterThrowing(pointcut = "logPutMethods()", throwing = "ex")
@@ -96,14 +99,14 @@ public class ControllerLoggingAspect {
         String methodName = joinPoint.getSignature().getName();
         Object[] agrs = joinPoint.getArgs();
 
-        log.info("DELETE method {} taken with args {}...", methodName, Arrays.toString(agrs));
+        log.debug("DELETE method {} taken with args {}...", methodName, Arrays.toString(agrs));
     }
 
     @AfterReturning("logDeleteMethods()")
     public void logDeleteMethodAfterReturning(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
 
-        log.info("DELETE method {} was served", methodName);
+        log.debug("DELETE method {} was served", methodName);
     }
 
     @AfterThrowing(pointcut = "logDeleteMethods()", throwing = "ex")

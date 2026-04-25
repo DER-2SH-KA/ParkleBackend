@@ -1,16 +1,17 @@
 package ru.d2k.parkle.dto;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class RoleResponseDtoTest {
+
     @DisplayName("equals -- Two different objects with same field's values")
     @Test
     public void equals_TwoDifferentObjectsWithSameFields() {
         RoleResponseDto firstRoleResponseDto = new RoleResponseDto("USER", 10);
         RoleResponseDto secondRoleResponseDto = new RoleResponseDto("USER", 10);
 
-        Assertions.assertEquals(firstRoleResponseDto, secondRoleResponseDto);
+        assertEquals(firstRoleResponseDto, secondRoleResponseDto);
     }
 }

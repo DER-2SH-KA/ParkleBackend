@@ -2,22 +2,27 @@ package ru.d2k.parkle.utils.safety.extremism;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import java.util.regex.*;
-
-@Getter
 @Slf4j
+@Getter
 public class ExtremismCSVLoader implements ExtremismMaterialLoader {
+
     private final String filePath;
     private final Charset charset;
     private final String divider;
 
-    private static final Pattern urlHttpPattern =
-            Pattern.compile("http(s)?://\\S+", Pattern.CASE_INSENSITIVE);
+    private static final Pattern urlHttpPattern = Pattern.compile("http(s)?://\\S+", Pattern.CASE_INSENSITIVE);
 
     public ExtremismCSVLoader(String filePath, Charset charset, String divider) {
         this.filePath = filePath;
@@ -33,12 +38,8 @@ public class ExtremismCSVLoader implements ExtremismMaterialLoader {
     private List<String> loadLinksFromFile(String filePath, Charset charset) {
         final List<String> links = new ArrayList<>();
 
-        try (
-                InputStream in = Thread.currentThread()
-                        .getContextClassLoader()
-                        .getResourceAsStream(filePath);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in, charset));
-        ) {
+        try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in, charset))) {
             String lineRaw;
 
             while ((lineRaw = reader.readLine()) != null) {
@@ -50,31 +51,22 @@ public class ExtremismCSVLoader implements ExtremismMaterialLoader {
                     String extremismLinkRaw = matcher.group().trim();
                     String extremismLink = extremismLinkRaw;
 
-                    if (
-                        extremismLinkRaw.endsWith("/") ||
-                        extremismLink.endsWith(",") ||
-                        extremismLink.endsWith("!") ||
-                        extremismLink.endsWith(".") ||
-                        extremismLink.endsWith("?")
-                    ) {
+                    if (extremismLinkRaw.endsWith("/") || extremismLink.endsWith(",") || extremismLink.endsWith("!") ||
+                            extremismLink.endsWith(".") || extremismLink.endsWith("?")) {
                         StringBuffer sb = new StringBuffer(extremismLinkRaw);
                         sb.deleteCharAt(sb.length() - 1);
-
                         extremismLink = sb.toString();
                     }
 
                     links.add(extremismLink);
                 }
             }
-        }
-        catch (IOException ioex) {
+        } catch (IOException ioex) {
             log.error("Can't load CSV file with path '" + filePath + "':" + ioex.getMessage());
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             log.error("Some Exception in CSV Loader: " + ex);
         }
 
         return links;
     }
-
 }

@@ -7,10 +7,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.d2k.parkle.dto.ErrorResponseDto;
-import ru.d2k.parkle.exception.*;
-
 import org.postgresql.util.PSQLException;
-
+import ru.d2k.parkle.exception.RoleNotFoundException;
+import ru.d2k.parkle.exception.UserNotFoundException;
+import ru.d2k.parkle.exception.UserWrongPasswordException;
+import ru.d2k.parkle.exception.WebsiteIsExtremismSourceException;
+import ru.d2k.parkle.exception.WebsiteNotFoundException;
 import java.sql.SQLException;
 
 @Slf4j
@@ -50,7 +52,8 @@ public class EntityControllerAdvice {
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponseDto("Пользователь с такими логином и/или паролем не найден!", ex.getMessage()));
+                .body(new ErrorResponseDto("Пользователь с такими логином и/или паролем не найден!",
+                        ex.getMessage()));
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
@@ -68,7 +71,8 @@ public class EntityControllerAdvice {
 
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ErrorResponseDto("Данная ссылка находится в списке экстремистских материалов!", ex.getMessage()));
+                .body(new ErrorResponseDto("Данная ссылка находится в списке экстремистских материалов!",
+                        ex.getMessage()));
     }
 
     @ExceptionHandler(PSQLException.class)
@@ -77,10 +81,6 @@ public class EntityControllerAdvice {
 
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new ErrorResponseDto(
-                        "Переданны некорректные данные!",
-                        ex.getMessage()
-                        )
-                );
+                .body(new ErrorResponseDto("Переданны некорректные данные!", ex.getMessage()));
     }
 }
