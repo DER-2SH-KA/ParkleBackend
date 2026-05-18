@@ -2,19 +2,20 @@ package ru.d2k.parkle.service.rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.d2k.parkle.dao.RoleDao;
 import ru.d2k.parkle.dao.UserDao;
-import ru.d2k.parkle.dto.*;
+import ru.d2k.parkle.dto.UserCreateDto;
+import ru.d2k.parkle.dto.UserResponseDto;
+import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.cache.RoleCache;
@@ -25,13 +26,20 @@ import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.utils.mapper.UserMapper;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
-// TODO: Убрать ручное логирование, заменив их AOP и аннотациями.
+@RequiredArgsConstructor
 public class UserService {
+
+    @Autowired
     private final RoleDao roleDao;
+
+    @Autowired
     private final UserDao userDao;
+
+    @Autowired
     private final UserMapper userMapper;
+
+    @Autowired
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
@@ -43,6 +51,7 @@ public class UserService {
                 .collect(Collectors.toSet());
 
         log.info("Users was founded: {}", dtos.size());
+
         return dtos;
     }
 
@@ -50,14 +59,15 @@ public class UserService {
     public UserResponseDto findUserByLogin(String login) {
         log.info("Getting user by login '{}'...", login);
 
-        if (Objects.isNull(login)) return null;
+        if (Objects.isNull(login)) {
+            return null;
+        }
 
         UserCache user = userDao.getByLogin(login)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User was not found with login: " + login)
-                );
+                .orElseThrow(() -> new UserNotFoundException("User was not found with login: " + login));
 
         log.info("User with login '{}' was founded", login);
+
         return userMapper.toResponseDto(user);
     }
 
@@ -66,18 +76,14 @@ public class UserService {
         log.info("Creating user: {}...", dto.toString());
 
         RoleCache role = roleDao.getByName(dto.getRoleName()).orElseThrow(() ->
-                new RoleNotFoundException("Role was not found with Name: " + dto.getRoleName())
-        );
+                new RoleNotFoundException("Role was not found with Name: " + dto.getRoleName()));
 
-        User user = User.create(
-                new Role(role.id(), role.name(), role.priority()),
-                dto.getLogin(),
-                dto.getEmail(),
-                passwordEncoder.encode(dto.getPassword())
-        );
+        User user = User.create(new Role(role.id(), role.name(), role.priority()), dto.getLogin(), dto.getEmail(),
+                passwordEncoder.encode(dto.getPassword()));
         UserCache savedUser = userDao.create(user);
 
         log.info("User was created: {}", user);
+
         return userMapper.toResponseDto(savedUser);
     }
 
@@ -87,11 +93,11 @@ public class UserService {
 
         Optional<UserCache> updatedUser = userDao.update(login, udto);
 
-        UserResponseDto dto = userMapper.toResponseDto(updatedUser.orElseThrow(
-                () -> new UserNotFoundException("User with login '{}' not found and not updated!")
-        ));
+        UserResponseDto dto = userMapper.toResponseDto(updatedUser.orElseThrow(() ->
+                new UserNotFoundException("User with login '{}' not found and not updated!")));
 
         log.info("User with login '{}' was updated", login);
+
         return dto;
     }
 
@@ -99,41 +105,41 @@ public class UserService {
     public boolean deleteUser(String login) {
         log.info("Deleting user by login '{}'...", login);
 
-        if (Objects.nonNull(login)) {
-
+        if (login != null) {
             if (userDao.deleteByLogin(login)) {
                 log.info("User with login '{}' was deleted", login);
-                return true;
-            }
-            else log.info("User with login '{}' wasn't deleted", login);
 
+                return true;
+            } else {
+                log.error("User with login '{}' wasn't deleted", login);
+            }
+
+        } else {
+            log.error("User login equals null");
         }
-        else log.error("User login equals null");
 
         return false;
     }
 
-    public Optional<UserResponseDto> getUserByUserCache(
-            UserCache cache
-    ) {
+    public Optional<UserResponseDto> getUserByUserCache(UserCache cache) {
         log.info("Start to getUserByUserCache() (login): {}", cache.login());
 
         UserResponseDto dto = userMapper.toResponseDto(cache);
 
-        log.info("User was taken in getUserByUserCache() (login): {}", cache.login());
+        log.info("User was taken in getUserByUserCache() by login: {}", cache.login());
+
         return Optional.ofNullable(dto);
     }
 
     public Optional<UserResponseDto> getUserByJwt(String jwt) {
         Optional<UserResponseDto> dto = Optional.empty();
 
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        log.debug(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
 
-        UserCache userCache =
-                ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                        .getCache();
+        UserCache userCache = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal()).getCache();
 
-        if (Objects.nonNull(userCache)) {
+        if (userCache != null) {
             dto = Optional.of(userMapper.toResponseDto(userCache));
         }
 

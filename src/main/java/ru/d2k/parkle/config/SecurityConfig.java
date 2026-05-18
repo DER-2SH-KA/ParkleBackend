@@ -35,40 +35,19 @@ public class SecurityConfig {
                 // TODO: Включить и реализовать CSRF! Нам оно нужно!
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
-                        request
+                        request.requestMatchers("/", "/api/auth/login", "/api/auth/registration",
+                                        "/api/auth/isAuthed", "/index.html", "/*.js", "/*.css", "/*.ico",
+                                        "/assets/**", "/api/auth/ping")
+                                .permitAll()
                                 .requestMatchers(
-                                        "/",
-                                        "/api/auth/login",
-                                        "/api/auth/registration",
-                                        "/api/auth/isAuthed",
-                                        "/index.html",
-                                        "/*.js",
-                                        "/*.css",
-                                        "/*.ico",
-                                        "/assets/**",
-                                        "/api/auth/ping"
-                                ).permitAll()
-                                .requestMatchers(
-                                        "/api/roles",
-                                        "/api/roles/**",
-                                        "/api/users",
-                                        "/api/websites",
-                                        "/swagger-ui/**",
-                                        "/actuator",
-                                        "/actuator/**"
-                                ).hasRole("DEV")
-                                .anyRequest().authenticated()
-
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                                        "/api/roles", "/api/roles/**", "/api/users", "/api/websites",
+                                        "/swagger-ui/**", "/actuator", "/actuator/**")
+                                .hasRole("DEV")
+                                .anyRequest().authenticated())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(handler ->
-                    handler
-                            .authenticationEntryPoint(
-                                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
-                            )
-                )
+                    handler.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -83,8 +62,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration
-    ) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         ProviderManager authenticationManager = new ProviderManager(authenticationProvider(passwordEncoder));
         authenticationManager.setEraseCredentialsAfterAuthentication(true);
 

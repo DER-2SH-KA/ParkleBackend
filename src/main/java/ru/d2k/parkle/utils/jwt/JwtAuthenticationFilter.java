@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.lang.NonNull;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.service.security.cookie.CustomCookieService;
-
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,24 +28,27 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    @Autowired
     private final CustomCookieService cookieService;
+
+    @Autowired
     private final JwtUtil jwtUtil;
+
+    @Autowired
     private final UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
-    ) throws ServletException, IOException
-    {
-        log.info("Request by path: {}", request.getContextPath() + request.getServletPath());
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+        log.debug("Request by path: {}", request.getContextPath() + request.getServletPath());
 
         Optional<Cookie> cookie = cookieService.fetchCookie(CookieNames.JwtToken, request);
 
         if (cookie.isEmpty()) {
             log.warn("Cookie is empty. Do Filter.");
             filterChain.doFilter(request, response);
+
             return;
         }
 
@@ -53,47 +56,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (jwtOptional.isEmpty()) {
             log.warn("JWT is empty. Do Filter.");
+
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
             if (jwtOptional.get() instanceof String jwt) {
-
                 if (jwt.isBlank()) {
                     log.warn("JWT is blank. Do Filter.");
                     filterChain.doFilter(request, response);
+
                     return;
                 }
 
                 String userLogin = jwtUtil.extractUsername(jwt);
 
-                if (
-                        Objects.nonNull(userLogin) &&
-                                Objects.isNull(SecurityContextHolder.getContext().getAuthentication())
-                ) {
+                if (userLogin != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = this.userDetailsService.loadUserByUsername(userLogin);
 
                     if (jwtUtil.isTokenValid(jwt, userDetails)) {
-                        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
+                                null, userDetails.getAuthorities());
 
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
                 }
             }
-        }
-        catch (Exception ex) {
-            log.error("Exception when JWT filter authentication process: {}", ex);
+        } catch (Exception ex) {
+            log.error("Exception when JWT filter authentication process", ex);
 
             ResponseCookie responseCookie = jwtUtil.createJwtExpiredCookie();
             response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
-        }
-        finally {
+        } finally {
             log.warn("At end. Do Filter.");
+
             filterChain.doFilter(request, response);
         }
     }
@@ -102,8 +99,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
 
-        return path.equals("/api/auth/login") ||
-                path.equals("/api/auth/registration") ||
-                path.equals("/api/auth/ping");
+        return path.equals("/api/auth/login") || path.equals("/api/auth/registration")
+                || path.equals("/api/auth/ping");
     }
 }

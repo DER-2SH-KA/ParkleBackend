@@ -8,19 +8,18 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
 public class UserCreateDtoTest {
-    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     private static final String ROLE = "role";
     private static final String LOGIN = "login";
     private static final String EMAIL = "email";
     private static final String PASSWORD = "password";
+
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @DisplayName("equals/hashCode - Should be True with similar objects")
     @Test
@@ -51,12 +50,8 @@ public class UserCreateDtoTest {
     @DisplayName("validate - return true with objects which has correct field's values")
     @Test
     public void shouldBeTrueWhenValidationObjectHasCorrectFieldsValues() {
-        UserCreateDto dto = new UserCreateDto(
-                "Dev",
-                "Developer",
-                "developer@mail.ru",
-                "5GdS4FaVtgS"
-        );
+        UserCreateDto dto = new UserCreateDto("Dev", "Developer", "developer@mail.ru",
+                "5GdS4FaVtgS");
         Set<ConstraintViolation<UserCreateDto>> violations = validator.validate(dto);
 
         Assertions.assertTrue(violations.isEmpty());
@@ -84,22 +79,21 @@ public class UserCreateDtoTest {
         return Stream.of(
                 new UserCreateDto("role2", LOGIN, EMAIL, PASSWORD),
                 new UserCreateDto(ROLE, "login2", EMAIL, PASSWORD),
-                new UserCreateDto(ROLE, LOGIN, "email2", PASSWORD)
-        );
+                new UserCreateDto(ROLE, LOGIN, "email2", PASSWORD));
     }
 
     private static Stream<UserCreateDto> shouldBeFalseWhenValidationObjectHasWrongFieldsValues() {
-        final char[] overMaxLoginChars = new char[101];
-        final char[] overMaxEmailChars = new char[321];
-        final char[] overMaxPasswordChars = new char[73];
+        char[] overMaxLoginChars = new char[101];
+        char[] overMaxEmailChars = new char[321];
+        char[] overMaxPasswordChars = new char[73];
 
         Arrays.fill(overMaxLoginChars, 'l');
         Arrays.fill(overMaxEmailChars, 'e');
         Arrays.fill(overMaxPasswordChars, 'p');
 
-        final String overMaxLogin = new String(overMaxLoginChars);
-        final String overMaxEmail = new String(overMaxEmailChars);
-        final String overMaxPassword = new String(overMaxPasswordChars);
+        String overMaxLogin = new String(overMaxLoginChars);
+        String overMaxEmail = new String(overMaxEmailChars);
+        String overMaxPassword = new String(overMaxPasswordChars);
 
         return Stream.of(
                 new UserCreateDto(null, LOGIN, EMAIL, PASSWORD),
@@ -114,7 +108,6 @@ public class UserCreateDtoTest {
                 new UserCreateDto(ROLE, LOGIN, EMAIL, null),
                 new UserCreateDto(ROLE, LOGIN, EMAIL, ""),
                 new UserCreateDto(ROLE, LOGIN, EMAIL, "1234567"),
-                new UserCreateDto(ROLE, LOGIN, EMAIL, overMaxPassword)
-        );
+                new UserCreateDto(ROLE, LOGIN, EMAIL, overMaxPassword));
     }
 }

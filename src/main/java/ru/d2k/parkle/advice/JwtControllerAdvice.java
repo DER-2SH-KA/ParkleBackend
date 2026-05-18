@@ -17,13 +17,9 @@ public class JwtControllerAdvice {
     public ResponseEntity<ErrorResponseDto> handleJwtException(RuntimeException ex) {
         log.error("JWT error. Message: {}", ex.getMessage());
 
-        // return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponseDto(
-                        "Браузер не отправил достаточно данных о вас для автоматического входа в систему!",
-                        ex.getMessage()
-                ));
+                .body(new ErrorResponseDto("Браузер не отправил достаточно данных о вас для " +
+                        "автоматического входа в систему!", ex.getMessage()));
     }
-
 }

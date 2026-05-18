@@ -1,6 +1,10 @@
 package ru.d2k.parkle.utils.mapper;
 
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.d2k.parkle.dto.RoleUpdateDto;
 import ru.d2k.parkle.dto.RoleResponseDto;
 import ru.d2k.parkle.entity.Role;
@@ -17,10 +21,7 @@ public interface RoleMapper{
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "users", ignore = true)
-    Role updateEntityByDto(
-            @MappingTarget Role role,
-            RoleUpdateDto dto
-    );
+    Role updateEntityByDto(@MappingTarget Role role, RoleUpdateDto dto);
 
     /**
      * CACHE => DTO

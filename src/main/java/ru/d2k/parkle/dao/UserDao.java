@@ -2,18 +2,17 @@ package ru.d2k.parkle.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dao.cache.user.UserCacheSource;
 import ru.d2k.parkle.dao.database.user.UserDatabaseSource;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
-import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.redis.RedisCacheKeys;
 import ru.d2k.parkle.utils.mapper.UserMapper;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -25,23 +24,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class UserDao {
+
+    @Autowired
     private final UserDatabaseSource userDatabase;
+
+    @Autowired
     private final UserCacheSource userCache;
+
+    @Autowired
     private final UserMapper userMapper;
 
+    @Autowired
     private final RoleDao roleDao;
 
     // CRUD.
     // Create.
     public UserCache create(User entity) {
         User createdEntity = this.saveToDatabase(entity);
-        UserCache cache = userMapper.toCache(createdEntity);
 
-        this.setToCache(
-                RedisCacheKeys.USER_SLICE_KEY + cache.login(),
-                cache,
-                Duration.ofHours(1)
-        );
+        UserCache cache = userMapper.toCache(createdEntity);
+        this.setToCache(RedisCacheKeys.USER_SLICE_KEY + cache.login(), cache, Duration.ofHours(1));
 
         return cache;
     }
@@ -51,7 +53,7 @@ public class UserDao {
     public Set<UserCache> getAll() {
         List<User> entities = this.getAllFromDatabase();
 
-        log.info("Users was taken from database!");
+        log.debug("Users was taken from database!");
 
         return entities.stream()
                 .map(userMapper::toCache)
@@ -68,7 +70,7 @@ public class UserDao {
         Optional<User> entityFromDb = this.getFromDatabaseById(id);
 
         if (entityFromDb.isPresent()) {
-            log.info("User by id {} was taken from database!", id);
+            log.debug("User by id {} was taken from database!", id);
 
             return Optional.of(userMapper.toCache(entityFromDb.get()));
         }
@@ -85,22 +87,20 @@ public class UserDao {
         Optional<UserCache> cache = this.getFromCache(RedisCacheKeys.USER_SLICE_KEY + login);
 
         if (cache.isPresent()) {
-            log.info("User with login '{}' taken from cache!", login);
+            log.debug("User with login '{}' taken from cache!", login);
+
             return cache;
-        }
-        else {
+        } else {
             Optional<User> entityFromDb = this.getFromDatabaseByLogin(login);
 
             if (entityFromDb.isPresent()) {
                 UserCache cacheFromEntity = userMapper.toCache(entityFromDb.get());
 
-                this.setToCache(
-                        RedisCacheKeys.USER_SLICE_KEY + cacheFromEntity.login(),
-                        cacheFromEntity,
-                        Duration.ofHours(1)
-                );
+                this.setToCache(RedisCacheKeys.USER_SLICE_KEY + cacheFromEntity.login(), cacheFromEntity,
+                        Duration.ofHours(1));
 
-                log.info("User with login '{}' taken from database!", login);
+                log.debug("User with login '{}' taken from database!", login);
+
                 return Optional.of(cacheFromEntity);
             }
         }
@@ -133,14 +133,11 @@ public class UserDao {
 
             // Delete old entity information from Redis cache.
             this.deleteFromCache(RedisCacheKeys.USER_SLICE_KEY + entity.get().getLogin());
+
             // На всякий случай и по ID.
             this.deleteFromCache(RedisCacheKeys.USER_SLICE_KEY + entity.get().getId());
 
-            this.setToCache(
-                    RedisCacheKeys.USER_SLICE_KEY + entity.get().getLogin(),
-                    cache,
-                    Duration.ofHours(1)
-            );
+            this.setToCache(RedisCacheKeys.USER_SLICE_KEY + entity.get().getLogin(), cache, Duration.ofHours(1));
 
             return Optional.of(cache);
         }
@@ -161,13 +158,13 @@ public class UserDao {
             this.deleteFromCache(RedisCacheKeys.USER_SLICE_KEY + entityToDelete.get().getLogin());
             // На всякий случай и по ID.
             this.deleteFromCache(RedisCacheKeys.USER_SLICE_KEY + entityToDelete.get().getId());
-
             this.deleteFromDatabaseByLogin(login);
 
             return !this.existInDatabaseByLogin(login);
         }
 
         log.error("User to delete with login '{}' not exist!", login);
+
         return true;
     }
 
@@ -176,8 +173,7 @@ public class UserDao {
 
         UserCache newUserCache = this.getByLogin(userLogin)
                 .orElseThrow(() ->
-                        new UserNotFoundException(String.format("User not found by login '%s'!", userLogin))
-                );
+                        new UserNotFoundException(String.format("User not found by login '%s'!", userLogin)));
 
         this.setToCache(key, newUserCache, duration);
 

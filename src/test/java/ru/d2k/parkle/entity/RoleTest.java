@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
-
 import java.util.UUID;
 
 public class RoleTest {
+
     @DisplayName("hashCode -- hash codes of the same object are the same")
     @Test
     public void hashCode_sameObjectHashCodeEquals() {
@@ -35,6 +35,7 @@ public class RoleTest {
         Role role = new Role(null, "TEMP", 0);
 
         // !! 102, а не 0, по каким-то причинам. !!
+        // Я из будущего: Hibernate и Lombok не ладят.
         Assertions.assertEquals(102, role.hashCode());
     }
 

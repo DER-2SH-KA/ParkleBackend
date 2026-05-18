@@ -8,15 +8,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
 public class UserAuthDtoTest {
-    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     private static final String LOGIN = "login";
     private static final String PASSWORD = "password";
+
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @DisplayName("equals/hashCode - Should be True with similar objects")
     @Test
@@ -74,19 +75,18 @@ public class UserAuthDtoTest {
     private static Stream<UserAuthDto> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
         return Stream.of(
                 new UserAuthDto("Login2", PASSWORD),
-                new UserAuthDto("Login2", "Password2")
-        );
+                new UserAuthDto("Login2", "Password2"));
     }
 
     private static Stream<UserAuthDto> shouldBeFalseWhenValidationObjectHasWrongFieldsValues() {
-        final char[] overMaxLoginChars = new char[101];
-        final char[] overMaxPasswordChars = new char[73];
+        char[] overMaxLoginChars = new char[101];
+        char[] overMaxPasswordChars = new char[73];
 
         Arrays.fill(overMaxLoginChars, 'l');
         Arrays.fill(overMaxPasswordChars, 'p');
 
-        final String overMaxLogin = new String(overMaxLoginChars);
-        final String overMaxPassword = new String(overMaxPasswordChars);
+        String overMaxLogin = new String(overMaxLoginChars);
+        String overMaxPassword = new String(overMaxPasswordChars);
 
         return Stream.of(
                 new UserAuthDto(null, PASSWORD),
@@ -95,7 +95,6 @@ public class UserAuthDtoTest {
                 new UserAuthDto(LOGIN, null),
                 new UserAuthDto(LOGIN, ""),
                 new UserAuthDto(LOGIN, "1234567"),
-                new UserAuthDto(LOGIN, overMaxPassword)
-        );
+                new UserAuthDto(LOGIN, overMaxPassword));
     }
 }

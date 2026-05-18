@@ -1,6 +1,7 @@
 package ru.d2k.parkle.utils.type;
 
 public class Pair<K, V> {
+
     private final K key;
     private V value;
 

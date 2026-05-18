@@ -15,5 +15,4 @@ public class ParkleProjectJun2025Application {
 	private static void startLogs() {
 		System.out.println("App was started!");
 	}
-
 }

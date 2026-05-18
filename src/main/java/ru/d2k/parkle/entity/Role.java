@@ -1,9 +1,18 @@
 package ru.d2k.parkle.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -11,41 +20,25 @@ import java.util.UUID;
 /** Entity for role. **/
 @Entity
 @Table(name = "roles")
-
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
 @ToString(of = {"id", "name", "priority"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Role {
+
     @Id
-    @Column(
-            name = "id",
-            nullable = false,
-            updatable = false,
-            columnDefinition = "UUID"
-    )
+    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
     private UUID id;
 
-    @Column(
-            name = "name",
-            unique = true,
-            nullable = false,
-            length = 32
-    )
+    @Column(name = "name", unique = true, nullable = false, length = 32)
     private String name;
 
-    @Column(
-            name = "priority",
-            nullable = false
-    )
+    @Column(name = "priority", nullable = false)
     private Integer priority;
 
-    @OneToMany(
-            mappedBy = "role",
-            fetch = FetchType.LAZY
-    )
-    private Set<User> users = new HashSet<User>();
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    private Set<User> users = new HashSet<>();
 
     private Role(String name, Integer priority) {
         this.id = Uuid7Generator.generateNewUUID();

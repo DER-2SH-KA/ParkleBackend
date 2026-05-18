@@ -10,25 +10,16 @@ import ru.d2k.parkle.dto.ErrorResponseDto;
 
 @RestControllerAdvice
 public class AuthenticationControllerAdvice {
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponseDto> badCredentials(Exception ex) {
-        return new ResponseEntity<>(
-                new ErrorResponseDto(
-                        "Пользователь не существует или введены неверные данные",
-                        ex.getMessage()
-                ),
-                HttpStatus.UNAUTHORIZED
-        );
+        return new ResponseEntity<>(new ErrorResponseDto("Пользователь не существует или введены " +
+                "неверные данные", ex.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> methodArgumentNotValidException(Exception ex) {
-        return new ResponseEntity<>(
-                new ErrorResponseDto(
-                        "Переданы неподходящие данные",
-                        ex.getMessage()
-                ),
-                HttpStatus.UNAUTHORIZED
-        );
+        return new ResponseEntity<>(new ErrorResponseDto("Переданы неподходящие данные", ex.getMessage()),
+                HttpStatus.UNAUTHORIZED);
     }
 }

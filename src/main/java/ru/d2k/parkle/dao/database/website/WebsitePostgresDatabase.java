@@ -1,19 +1,21 @@
 package ru.d2k.parkle.dao.database.website;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.entity.Website;
 import ru.d2k.parkle.repository.WebsiteRepository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Component
 @Primary
+@Component
 @RequiredArgsConstructor
 public class WebsitePostgresDatabase implements WebsiteDatabaseSource {
+
+    @Autowired
     private final WebsiteRepository websiteRepository;
 
     @Override

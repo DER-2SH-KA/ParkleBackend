@@ -2,6 +2,7 @@ package ru.d2k.parkle.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dao.cache.website.WebsiteCacheSource;
 import ru.d2k.parkle.dao.database.website.WebsiteDatabaseSource;
@@ -14,43 +15,45 @@ import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.exception.WebsiteNotFoundException;
 import ru.d2k.parkle.redis.RedisCacheKeys;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
-
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class WebsiteDao {
+
+    @Autowired
     private final WebsiteDatabaseSource websiteDatabase;
+
+    @Autowired
     private final WebsiteCacheSource websiteCache;
+
+    @Autowired
     private final WebsiteMapper websiteMapper;
+
+    @Autowired
     private final UserDao userDao;
 
     // CRUD.
     // Create.
     public WebsiteCache create(Website entity, String userLogin) {
         Website createdEntity = this.saveToDatabase(entity);
+
         WebsiteCache cache = websiteMapper.toCache(createdEntity);
-
-        this.setToCache(
-                RedisCacheKeys.WEBSITE_SLICE_KEY + cache.id().toString(),
-                cache,
-                Duration.ofMinutes(15)
-        );
-
-        userDao.refreshCacheByWebsiteCache(
-                RedisCacheKeys.USER_SLICE_KEY + userLogin,
-                Duration.ofMinutes(15),
-                userLogin
-        );
+        this.setToCache(RedisCacheKeys.WEBSITE_SLICE_KEY + cache.id().toString(), cache, Duration.ofMinutes(15));
+        userDao.refreshCacheByWebsiteCache(RedisCacheKeys.USER_SLICE_KEY + userLogin, Duration.ofMinutes(15),
+                userLogin);
 
         return cache;
     }
 
     // Read.
     public List<WebsiteCache> getAll() {
-        log.info("Websites was taken from database!");
+        log.debug("Websites was taken from database!");
 
         return websiteDatabase.getAll().stream()
                 .map(websiteMapper::toCache)
@@ -68,8 +71,7 @@ public class WebsiteDao {
 
             if (cache.isPresent()) {
                 websiteCaches.add(cache.get());
-            }
-            else {
+            } else {
                 log.error("Website not found by ID {}!", websiteId);
             }
         }
@@ -90,17 +92,13 @@ public class WebsiteDao {
 
         if (fromDatabase.isEmpty()) {
             throw new WebsiteNotFoundException(String.format("Website not found by ID '%s'!", id));
-        }
-        else {
+        } else {
             WebsiteCache cache = websiteMapper.toCache(fromDatabase.get());
 
-            this.setToCache(
-                    RedisCacheKeys.WEBSITE_SLICE_KEY + id,
-                    cache,
-                    Duration.ofMinutes(15)
-            );
+            this.setToCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id, cache, Duration.ofMinutes(15));
 
             log.debug("Website by id '{}' was taken from database!", id);
+
             return Optional.ofNullable(cache);
         }
     }
@@ -117,6 +115,7 @@ public class WebsiteDao {
 
         if (entity.isPresent() && userEntity.isPresent()) {
             log.debug("Entity and website is present");
+
             websiteMapper.updateByDto(entity.get(), udto, userEntity.get());
 
             Website updatedEntity = this.saveToDatabase(entity.get());
@@ -124,49 +123,42 @@ public class WebsiteDao {
 
             this.deleteFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id.toString());
 
-            this.setToCache(
-                    RedisCacheKeys.WEBSITE_SLICE_KEY + id,
-                    cache,
-                    Duration.ofMinutes(15)
-            );
+            this.setToCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id, cache, Duration.ofMinutes(15));
+            userDao.refreshCacheByWebsiteCache(RedisCacheKeys.USER_SLICE_KEY + userLogin, Duration.ofMinutes(15),
+                    userLogin);
 
-            userDao.refreshCacheByWebsiteCache(
-                    RedisCacheKeys.USER_SLICE_KEY + userLogin,
-                    Duration.ofMinutes(15),
-                    userLogin
-            );
+            log.debug("Website with id {} was updated", id);
 
-            log.info("Website with id {} was updated", id);
             return Optional.of(cache);
-        }
-        else {
+        } else {
             if (entity.isEmpty()) {
-                System.out.println("Website not found with ID: " + id);
+                log.error("Website not found with ID: {}", id);
+
                 throw new WebsiteNotFoundException(String.format("Website not found by ID '%s'!", id));
-            }
-            else if (userEntity.isEmpty()) {
-                System.out.println("User not found with login: " + userLogin);
+            } else if (userEntity.isEmpty()) {
+                log.error("User not found with login: {}", userLogin);
+
                 throw new UserNotFoundException(String.format("User not found by login '%s'!", udto.userLogin()));
             }
         }
 
         log.error("Website with id {} wasn't updated", id);
+
         return Optional.empty();
     }
 
     public boolean deleteById(UUID id, String userLogin) {
         Optional<WebsiteCache> cache = this.getFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id);
 
-        if (cache.isEmpty()) return true;
+        if (cache.isEmpty()) {
+            return true;
+        }
 
         this.deleteFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id);
         this.deleteFromDatabase(id);
 
-        userDao.refreshCacheByWebsiteCache(
-                RedisCacheKeys.USER_SLICE_KEY + userLogin,
-                Duration.ofMinutes(15),
-                userLogin
-        );
+        userDao.refreshCacheByWebsiteCache(RedisCacheKeys.USER_SLICE_KEY + userLogin, Duration.ofMinutes(15),
+                userLogin);
 
         return !this.existInDatabaseById(id);
     }

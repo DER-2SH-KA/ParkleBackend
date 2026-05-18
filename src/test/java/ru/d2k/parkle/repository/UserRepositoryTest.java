@@ -8,10 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
-
 import java.util.Optional;
-
-import org.assertj.core.api.Assertions.*;
 import ru.d2k.parkle.utils.generator.Uuid7Generator;
 
 // @Disabled
@@ -34,12 +31,8 @@ public class UserRepositoryTest {
 
         Optional<User> savedUser = userRepository.findByLogin("Login");
 
-        Assertions
-                .assertThat(savedUser)
-                .isPresent();
-        Assertions
-                .assertThat(savedUser.get().getLogin())
-                .isEqualTo("Login");
+        Assertions.assertThat(savedUser).isPresent();
+        Assertions.assertThat(savedUser.get().getLogin()).isEqualTo("Login");
     }
 
     @Test
@@ -52,9 +45,7 @@ public class UserRepositoryTest {
 
         Optional<User> savedUser = userRepository.findByLogin("Login");
 
-        Assertions
-                .assertThat(savedUser)
-                .isEmpty();
+        Assertions.assertThat(savedUser).isEmpty();
     }
 
     @Test
@@ -67,9 +58,7 @@ public class UserRepositoryTest {
 
         boolean isUserExists = userRepository.existsById(newUser.getId());
 
-        Assertions
-                .assertThat(isUserExists)
-                .isTrue();
+        Assertions.assertThat(isUserExists).isTrue();
     }
 
     @Test
@@ -82,9 +71,7 @@ public class UserRepositoryTest {
 
         boolean isUserExists = userRepository.existsById(Uuid7Generator.generateNewUUID());
 
-        Assertions
-                .assertThat(isUserExists)
-                .isFalse();
+        Assertions.assertThat(isUserExists).isFalse();
     }
 
     @Test
@@ -97,9 +84,7 @@ public class UserRepositoryTest {
 
         boolean isUserExists = userRepository.existsByLogin("Login");
 
-        Assertions
-                .assertThat(isUserExists)
-                .isTrue();
+        Assertions.assertThat(isUserExists).isTrue();
     }
 
     @Test
@@ -112,9 +97,7 @@ public class UserRepositoryTest {
 
         boolean isUserExists = userRepository.existsByLogin("Login");
 
-        Assertions
-                .assertThat(isUserExists)
-                .isFalse();
+        Assertions.assertThat(isUserExists).isFalse();
     }
 
     @Test
@@ -127,8 +110,6 @@ public class UserRepositoryTest {
 
         userRepository.deleteByLogin("Login");
 
-        Assertions
-                .assertThat(userRepository.existsByLogin("Login"))
-                .isFalse();
+        Assertions.assertThat(userRepository.existsByLogin("Login")).isFalse();
     }
 }
