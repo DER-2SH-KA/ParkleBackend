@@ -4,11 +4,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseCookie;
+import org.springframework.stereotype.Service;
 import org.springframework.web.util.WebUtils;
 import java.util.Objects;
 import java.util.Optional;
 
 @Primary
+@Service
 public class ManualCookieService extends CustomCookieService {
 
     @Override
