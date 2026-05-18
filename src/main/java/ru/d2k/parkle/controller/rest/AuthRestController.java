@@ -55,19 +55,6 @@ public class AuthRestController {
         return dto.isPresent() ? ResponseEntity.ok(dto.get()) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @PostMapping("/registration")
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserCreateDto cdto, HttpServletResponse response) {
-        Pair<String, UserResponseDto> jwtAndDto = authService.registration(cdto);
-
-        String jwt = jwtAndDto.getKey();
-        UserResponseDto dto = jwtAndDto.getValue();
-
-        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwt);
-        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-
-        return new ResponseEntity<>(dto, HttpStatus.CREATED);
-    }
-
     // TODO: Переделать с /{login} на /me
     @PatchMapping("/update/{login}")
     public ResponseEntity<UserResponseDto> updateUserById(@PathVariable String login,
