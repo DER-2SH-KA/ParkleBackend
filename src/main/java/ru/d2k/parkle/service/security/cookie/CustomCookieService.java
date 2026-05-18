@@ -6,7 +6,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
-@Service
 public abstract class CustomCookieService {
 
     public abstract Optional<jakarta.servlet.http.Cookie> fetchCookie(String name, HttpServletRequest request);
