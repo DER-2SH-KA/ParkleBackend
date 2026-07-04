@@ -4,15 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.dao.cache.role.RoleCacheSource;
 import ru.d2k.parkle.dao.database.role.RoleDatabaseSource;
 import ru.d2k.parkle.dto.RoleCreateDto;
 import ru.d2k.parkle.dto.RoleUpdateDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.cache.RoleCache;
-import ru.d2k.parkle.redis.RedisCacheKeys;
 import ru.d2k.parkle.utils.mapper.RoleMapper;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,9 +23,6 @@ public class RoleDao {
 
     @Autowired
     private final RoleDatabaseSource roleDatabase;
-
-    @Autowired
-    private final RoleCacheSource roleCache;
 
     @Autowired
     private final RoleMapper roleMapper;
@@ -45,7 +39,6 @@ public class RoleDao {
 
         Role createdEntity = this.saveToDatabase(entityToCreate);
         RoleCache cache = roleMapper.toCache(createdEntity);
-        this.setToCache(RedisCacheKeys.ROLE_SLICE_KEY + cache.name(), cache, Duration.ofMinutes(15));
 
         return cache;
     }
@@ -84,25 +77,14 @@ public class RoleDao {
      * @return entity as {@link RoleCache} object.
      * */
     public Optional<RoleCache> getByName(String name) {
-        Optional<RoleCache> cache = this.getFromCache(RedisCacheKeys.ROLE_SLICE_KEY + name);
+        Optional<Role> entityFromDb = this.getFromDatabaseByName(name);
 
-        if (cache.isPresent()) {
-            log.debug("Role with name '{}' taken from cache!", name);
+        if (entityFromDb.isPresent()) {
+            RoleCache cacheFromEntity = roleMapper.toCache(entityFromDb.get());
 
-            return cache;
-        } else {
-            Optional<Role> entityFromDb = this.getFromDatabaseByName(name);
+            log.debug("Role with name '{}' taken from database!", name);
 
-            if (entityFromDb.isPresent()) {
-                RoleCache cacheFromEntity = roleMapper.toCache(entityFromDb.get());
-
-                this.setToCache(RedisCacheKeys.ROLE_SLICE_KEY + cacheFromEntity.name(), cacheFromEntity,
-                        Duration.ofMinutes(15));
-
-                log.debug("Role with name '{}' taken from database!", name);
-
-                return Optional.of(cacheFromEntity);
-            }
+            return Optional.of(cacheFromEntity);
         }
 
         return Optional.empty();
@@ -128,10 +110,6 @@ public class RoleDao {
             Role updatedEntity = this.saveToDatabase(entity.get());
             RoleCache cache = roleMapper.toCache(updatedEntity);
 
-            // Delete old entity information from Redis cache.
-            this.deleteFromCache(RedisCacheKeys.ROLE_SLICE_KEY + entity.get().getName());
-            this.setToCache(RedisCacheKeys.ROLE_SLICE_KEY + cache.name(), cache, Duration.ofMinutes(15));
-
             return Optional.of(cache);
         }
 
@@ -148,7 +126,6 @@ public class RoleDao {
         Optional<Role> entityToDelete = this.getFromDatabaseById(id);
 
         if (entityToDelete.isPresent()) {
-            this.deleteFromCache(RedisCacheKeys.ROLE_SLICE_KEY + entityToDelete.get().getName());
             this.deleteFromDatabaseById(id);
 
             return !this.existInDatabaseById(id);
@@ -181,16 +158,6 @@ public class RoleDao {
     public boolean existsByName(String name) {
         return roleDatabase.existsByName(name);
     }
-
-    private void setToCache(String key, RoleCache value, Duration duration) {
-        roleCache.set(key, value, duration);
-    }
-
-    private Optional<RoleCache> getFromCache(String key) {
-        return roleCache.get(key);
-    }
-
-    private void deleteFromCache(String key) { roleCache.delete(key); }
 
     private Role saveToDatabase(Role entity) {
         return roleDatabase.save(entity);
