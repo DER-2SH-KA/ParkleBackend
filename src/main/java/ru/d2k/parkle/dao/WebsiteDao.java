@@ -148,12 +148,6 @@ public class WebsiteDao {
     }
 
     public boolean deleteById(UUID id, String userLogin) {
-        Optional<WebsiteCache> cache = this.getFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id);
-
-        if (cache.isEmpty()) {
-            return true;
-        }
-
         this.deleteFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id);
         this.deleteFromDatabase(id);
 
