@@ -36,8 +36,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
-        condition: service_healthy
     healthcheck:
       test: [ "CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/api/auth/ping || exit 1" ]
       interval: 20s
@@ -75,26 +73,6 @@ services:
       interval: 20s
       retries: 5
       timeout: 10s
-    deploy:
-      resources:
-        limits:
-          memory: 200m
-      restart_policy: *restart-policy-default
-    logging: *logging-default
-
-  redis:
-    image: redis:alpine3.22
-    container_name: redis_parkle
-    hostname: redis_parkle
-    expose:
-      - "6379"
-    networks:
-      - backend_network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 20s
-      timeout: 5s
-      retries: 3
     deploy:
       resources:
         limits:

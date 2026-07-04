@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.dao.cache.website.WebsiteCacheSource;
 import ru.d2k.parkle.dao.database.website.WebsiteDatabaseSource;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
 import ru.d2k.parkle.entity.User;
@@ -13,9 +12,7 @@ import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.entity.cache.WebsiteCache;
 import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.exception.WebsiteNotFoundException;
-import ru.d2k.parkle.redis.RedisCacheKeys;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,9 +27,6 @@ public class WebsiteDao {
     private final WebsiteDatabaseSource websiteDatabase;
 
     @Autowired
-    private final WebsiteCacheSource websiteCache;
-
-    @Autowired
     private final WebsiteMapper websiteMapper;
 
     @Autowired
@@ -44,9 +38,6 @@ public class WebsiteDao {
         Website createdEntity = this.saveToDatabase(entity);
 
         WebsiteCache cache = websiteMapper.toCache(createdEntity);
-        this.setToCache(RedisCacheKeys.WEBSITE_SLICE_KEY + cache.id().toString(), cache, Duration.ofMinutes(15));
-        userDao.refreshCacheByWebsiteCache(RedisCacheKeys.USER_SLICE_KEY + userLogin, Duration.ofMinutes(15),
-                userLogin);
 
         return cache;
     }
@@ -80,22 +71,12 @@ public class WebsiteDao {
     }
 
     public Optional<WebsiteCache> getById(UUID id) {
-        Optional<WebsiteCache> fromCache = this.getFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id.toString());
-
-        if (fromCache.isPresent()) {
-            log.debug("Website by id '{}' was taken from cache!", id);
-
-            return fromCache;
-        }
-
         Optional<Website> fromDatabase = this.getFromDatabaseById(id);
 
         if (fromDatabase.isEmpty()) {
             throw new WebsiteNotFoundException(String.format("Website not found by ID '%s'!", id));
         } else {
             WebsiteCache cache = websiteMapper.toCache(fromDatabase.get());
-
-            this.setToCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id, cache, Duration.ofMinutes(15));
 
             log.debug("Website by id '{}' was taken from database!", id);
 
@@ -121,12 +102,6 @@ public class WebsiteDao {
             Website updatedEntity = this.saveToDatabase(entity.get());
             WebsiteCache cache = websiteMapper.toCache(updatedEntity);
 
-            this.deleteFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id.toString());
-
-            this.setToCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id, cache, Duration.ofMinutes(15));
-            userDao.refreshCacheByWebsiteCache(RedisCacheKeys.USER_SLICE_KEY + userLogin, Duration.ofMinutes(15),
-                    userLogin);
-
             log.debug("Website with id {} was updated", id);
 
             return Optional.of(cache);
@@ -148,11 +123,7 @@ public class WebsiteDao {
     }
 
     public boolean deleteById(UUID id, String userLogin) {
-        this.deleteFromCache(RedisCacheKeys.WEBSITE_SLICE_KEY + id);
         this.deleteFromDatabase(id);
-
-        userDao.refreshCacheByWebsiteCache(RedisCacheKeys.USER_SLICE_KEY + userLogin, Duration.ofMinutes(15),
-                userLogin);
 
         return !this.existInDatabaseById(id);
     }
@@ -161,28 +132,12 @@ public class WebsiteDao {
         return this.existInDatabaseById(id);
     }
 
-    private void setToCache(String key, WebsiteCache cache, Duration duration) {
-        websiteCache.set(key, cache, duration);
-    }
-
-    private Optional<WebsiteCache> getFromCache(String key) {
-        return websiteCache.get(key);
-    }
-
-    private void deleteFromCache(String key) {
-        websiteCache.delete(key);
-    }
-
     private Website saveToDatabase(Website entity) {
         return websiteDatabase.save(entity);
     }
 
     private Optional<Website> getFromDatabaseById(UUID id) {
         return websiteDatabase.getById(id);
-    }
-
-    private List<Website> getFromDatabaseByUserIdSortedByTitleAsc(UUID userId) {
-        return websiteDatabase.getByUserIdSortedByTitleAsc(userId);
     }
 
     private void deleteFromDatabase(UUID id) {
