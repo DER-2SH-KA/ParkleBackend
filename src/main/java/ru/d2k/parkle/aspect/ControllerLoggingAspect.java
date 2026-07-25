@@ -10,25 +10,27 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
-
 @Slf4j
 @Aspect
 @Component
 public class ControllerLoggingAspect {
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping)")
-    public void logGetMethods() {}
+    public void pointcutForGetMethod() {}
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.PostMapping)")
-    public void logPostMethods() {}
+    public void pointcutForPostMethod() {}
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.PutMapping)")
-    public void logPutMethods() {}
+    public void pointcutForPutMethod() {}
+
+    @Pointcut("@annotation(org.springframework.web.bind.annotation.PatchMapping)")
+    public void pointcutForPatchMethod() {}
 
     @Pointcut("@annotation(org.springframework.web.bind.annotation.DeleteMapping)")
-    public void logDeleteMethods() {}
+    public void pointcutForDeleteMethod() {}
 
-    @Before("logGetMethods()")
+    @Before("pointcutForGetMethod()")
     public void logGetMethodBefore(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
         Object[] agrs = joinPoint.getArgs();
@@ -36,21 +38,21 @@ public class ControllerLoggingAspect {
         log.debug("GET method {} taken with args {}...", methodName, Arrays.toString(agrs));
     }
 
-    @AfterReturning("logGetMethods()")
+    @AfterReturning("pointcutForGetMethod()")
     public void logGetMethodAfterReturning(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
 
         log.debug("GET method {} was served", methodName);
     }
 
-    @AfterThrowing(pointcut = "logGetMethods()", throwing = "ex")
+    @AfterThrowing(pointcut = "pointcutForGetMethod()", throwing = "ex")
     public void logGetMethodAfterThrowing(JoinPoint joinPoint, Exception ex) {
         String methodName = joinPoint.getSignature().getName();
 
         log.error("GET method {} return exception: {}", methodName, ex.getMessage());
     }
 
-    @Before("logPostMethods()")
+    @Before("pointcutForPostMethod()")
     public void logPostMethodBefore(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
         Object[] agrs = joinPoint.getArgs();
@@ -58,21 +60,21 @@ public class ControllerLoggingAspect {
         log.debug("POST method {} taken with args {}...", methodName, Arrays.toString(agrs));
     }
 
-    @AfterReturning("logPostMethods()")
+    @AfterReturning("pointcutForPostMethod()")
     public void logPostMethodAfterReturning(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
 
         log.debug("POST method {} was served", methodName);
     }
 
-    @AfterThrowing(pointcut = "logPostMethods()", throwing = "ex")
+    @AfterThrowing(pointcut = "pointcutForPostMethod()", throwing = "ex")
     public void logPostMethodAfterThrowing(JoinPoint joinPoint, Exception ex) {
         String methodName = joinPoint.getSignature().getName();
 
         log.error("POST method {} return exception: {}", methodName, ex.getMessage());
     }
 
-    @Before("logPutMethods()")
+    @Before("pointcutForPutMethod()")
     public void logPutMethodBefore(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
         Object[] agrs = joinPoint.getArgs();
@@ -80,21 +82,43 @@ public class ControllerLoggingAspect {
         log.debug("PUT method {} taken with args {}...", methodName, Arrays.toString(agrs));
     }
 
-    @AfterReturning("logPutMethods()")
+    @AfterReturning("pointcutForPutMethod()")
     public void logPutMethodAfterReturning(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
 
         log.debug("PUT method {} was served", methodName);
     }
 
-    @AfterThrowing(pointcut = "logPutMethods()", throwing = "ex")
+    @AfterThrowing(pointcut = "pointcutForPutMethod()", throwing = "ex")
     public void logPutMethodAfterThrowing(JoinPoint joinPoint, Exception ex) {
         String methodName = joinPoint.getSignature().getName();
 
         log.error("PUT method {} return exception: {}", methodName, ex.getMessage());
     }
 
-    @Before("logDeleteMethods()")
+    @Before("pointcutForPatchMethod()")
+    public void logPatchMethodBefore(JoinPoint joinPoint) {
+        String methodName = joinPoint.getSignature().getName();
+        Object[] agrs = joinPoint.getArgs();
+
+        log.debug("PATCH method {} taken with args {}...", methodName, Arrays.toString(agrs));
+    }
+
+    @AfterReturning("pointcutForPatchMethod()")
+    public void logPatchMethodAfterReturning(JoinPoint joinPoint) {
+        String methodName = joinPoint.getSignature().getName();
+
+        log.debug("PATCH method {} was served", methodName);
+    }
+
+    @AfterThrowing(pointcut = "pointcutForPatchMethod()", throwing = "ex")
+    public void logPatchMethodAfterThrowing(JoinPoint joinPoint, Exception ex) {
+        String methodName = joinPoint.getSignature().getName();
+
+        log.error("PATCH method {} return exception: {}", methodName, ex.getMessage());
+    }
+
+    @Before("pointcutForDeleteMethod()")
     public void logDeleteMethodBefore(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
         Object[] agrs = joinPoint.getArgs();
@@ -102,14 +126,14 @@ public class ControllerLoggingAspect {
         log.debug("DELETE method {} taken with args {}...", methodName, Arrays.toString(agrs));
     }
 
-    @AfterReturning("logDeleteMethods()")
+    @AfterReturning("pointcutForDeleteMethod()")
     public void logDeleteMethodAfterReturning(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
 
         log.debug("DELETE method {} was served", methodName);
     }
 
-    @AfterThrowing(pointcut = "logDeleteMethods()", throwing = "ex")
+    @AfterThrowing(pointcut = "pointcutForDeleteMethod()", throwing = "ex")
     public void logDeleteMethodAfterThrowing(JoinPoint joinPoint, Exception ex) {
         String methodName = joinPoint.getSignature().getName();
 
