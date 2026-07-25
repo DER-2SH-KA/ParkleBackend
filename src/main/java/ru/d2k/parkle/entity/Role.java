@@ -37,9 +37,6 @@ public class Role {
     @Column(name = "priority", nullable = false)
     private Integer priority;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-    private Set<User> users = new HashSet<>();
-
     private Role(String name, Integer priority) {
         this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.name = name;

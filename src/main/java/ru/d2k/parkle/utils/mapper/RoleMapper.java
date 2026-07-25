@@ -15,7 +15,6 @@ public interface RoleMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "users", ignore = true)
     void updateEntityByDto(@MappingTarget Role role, RoleUpdateDto dto);
 
     RoleResponseDto toResponseDto(RoleCache cache);
