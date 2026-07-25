@@ -33,23 +33,23 @@ public class AuthenticationService {
                 .createHttpUnauthorizedAuthentication(authenticateUserDto);
         CustomUserDetails customUserDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
-        String jwtToken = jwtService.generateTokenByUserCache(customUserDetails.getCache());
+        String jwt = jwtService.generateTokenByUserCache(customUserDetails.getCache());
 
-        Optional<UserResponseDto> responseUserDto = userService.getUserByUserCache(customUserDetails.getCache());
+        Optional<UserResponseDto> userResponseDto = userService.getUserByUserCache(customUserDetails.getCache());
 
-        return new Pair<>(jwtToken, responseUserDto);
+        return new Pair<>(jwt, userResponseDto);
     }
 
     public Pair<String, UserResponseDto> updateByLogin(String login, UserUpdateDto updateUserDto) {
-        UserResponseDto dto = userService.updateByLogin(login, updateUserDto);
+        UserResponseDto updatedUserDto = userService.updateByLogin(login, updateUserDto);
 
         Authentication signedAuthentication = authenticationManagerService
                 .createHttpUnauthorizedAuthentication(updateUserDto);
-        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
+        CustomUserDetails customUserDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
-        String jwtToken = jwtService.generateTokenByUserCache(userDetails.getCache());
+        String jwtToken = jwtService.generateTokenByUserCache(customUserDetails.getCache());
 
-        return new Pair<>(jwtToken, dto);
+        return new Pair<>(jwtToken, updatedUserDto);
     }
 
     public boolean deleteByLogin(String login) {

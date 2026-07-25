@@ -27,9 +27,6 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    @Autowired
-    private final CustomCookieService cookieService;
-
     public String generateTokenByUserCache(UserCache userCache) {
         Map<String, Object> claims = new HashMap<>();
 
