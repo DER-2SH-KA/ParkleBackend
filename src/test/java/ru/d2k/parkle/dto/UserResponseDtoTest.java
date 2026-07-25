@@ -7,13 +7,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 public class UserResponseDtoTest {
 
-    private static final UUID UUID = Uuid7Generator.generateNewUUID();
+    private static final UUID UUID = UuidGeneratorUtil.generateNewUuidV7();
     private static final String ROLE_NAME = "role";
     private static final Integer ROLE_PRIORITY = 1;
     private static final String LOGIN = "login";
@@ -58,7 +58,7 @@ public class UserResponseDtoTest {
 
     private static Stream<UserResponseDto> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
         return Stream.of(
-                new UserResponseDto(Uuid7Generator.generateNewUUID(), ROLE_NAME, ROLE_PRIORITY, LOGIN, EMAIL),
+                new UserResponseDto(UuidGeneratorUtil.generateNewUuidV7(), ROLE_NAME, ROLE_PRIORITY, LOGIN, EMAIL),
                 new UserResponseDto(UUID, "role2", 2, LOGIN, EMAIL),
                 new UserResponseDto(UUID, ROLE_NAME, ROLE_PRIORITY, "login2", EMAIL),
                 new UserResponseDto(UUID, ROLE_NAME, ROLE_PRIORITY, LOGIN, "email2@mail.ru"));

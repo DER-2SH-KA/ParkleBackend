@@ -103,7 +103,7 @@ public class UserDao {
         Optional<Role> role = roleDao.getFromDatabaseByName(udto.getRoleName());
 
         if (entity.isPresent() && role.isPresent()) {
-            userMapper.updateByDto(entity.get(), udto, role.get());
+            userMapper.updateEntityByDto(entity.get(), udto, role.get());
 
             User updatedEntity = this.saveToDatabase(entity.get());
             UserCache cache = userMapper.toCache(updatedEntity);

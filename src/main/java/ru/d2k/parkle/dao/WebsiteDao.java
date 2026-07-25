@@ -97,7 +97,7 @@ public class WebsiteDao {
         if (entity.isPresent() && userEntity.isPresent()) {
             log.debug("Entity and website is present");
 
-            websiteMapper.updateByDto(entity.get(), udto, userEntity.get());
+            websiteMapper.updateEntityByDto(entity.get(), udto, userEntity.get());
 
             Website updatedEntity = this.saveToDatabase(entity.get());
             WebsiteCache cache = websiteMapper.toCache(updatedEntity);

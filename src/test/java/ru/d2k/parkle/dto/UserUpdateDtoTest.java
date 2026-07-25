@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 public class UserUpdateDtoTest {
 
-    private static final UUID ID = Uuid7Generator.generateNewUUID();
+    private static final UUID ID = UuidGeneratorUtil.generateNewUuidV7();
     private static final String ROLE_NAME = "role";
     private static final String LOGIN = "login";
     private static final String EMAIL = "email@mail.ru";

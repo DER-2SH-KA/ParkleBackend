@@ -1,7 +1,6 @@
 package ru.d2k.parkle.repository;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -9,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
 import java.util.Optional;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 
 // @Disabled
 @DataJpaTest
@@ -69,7 +68,7 @@ public class UserRepositoryTest {
         testEntityManager.persistAndFlush(newRole);
         testEntityManager.persistAndFlush(newUser);
 
-        boolean isUserExists = userRepository.existsById(Uuid7Generator.generateNewUUID());
+        boolean isUserExists = userRepository.existsById(UuidGeneratorUtil.generateNewUuidV7());
 
         Assertions.assertThat(isUserExists).isFalse();
     }

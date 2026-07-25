@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -41,7 +41,7 @@ public class Role {
     private Set<User> users = new HashSet<>();
 
     private Role(String name, Integer priority) {
-        this.id = Uuid7Generator.generateNewUUID();
+        this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.name = name;
         this.priority = priority;
     }

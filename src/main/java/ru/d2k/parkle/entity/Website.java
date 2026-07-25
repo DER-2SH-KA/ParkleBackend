@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.UUID;
 
 /** Entity for website. **/
@@ -48,7 +48,7 @@ public class Website {
     private String url;
 
     private Website(User user, String hexColor, String title, String description, String url) {
-        this.id = Uuid7Generator.generateNewUUID();
+        this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.user = user;
         this.hexColor = hexColor;
         this.title = title;

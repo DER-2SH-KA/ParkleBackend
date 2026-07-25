@@ -1,7 +1,6 @@
 package ru.d2k.parkle.repository;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -9,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 
 import java.util.List;
 
@@ -72,7 +71,7 @@ public class WebsiteRepositoryTest {
         testEntityManager.persistAndFlush(website2);
         testEntityManager.persistAndFlush(website3);
 
-        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(Uuid7Generator.generateNewUUID());
+        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(UuidGeneratorUtil.generateNewUuidV7());
 
         Assertions.assertThat(websites.size()).isEqualTo(0);
     }
@@ -104,7 +103,7 @@ public class WebsiteRepositoryTest {
         testEntityManager.persistAndFlush(newUser);
         testEntityManager.persistAndFlush(website);
 
-        boolean isWebsiteExist = websiteRepository.existsById(Uuid7Generator.generateNewUUID());
+        boolean isWebsiteExist = websiteRepository.existsById(UuidGeneratorUtil.generateNewUuidV7());
 
         Assertions.assertThat(isWebsiteExist).isFalse();
     }

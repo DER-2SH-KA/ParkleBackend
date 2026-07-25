@@ -3,7 +3,7 @@ package ru.d2k.parkle.entity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.UUID;
 
 public class RoleTest {
@@ -11,7 +11,7 @@ public class RoleTest {
     @DisplayName("hashCode -- hash codes of the same object are the same")
     @Test
     public void hashCode_sameObjectHashCodeEquals() {
-        Role role = new Role(Uuid7Generator.generateNewUUID(), "TEMP", 0);
+        Role role = new Role(UuidGeneratorUtil.generateNewUuidV7(), "TEMP", 0);
 
         Assertions.assertEquals(role.hashCode(), role.hashCode());
     }
@@ -19,7 +19,7 @@ public class RoleTest {
     @DisplayName("hashCode -- hash codes of objects with different non Id fields are equals")
     @Test
     public void hashCode_twoObjectWithSameIdAreEquals() {
-        UUID uuid = Uuid7Generator.generateNewUUID();
+        UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
         Role role1 = new Role(uuid, "TEMP1", 1);
         Role role2 = new Role(uuid, "TEMP2", 2);
 
@@ -42,7 +42,7 @@ public class RoleTest {
     @DisplayName("equals -- Same object are equals")
     @Test
     public void equals_sameObjectAreEquals() {
-        Role role = new Role(Uuid7Generator.generateNewUUID(), "TEMP", 0);
+        Role role = new Role(UuidGeneratorUtil.generateNewUuidV7(), "TEMP", 0);
 
         Assertions.assertEquals(role, role);
     }
@@ -50,7 +50,7 @@ public class RoleTest {
     @DisplayName("equals -- Object equals with null is false")
     @Test
     public void equals_withNullObject() {
-        Role role = new Role(Uuid7Generator.generateNewUUID(), "TEMP", 0);
+        Role role = new Role(UuidGeneratorUtil.generateNewUuidV7(), "TEMP", 0);
 
         Assertions.assertFalse(role.equals(null));
     }
@@ -58,7 +58,7 @@ public class RoleTest {
     @DisplayName("equals -- Objects with same ID are equals")
     @Test
     public void equals_objectsWithSameIdAreEquals() {
-        UUID uuid = Uuid7Generator.generateNewUUID();
+        UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
         Role role1 = new Role(uuid, "TEMP1", 1);
         Role role2 = new Role(uuid, "TEMP2", 2);
 
@@ -68,7 +68,7 @@ public class RoleTest {
     @DisplayName("equals -- equals with object which ID is null is false")
     @Test
     public void equals_withObjectIdNull() {
-        Role role1 = new Role(Uuid7Generator.generateNewUUID(), "TEMP1", 1);
+        Role role1 = new Role(UuidGeneratorUtil.generateNewUuidV7(), "TEMP1", 1);
         Role role2 = new Role(null, "TEMP2", 2);
 
         Assertions.assertFalse(role1.equals(role2));
