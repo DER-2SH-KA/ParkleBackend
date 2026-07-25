@@ -1,36 +1,32 @@
-package ru.d2k.parkle.utils.jwt;
+package ru.d2k.parkle.service.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
+import org.springframework.stereotype.Service;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.service.security.cookie.CustomCookieService;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.function.Function;
 
-@Component
 @RequiredArgsConstructor
-public class JwtUtil {
+@Service
+public class JwtService {
 
     @Value("${jwt.secret-key}")
     private String secretKey;
 
     @Value("${jwt.expiration}")
-    private Long jwtTokenExpiration;
+    private Long expiration;
 
     @Autowired
     private final CustomCookieService cookieService;
@@ -70,7 +66,7 @@ public class JwtUtil {
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(currentTimeMillis))
-                .expiration(new Date(currentTimeMillis + jwtTokenExpiration))
+                .expiration(new Date(currentTimeMillis + expiration))
                 .signWith(getSignKey())
                 .compact();
     }
@@ -96,15 +92,9 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public static Optional<String> extractJwtFromCookie(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, CookieNames.JwtToken);
-
-        return cookie != null ? Optional.of(cookie.getValue()) : Optional.empty();
-    }
-
     public ResponseCookie createJwtCookie(String jwt) {
         return cookieService.createResponseCookie(CookieNames.JwtToken, jwt, true, false, "/",
-                (int) (jwtTokenExpiration / 1000), "Lax");
+                (int) (expiration / 1000), "Lax");
     }
 
     public ResponseCookie createJwtExpiredCookie() {

@@ -11,7 +11,7 @@ import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.service.security.authentication.CustomAuthenticationManagerService;
-import ru.d2k.parkle.utils.jwt.JwtUtil;
+import ru.d2k.parkle.service.security.jwt.JwtService;
 import ru.d2k.parkle.utils.type.Pair;
 import java.util.Optional;
 
@@ -27,13 +27,13 @@ public class AuthService {
     private final CustomAuthenticationManagerService authenticationManagerService;
 
     @Autowired
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     public Pair<String, Optional<UserResponseDto>> login(UserAuthDto adto) {
         Authentication signedAuthentication = authenticationManagerService.createHttpUnauthorizedAuthentication(adto);
         CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
-        String jwtToken = jwtUtil.generateToken(userDetails);
+        String jwtToken = jwtService.generateToken(userDetails);
 
         Optional<UserResponseDto> dto = userService.getUserByUserCache(userDetails.getCache());
 
@@ -46,7 +46,7 @@ public class AuthService {
         Authentication signedAuthentication = authenticationManagerService.createHttpUnauthorizedAuthentication(cdto);
         CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
-        String jwtToken = jwtUtil.generateToken(userDetails);
+        String jwtToken = jwtService.generateToken(userDetails);
 
         return new Pair<>(jwtToken, dto);
     }
@@ -57,7 +57,7 @@ public class AuthService {
         Authentication signedAuthentication = authenticationManagerService.createHttpUnauthorizedAuthentication(udto);
         CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
-        String jwtToken = jwtUtil.generateToken(userDetails);
+        String jwtToken = jwtService.generateToken(userDetails);
 
         return new Pair<>(jwtToken, dto);
     }

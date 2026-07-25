@@ -17,39 +17,38 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.d2k.parkle.controller.ApiPaths;
+import ru.d2k.parkle.controller.ApiRoutes;
 import ru.d2k.parkle.dto.ErrorResponseDto;
 import ru.d2k.parkle.dto.UserAuthDto;
-import ru.d2k.parkle.dto.UserCreateDto;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.service.rest.AuthService;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
-import ru.d2k.parkle.utils.jwt.JwtUtil;
+import ru.d2k.parkle.service.security.jwt.JwtService;
 import ru.d2k.parkle.utils.type.Pair;
-
 import java.util.Optional;
 
-@RestController
-@RequestMapping(value = ApiPaths.AUTH_API)
 @RequiredArgsConstructor
+@RestController
+@RequestMapping(ApiRoutes.API + ApiRoutes.AUTH_API)
 // TODO: Вынести логику авторизации вне контроллера в отдельный класс.
-public class AuthRestController {
+public class AuthenticationRestController {
 
     @Autowired
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     @Autowired
-    private final AuthService authService;
+    private final AuthService service;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authentication(@Valid @RequestBody UserAuthDto uadto, HttpServletResponse response) {
-        Pair<String, Optional<UserResponseDto>> jwtAndDto = authService.login(uadto);
+    public ResponseEntity<?> authentication(@Valid @RequestBody UserAuthDto authenticateUserDto,
+                                            HttpServletResponse response) {
+        Pair<String, Optional<UserResponseDto>> jwtAndDto = service.login(authenticateUserDto);
 
         String jwt = jwtAndDto.getKey();
         Optional<UserResponseDto> dto = jwtAndDto.getValue();
 
-        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwt);
+        ResponseCookie jwtCookie = jwtService.createJwtCookie(jwt);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
         return dto.isPresent() ? ResponseEntity.ok(dto.get()) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -57,15 +56,15 @@ public class AuthRestController {
 
     // TODO: Переделать с /{login} на /me
     @PatchMapping("/update/{login}")
-    public ResponseEntity<UserResponseDto> updateUserById(@PathVariable String login,
-                                                          @Valid @RequestBody UserUpdateDto udto,
-                                                          HttpServletResponse response) {
-        Pair<String, UserResponseDto> jwtAndDto = authService.update(login, udto);
+    public ResponseEntity<UserResponseDto> updateByLogin(@PathVariable("login") String login,
+                                                         @Valid @RequestBody UserUpdateDto updateUserDto,
+                                                         HttpServletResponse response) {
+        Pair<String, UserResponseDto> jwtAndDto = service.update(login, updateUserDto);
 
         String jwt = jwtAndDto.getKey();
         UserResponseDto dto = jwtAndDto.getValue();
 
-        ResponseCookie jwtCookie = jwtUtil.createJwtCookie(jwt);
+        ResponseCookie jwtCookie = jwtService.createJwtCookie(jwt);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
         return ResponseEntity.ok(dto);
@@ -73,8 +72,8 @@ public class AuthRestController {
 
     // TODO: Переделать с /{login} на /me
     @DeleteMapping("/delete/{login}")
-    public ResponseEntity<?> deleteUserByLogin(@PathVariable String login, HttpServletResponse response) {
-        boolean result = authService.delete(login);
+    public ResponseEntity<?> deleteByLogin(@PathVariable("login") String login, HttpServletResponse response) {
+        boolean result = service.delete(login);
 
         this.logout(response);
 
@@ -85,7 +84,7 @@ public class AuthRestController {
     @GetMapping("/isAuthed")
     public ResponseEntity<?> isAuthed(@CookieValue(name = CookieNames.JwtToken, defaultValue = "") String jwt) {
         if (!jwt.isBlank()) {
-            Optional<UserResponseDto> dto = authService.getUserIfJwtPresent(jwt);
+            Optional<UserResponseDto> dto = service.getUserIfJwtPresent(jwt);
 
             return dto.isPresent() ? ResponseEntity.ok(dto.get()) : new ResponseEntity<>(new ErrorResponseDto(
                     "Пользователь не авторизован в системе",
@@ -98,7 +97,7 @@ public class AuthRestController {
 
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        ResponseCookie emptyCookie = jwtUtil.createJwtExpiredCookie();
+        ResponseCookie emptyCookie = jwtService.createJwtExpiredCookie();
         response.addHeader(HttpHeaders.SET_COOKIE, emptyCookie.toString());
 
         return ResponseEntity.ok().build();

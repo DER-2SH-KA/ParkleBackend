@@ -20,8 +20,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.service.security.cookie.CustomCookieService;
+import ru.d2k.parkle.service.security.jwt.JwtService;
+
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -33,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomCookieService cookieService;
 
     @Autowired
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     @Autowired
     private final UserDetailsService userDetailsService;
@@ -70,12 +71,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                String userLogin = jwtUtil.extractUsername(jwt);
+                String userLogin = jwtService.extractUsername(jwt);
 
                 if (userLogin != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = this.userDetailsService.loadUserByUsername(userLogin);
 
-                    if (jwtUtil.isTokenValid(jwt, userDetails)) {
+                    if (jwtService.isTokenValid(jwt, userDetails)) {
                         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
                                 null, userDetails.getAuthorities());
 
@@ -86,7 +87,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             log.error("Exception when JWT filter authentication process", ex);
 
-            ResponseCookie responseCookie = jwtUtil.createJwtExpiredCookie();
+            ResponseCookie responseCookie = jwtService.createJwtExpiredCookie();
             response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
         } finally {
             log.warn("At end. Do Filter.");
