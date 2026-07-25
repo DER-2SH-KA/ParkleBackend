@@ -14,7 +14,7 @@ import ru.d2k.parkle.exception.JwtNotIncludeUserLoginException;
 public class JwtControllerAdvice {
 
     @ExceptionHandler({JwtNotExistInRequestException.class, JwtNotIncludeUserLoginException.class})
-    public ResponseEntity<ErrorResponseDto> handleJwtException(RuntimeException ex) {
+    public ResponseEntity<ErrorResponseDto> handleJwtNotExistInRequestException(RuntimeException ex) {
         log.error("JWT error. Message: {}", ex.getMessage());
 
         return ResponseEntity

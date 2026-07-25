@@ -10,46 +10,46 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Component
 @Primary
-@RequiredArgsConstructor
-public class UserPostgresDatabase implements UserDatabaseSource{
+public class UserPostgresDatabase implements UserDatabase {
 
     @Autowired
-    private final UserRepository userRepository;
+    private final UserRepository repository;
 
     @Override
     public User save(User entity) {
-        return userRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public List<User> getAll() {
-        return userRepository.findAll();
+        return repository.findAll();
     }
 
     @Override
     public Optional<User> getById(UUID id) {
-        return userRepository.findById(id);
+        return repository.findById(id);
     }
 
     @Override
     public Optional<User> getByLogin(String login) {
-        return userRepository.findByLogin(login);
+        return repository.findByLogin(login);
     }
 
     @Override
     public User getReferenceById(UUID id) {
-        return userRepository.getReferenceById(id);
+        return repository.getReferenceById(id);
     }
 
     @Override
     public void deleteByLogin(String login) {
-        userRepository.deleteByLogin(login);
+        repository.deleteByLogin(login);
     }
 
     @Override
     public boolean existsByLogin(String login) {
-        return userRepository.existsByLogin(login);
+        return repository.existsByLogin(login);
     }
 }

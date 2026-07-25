@@ -3,13 +3,12 @@ package ru.d2k.parkle.dto;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -23,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RoleUpdateDtoTest {
 
-    private static final UUID uuid = Uuid7Generator.generateNewUUID();
+    private static final UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @DisplayName("hashCode/equals - return true with similar objects")
@@ -83,7 +82,7 @@ public class RoleUpdateDtoTest {
 
     private static Stream<Arguments> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
         return Stream.of(
-                Arguments.of(new RoleUpdateDto(Uuid7Generator.generateNewUUID(), "Role1", 1)),
+                Arguments.of(new RoleUpdateDto(UuidGeneratorUtil.generateNewUuidV7(), "Role1", 1)),
                 Arguments.of(new RoleUpdateDto(uuid, "Role2", 1)),
                 Arguments.of(new RoleUpdateDto(uuid, "Role1", 2)));
     }

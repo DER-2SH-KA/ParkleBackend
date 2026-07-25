@@ -17,26 +17,26 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service
 public class RoleService {
 
     @Autowired
-    private final RoleDao roleDao;
+    private final RoleDao dao;
 
     @Autowired
-    private final RoleMapper roleMapper;
+    private final RoleMapper mapper;
 
     @Transactional(readOnly = true)
     public Set<RoleResponseDto> findAll() {
         log.info("Getting all roles...");
 
-        Set<RoleCache> dtos = roleDao.getAll();
+        Set<RoleCache> roleCaches = dao.getAll();
 
-        log.info("Roles was founded: {}", dtos.size());
+        log.info("Roles was founded: {}", roleCaches.size());
 
-        return dtos.stream()
-                .map(roleMapper::toResponseDto)
+        return roleCaches.stream()
+                .map(mapper::toResponseDto)
                 .collect(Collectors.toSet());
     }
 
@@ -44,63 +44,63 @@ public class RoleService {
     public RoleResponseDto findById(UUID id) {
         log.info("Getting role by ID: {}...", id);
 
-        RoleCache role = roleDao.getById(id)
+        RoleCache roleCache = dao.getById(id)
                 .orElseThrow(() -> new RoleNotFoundException("Role was not found with ID: " + id));
 
         log.info("Role with ID {} was founded", id);
 
-        return roleMapper.toResponseDto(role);
+        return mapper.toResponseDto(roleCache);
     }
 
     @Transactional(readOnly = true)
     public RoleResponseDto findByName(String name) {
         log.info("Getting roles by Name '{}'...", name);
 
-        RoleCache role = roleDao.getByName(name)
+        RoleCache roleCache = dao.getByName(name)
                 .orElseThrow(() -> new RoleNotFoundException("Role was not found with name: " + name));
 
         log.info("Role with name '{}' was founded", name);
 
-        return roleMapper.toResponseDto(role);
+        return mapper.toResponseDto(roleCache);
     }
 
     @Transactional
-    public RoleResponseDto create(RoleCreateDto cdto) {
-        log.info("Creating role '{}'...", cdto.toString());
+    public RoleResponseDto create(RoleCreateDto createRoleDto) {
+        log.info("Creating role '{}'...", createRoleDto.toString());
 
-        if (roleDao.existsByName(cdto.name())) {
+        if (dao.existsByName(createRoleDto.name())) {
             throw new IllegalArgumentException("Role with this name is already exists");
         }
 
-        RoleCache role = roleDao.create(cdto);
+        RoleCache role = dao.create(createRoleDto);
 
         log.info("Role '{}' was created", role.name());
 
-        return roleMapper.toResponseDto(role);
+        return mapper.toResponseDto(role);
     }
 
     @Transactional
-    public RoleResponseDto update(UUID id, RoleUpdateDto udto) {
+    public RoleResponseDto updateById(UUID id, RoleUpdateDto updateRoleDto) {
         log.info("Updating role by id '{}'...", id);
 
         if (id == null) {
             throw new IllegalArgumentException("RoleUpdateDto ID is null");
         }
 
-        RoleCache updatedRole = roleDao.update(id, udto)
+        RoleCache updatedRole = dao.updateById(id, updateRoleDto)
                 .orElseThrow(() -> new RoleNotFoundException("Role with this ID is not exist!"));
 
         log.info("Role with id {} was updated to {}", id, updatedRole);
 
-        return roleMapper.toResponseDto(updatedRole);
+        return mapper.toResponseDto(updatedRole);
     }
 
     @Transactional
-    public boolean delete(UUID id) {
+    public boolean deleteById(UUID id) {
         log.info("Delete role by ID {}...", id);
 
         if (id != null) {
-            boolean isDeleted = roleDao.deleteById(id);
+            boolean isDeleted = dao.deleteById(id);
 
             if (isDeleted) {
                 log.info("Role by ID {} was deleted", id);

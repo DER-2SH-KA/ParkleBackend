@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 public class PasswordEncoderConfig {
 
     @Value("${spring.security.bcrypt.strength}")
-    private int passwordEncoderStrength;
+    private int strength;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder( passwordEncoderStrength );
+        return new BCryptPasswordEncoder(strength);
     }
 }

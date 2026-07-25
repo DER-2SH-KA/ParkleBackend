@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.dao.database.user.UserDatabaseSource;
+import ru.d2k.parkle.dao.database.user.UserDatabase;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
@@ -16,27 +16,24 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Component
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
+@Component
 public class UserDao {
 
     @Autowired
-    private final UserDatabaseSource userDatabase;
+    private final UserDatabase database;
 
     @Autowired
-    private final UserMapper userMapper;
+    private final UserMapper mapper;
 
     @Autowired
     private final RoleDao roleDao;
 
-    // CRUD.
-    // Create.
     public UserCache create(User entity) {
-        return userMapper.toCache(this.saveToDatabase(entity));
+        return mapper.toCache(this.saveToDatabase(entity));
     }
 
-    // Read.
     // TODO: Придумать и реализовать поиск списка пользователей (возможно, по срезу ключей).
     public Set<UserCache> getAll() {
         List<User> entities = this.getAllFromDatabase();
@@ -44,38 +41,28 @@ public class UserDao {
         log.debug("Users was taken from database!");
 
         return entities.stream()
-                .map(userMapper::toCache)
+                .map(mapper::toCache)
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Get {@link User} entity from database or cache by ID as {@link UserCache}.
-     * @param id ID of user.
-     * @return entity as {@link UserCache} object.
-     * */
     // TODO: сделать поиск по ID (нюанс в том, что ключ состоит из Name).
     public Optional<UserCache> getById(UUID id) {
-        Optional<User> entityFromDb = this.getFromDatabaseById(id);
+        Optional<User> entityFromDb = this.getByIdFromDatabase(id);
 
         if (entityFromDb.isPresent()) {
             log.debug("User by id {} was taken from database!", id);
 
-            return Optional.of(userMapper.toCache(entityFromDb.get()));
+            return Optional.of(mapper.toCache(entityFromDb.get()));
         }
 
         return Optional.empty();
     }
 
-    /**
-     * Get {@link User} entity from database or cache by name as {@link UserCache}.
-     * @param login login of user.
-     * @return entity as {@link UserCache} object.
-     * */
     public Optional<UserCache> getByLogin(String login) {
-        Optional<User> entityFromDb = this.getFromDatabaseByLogin(login);
+        Optional<User> entityFromDb = this.getByLoginFromDatabase(login);
 
         if (entityFromDb.isPresent()) {
-            UserCache cacheFromEntity = userMapper.toCache(entityFromDb.get());
+            UserCache cacheFromEntity = mapper.toCache(entityFromDb.get());
 
             log.debug("User with login '{}' taken from database!", login);
 
@@ -86,27 +73,20 @@ public class UserDao {
     }
 
     public User getReferenceById(UUID id) {
-        return userDatabase.getReferenceById(id);
+        return database.getReferenceById(id);
     }
 
-    // Update.
-    /**
-     * Update {@link User} entity in database and cache.
-     * @param login user's login.
-     * @param udto {@link UserUpdateDto} DTO for update entity.
-     * @return updated entity as {@link UserCache} object.
-     * */
     // TODO: Не обновляется роль. Роль сохраняется не в захэшированном виде.
-    public Optional<UserCache> update(String login, UserUpdateDto udto) {
-        Optional<User> entity = this.getFromDatabaseByLogin(login);
+    public Optional<UserCache> updateByLogin(String login, UserUpdateDto updateUserDto) {
+        Optional<User> entity = this.getByLoginFromDatabase(login);
 
-        Optional<Role> role = roleDao.getFromDatabaseByName(udto.getRoleName());
+        Optional<Role> role = roleDao.getByNameFromDatabase(updateUserDto.getRoleName());
 
         if (entity.isPresent() && role.isPresent()) {
-            userMapper.updateByDto(entity.get(), udto, role.get());
+            mapper.updateEntityByDto(entity.get(), updateUserDto, role.get());
 
             User updatedEntity = this.saveToDatabase(entity.get());
-            UserCache cache = userMapper.toCache(updatedEntity);
+            UserCache cache = mapper.toCache(updatedEntity);
 
             return Optional.of(cache);
         }
@@ -114,19 +94,13 @@ public class UserDao {
         return Optional.empty();
     }
 
-    // Delete.
-    /**
-     * Delete {@link User} entity from database and cache by ID.
-     * @param login user's login.
-     * @return is entity was deleted.
-     * */
     public boolean deleteByLogin(String login) {
-        Optional<User> entityToDelete = this.getFromDatabaseByLogin(login);
+        Optional<User> entityToDelete = this.getByLoginFromDatabase(login);
 
         if (entityToDelete.isPresent()) {
-            this.deleteFromDatabaseByLogin(login);
+            this.deleteByLoginFromDatabase(login);
 
-            return !this.existInDatabaseByLogin(login);
+            return !this.existsByLoginInDatabase(login);
         }
 
         log.error("User to delete with login '{}' not exist!", login);
@@ -134,36 +108,27 @@ public class UserDao {
         return true;
     }
 
-    /**
-     * Check is exist {@link User} in database by name (ONLY DATABASE AS SOURCE OF TRUTH).
-     * @param login user's login.
-     * @return is user exist in database.
-     * */
-    public boolean existsByLogin(String login) {
-        return this.userDatabase.existsByLogin(login);
-    }
-
     private User saveToDatabase(User entity) {
-        return userDatabase.save(entity);
+        return database.save(entity);
     }
 
     private List<User> getAllFromDatabase() {
-        return userDatabase.getAll();
+        return database.getAll();
     }
 
-    private Optional<User> getFromDatabaseById(UUID id) {
-        return userDatabase.getById(id);
+    private Optional<User> getByIdFromDatabase(UUID id) {
+        return database.getById(id);
     }
 
-    public Optional<User> getFromDatabaseByLogin(String login) {
-        return userDatabase.getByLogin(login);
+    public Optional<User> getByLoginFromDatabase(String login) {
+        return database.getByLogin(login);
     }
 
-    private void deleteFromDatabaseByLogin(String login) {
-        userDatabase.deleteByLogin(login);
+    private void deleteByLoginFromDatabase(String login) {
+        database.deleteByLogin(login);
     }
 
-    private boolean existInDatabaseByLogin(String login) {
-        return userDatabase.existsByLogin(login);
+    private boolean existsByLoginInDatabase(String login) {
+        return database.existsByLogin(login);
     }
 }

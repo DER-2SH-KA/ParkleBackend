@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class UserAuthDtoTest {
+public class UserAuthenticationDtoTest {
 
     private static final String LOGIN = "login";
     private static final String PASSWORD = "password";
@@ -22,8 +22,8 @@ public class UserAuthDtoTest {
     @DisplayName("equals/hashCode - Should be True with similar objects")
     @Test
     public void shouldBeTrueWhenEqualsAndHashCodeWithSimilarObjects() {
-        UserAuthDto dto1 = new UserAuthDto(LOGIN, PASSWORD);
-        UserAuthDto dto2 = new UserAuthDto(LOGIN, PASSWORD);
+        UserAuthenticationDto dto1 = new UserAuthenticationDto(LOGIN, PASSWORD);
+        UserAuthenticationDto dto2 = new UserAuthenticationDto(LOGIN, PASSWORD);
 
         Assertions.assertEquals(dto1.hashCode(), dto2.hashCode());
         Assertions.assertEquals(dto1, dto2);
@@ -32,7 +32,7 @@ public class UserAuthDtoTest {
     @DisplayName("equals - return false with null")
     @Test
     public void shouldBeFalseWhenEqualsWithNull() {
-        UserAuthDto dto = new UserAuthDto(LOGIN, PASSWORD);
+        UserAuthenticationDto dto = new UserAuthenticationDto(LOGIN, PASSWORD);
 
         Assertions.assertFalse(dto.equals(null));
     }
@@ -40,16 +40,16 @@ public class UserAuthDtoTest {
     @DisplayName("equals - return false with object which has null fields")
     @Test
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
-        UserAuthDto dto = new UserAuthDto(LOGIN, PASSWORD);
+        UserAuthenticationDto dto = new UserAuthenticationDto(LOGIN, PASSWORD);
 
-        Assertions.assertNotEquals(dto, new UserAuthDto(null, null));
+        Assertions.assertNotEquals(dto, new UserAuthenticationDto(null, null));
     }
 
     @DisplayName("validate - return true with objects which has correct field's values")
     @Test
     public void shouldBeTrueWhenValidationObjectHasCorrectFieldsValues() {
-        UserAuthDto dto = new UserAuthDto("Developer", "5GdS4FaVtgS");
-        Set<ConstraintViolation<UserAuthDto>> violations = validator.validate(dto);
+        UserAuthenticationDto dto = new UserAuthenticationDto("Developer", "5GdS4FaVtgS");
+        Set<ConstraintViolation<UserAuthenticationDto>> violations = validator.validate(dto);
 
         Assertions.assertTrue(violations.isEmpty());
     }
@@ -57,8 +57,8 @@ public class UserAuthDtoTest {
     @DisplayName("equals - return false with objects which has different fields")
     @ParameterizedTest
     @MethodSource
-    public void shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields(UserAuthDto dto2) {
-        UserAuthDto dto1 = new UserAuthDto(LOGIN, PASSWORD);
+    public void shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields(UserAuthenticationDto dto2) {
+        UserAuthenticationDto dto1 = new UserAuthenticationDto(LOGIN, PASSWORD);
 
         Assertions.assertNotEquals(dto1, dto2);
     }
@@ -66,19 +66,19 @@ public class UserAuthDtoTest {
     @DisplayName("validate - return false with objects which has wrong field's values")
     @ParameterizedTest
     @MethodSource
-    public void shouldBeFalseWhenValidationObjectHasWrongFieldsValues(UserAuthDto dto) {
-        Set<ConstraintViolation<UserAuthDto>> violations = validator.validate(dto);
+    public void shouldBeFalseWhenValidationObjectHasWrongFieldsValues(UserAuthenticationDto dto) {
+        Set<ConstraintViolation<UserAuthenticationDto>> violations = validator.validate(dto);
 
         Assertions.assertFalse(violations.isEmpty());
     }
 
-    private static Stream<UserAuthDto> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
+    private static Stream<UserAuthenticationDto> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
         return Stream.of(
-                new UserAuthDto("Login2", PASSWORD),
-                new UserAuthDto("Login2", "Password2"));
+                new UserAuthenticationDto("Login2", PASSWORD),
+                new UserAuthenticationDto("Login2", "Password2"));
     }
 
-    private static Stream<UserAuthDto> shouldBeFalseWhenValidationObjectHasWrongFieldsValues() {
+    private static Stream<UserAuthenticationDto> shouldBeFalseWhenValidationObjectHasWrongFieldsValues() {
         char[] overMaxLoginChars = new char[101];
         char[] overMaxPasswordChars = new char[73];
 
@@ -89,12 +89,12 @@ public class UserAuthDtoTest {
         String overMaxPassword = new String(overMaxPasswordChars);
 
         return Stream.of(
-                new UserAuthDto(null, PASSWORD),
-                new UserAuthDto("", PASSWORD),
-                new UserAuthDto(overMaxLogin, PASSWORD),
-                new UserAuthDto(LOGIN, null),
-                new UserAuthDto(LOGIN, ""),
-                new UserAuthDto(LOGIN, "1234567"),
-                new UserAuthDto(LOGIN, overMaxPassword));
+                new UserAuthenticationDto(null, PASSWORD),
+                new UserAuthenticationDto("", PASSWORD),
+                new UserAuthenticationDto(overMaxLogin, PASSWORD),
+                new UserAuthenticationDto(LOGIN, null),
+                new UserAuthenticationDto(LOGIN, ""),
+                new UserAuthenticationDto(LOGIN, "1234567"),
+                new UserAuthenticationDto(LOGIN, overMaxPassword));
     }
 }

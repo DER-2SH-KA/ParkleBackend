@@ -17,7 +17,7 @@ import lombok.ToString;
 @EqualsAndHashCode(exclude = "password")
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCreateDto implements UserDto {
+public class UserCreateDto implements UserDtoInterface {
 
     @NotBlank(message = "UserCreateDto must have any role (by name)")
     private String roleName;

@@ -8,32 +8,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-import ru.d2k.parkle.dto.UserDto;
+import ru.d2k.parkle.dto.UserDtoInterface;
 import java.util.Collection;
 
+@RequiredArgsConstructor
 @Primary
 @Service
-@RequiredArgsConstructor
-public class ManualAuthenticationManagerService extends CustomAuthenticationManagerService {
+public class ManualAuthenticationManagerService implements CustomAuthenticationManagerService {
 
     @Autowired
-    private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager manager;
 
     @Override
-    public Authentication createHttpUnauthorizedAuthentication(String username, String password) {
-        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-    }
-
-    @Override
-    public Authentication createHttpUnauthorizedAuthentication(UserDto dto) {
-        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getLogin(),
-                dto.getPassword()));
-    }
-
-    @Override
-    public Authentication createHttpAuthorizedAuthentication(String username, String password,
-                                                             Collection<? extends GrantedAuthority> authorities) {
-        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password,
-                authorities));
+    public Authentication createHttpUnauthorizedAuthentication(UserDtoInterface userDto) {
+        return manager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getLogin(), userDto.getPassword()));
     }
 }

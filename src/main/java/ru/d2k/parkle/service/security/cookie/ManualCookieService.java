@@ -2,6 +2,7 @@ package ru.d2k.parkle.service.security.cookie;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,10 @@ import java.util.Optional;
 
 @Primary
 @Service
-public class ManualCookieService extends CustomCookieService {
+public class ManualCookieService implements CustomCookieService {
+
+    @Value("${jwt.expiration}")
+    private Long expiration;
 
     @Override
     public Optional<Cookie> fetchCookie(String name, HttpServletRequest request) {
@@ -45,5 +49,17 @@ public class ManualCookieService extends CustomCookieService {
                 .maxAge(0L)
                 .sameSite(sameSite)
                 .build();
+    }
+
+    @Override
+    public ResponseCookie createCookieWithJwt(String jwt) {
+        return this.createResponseCookie(CookieNames.JWT_TOKEN, jwt, true, false, "/",
+                (int) (expiration / 1000), "Lax");
+    }
+
+    @Override
+    public ResponseCookie createCookieWithExpiredJwt() {
+        return this.createEmptyResponseCookie(CookieNames.JWT_TOKEN, true, false, "/",
+                "Lax");
     }
 }
