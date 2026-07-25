@@ -8,7 +8,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-import ru.d2k.parkle.dto.UserDto;
+import ru.d2k.parkle.dto.UserDtoInterface;
+
 import java.util.Collection;
 
 @Primary
@@ -25,7 +26,7 @@ public class ManualAuthenticationManagerService extends CustomAuthenticationMana
     }
 
     @Override
-    public Authentication createHttpUnauthorizedAuthentication(UserDto dto) {
+    public Authentication createHttpUnauthorizedAuthentication(UserDtoInterface dto) {
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getLogin(),
                 dto.getPassword()));
     }

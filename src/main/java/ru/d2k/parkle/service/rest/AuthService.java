@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import ru.d2k.parkle.dto.UserAuthDto;
+import ru.d2k.parkle.dto.UserAuthenticationDto;
 import ru.d2k.parkle.dto.UserCreateDto;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
@@ -29,7 +29,7 @@ public class AuthService {
     @Autowired
     private final JwtService jwtService;
 
-    public Pair<String, Optional<UserResponseDto>> login(UserAuthDto adto) {
+    public Pair<String, Optional<UserResponseDto>> login(UserAuthenticationDto adto) {
         Authentication signedAuthentication = authenticationManagerService.createHttpUnauthorizedAuthentication(adto);
         CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 

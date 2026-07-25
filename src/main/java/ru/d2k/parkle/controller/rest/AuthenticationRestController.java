@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.d2k.parkle.controller.ApiRoutes;
 import ru.d2k.parkle.dto.ErrorResponseDto;
-import ru.d2k.parkle.dto.UserAuthDto;
+import ru.d2k.parkle.dto.UserAuthenticationDto;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.service.rest.AuthService;
@@ -41,7 +41,7 @@ public class AuthenticationRestController {
     private final AuthService service;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authentication(@Valid @RequestBody UserAuthDto authenticateUserDto,
+    public ResponseEntity<?> authentication(@Valid @RequestBody UserAuthenticationDto authenticateUserDto,
                                             HttpServletResponse response) {
         Pair<String, Optional<UserResponseDto>> jwtAndDto = service.login(authenticateUserDto);
 

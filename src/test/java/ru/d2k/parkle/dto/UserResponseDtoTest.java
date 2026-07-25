@@ -44,7 +44,7 @@ public class UserResponseDtoTest {
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
         UserResponseDto dto = new UserResponseDto(UUID, ROLE_NAME, ROLE_PRIORITY, LOGIN, EMAIL);
 
-        Assertions.assertNotEquals(dto, new UserAuthDto(null, null));
+        Assertions.assertNotEquals(dto, new UserAuthenticationDto(null, null));
     }
 
     @DisplayName("equals - return false with objects which has different fields")

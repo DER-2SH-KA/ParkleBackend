@@ -18,7 +18,7 @@ import java.util.UUID;
 @EqualsAndHashCode(exclude = "password")
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserUpdateDto implements UserDto {
+public class UserUpdateDto implements UserDtoInterface {
 
     @NotNull(message = "UserUpdateDto id can't be null")
     private UUID id;

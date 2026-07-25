@@ -1,6 +1,6 @@
 package ru.d2k.parkle.dto;
 
-public interface UserDto {
+public interface UserDtoInterface {
 
     String getLogin();
     String getPassword();
