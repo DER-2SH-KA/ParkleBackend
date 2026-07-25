@@ -83,7 +83,7 @@ public class WebsiteService {
 
         Website website = Website.create(userDao.getReferenceById(userDetails.getCache().id()), dto.hexColor(),
                 dto.title(), dto.description(), dto.url());
-        WebsiteCache savedWebsite = websiteDao.create(website, userDetails.getUsername());
+        WebsiteCache savedWebsite = websiteDao.create(website);
 
         log.info("Website was created: {}", savedWebsite);
 
@@ -101,7 +101,7 @@ public class WebsiteService {
         String userLogin = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal()).getUsername();
 
-        Optional<WebsiteCache> updatedWebsite = websiteDao.update(id, udto, userLogin);
+        Optional<WebsiteCache> updatedWebsite = websiteDao.updateById(id, udto, userLogin);
 
         log.info("Website with ID '{}' was updated", id);
 
@@ -112,11 +112,8 @@ public class WebsiteService {
     public boolean deleteWebsite(UUID id) {
         log.info("Deleting website by ID '{}'", id);
 
-        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-                .getAuthentication().getPrincipal();
-
         if (Objects.nonNull(id)) {
-            if (websiteDao.deleteById(id, userDetails.getUsername())) {
+            if (websiteDao.deleteById(id)) {
                 log.info("Website with ID  '{}' was deleted", id);
 
                 return true;

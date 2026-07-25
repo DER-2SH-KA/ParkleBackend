@@ -87,7 +87,7 @@ public class RoleService {
             throw new IllegalArgumentException("RoleUpdateDto ID is null");
         }
 
-        RoleCache updatedRole = roleDao.update(id, udto)
+        RoleCache updatedRole = roleDao.updateById(id, udto)
                 .orElseThrow(() -> new RoleNotFoundException("Role with this ID is not exist!"));
 
         log.info("Role with id {} was updated to {}", id, updatedRole);

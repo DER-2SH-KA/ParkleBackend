@@ -91,7 +91,7 @@ public class UserService {
     public UserResponseDto updateUser(String login, UserUpdateDto udto) {
         log.info("Updating user by login '{}'...", login);
 
-        Optional<UserCache> updatedUser = userDao.update(login, udto);
+        Optional<UserCache> updatedUser = userDao.updateByLogin(login, udto);
 
         UserResponseDto dto = userMapper.toResponseDto(updatedUser.orElseThrow(() ->
                 new UserNotFoundException("User with login '{}' not found and not updated!")));

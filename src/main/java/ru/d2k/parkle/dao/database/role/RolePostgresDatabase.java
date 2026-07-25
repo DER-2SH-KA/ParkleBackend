@@ -10,51 +10,51 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Primary
 @Component
-@RequiredArgsConstructor
 public class RolePostgresDatabase implements RoleDatabaseSource {
 
     @Autowired
-    private final RoleRepository roleRepository;
+    private final RoleRepository repository;
 
     @Override
     public Role save(Role entity) {
-        return roleRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public List<Role> getAll() {
-        return roleRepository.findAll();
+        return repository.findAll();
     }
 
     @Override
     public Optional<Role> getById(UUID id) {
-        return roleRepository.findById(id);
+        return repository.findById(id);
     }
 
     @Override
     public Optional<Role> getByName(String name) {
-        return roleRepository.findByName(name);
+        return repository.findByName(name);
     }
 
     @Override
     public Role getReferenceById(UUID id) {
-        return roleRepository.getReferenceById(id);
+        return repository.getReferenceById(id);
     }
 
     @Override
     public void deleteById(UUID id) {
-        roleRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return roleRepository.existsById(id);
+        return repository.existsById(id);
     }
 
     @Override
     public boolean existsByName(String name) {
-        return roleRepository.existsByName(name);
+        return repository.existsByName(name);
     }
 }
