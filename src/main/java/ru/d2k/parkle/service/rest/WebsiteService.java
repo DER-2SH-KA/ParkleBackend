@@ -13,11 +13,9 @@ import ru.d2k.parkle.dto.WebsiteResponseDto;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
 import ru.d2k.parkle.entity.Website;
 import ru.d2k.parkle.entity.cache.WebsiteCache;
-import ru.d2k.parkle.exception.WebsiteIsExtremismSourceException;
 import ru.d2k.parkle.exception.WebsiteNotFoundException;
 import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
-import ru.d2k.parkle.utils.safety.extremism.ExtremismUtil;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,9 +34,6 @@ public class WebsiteService {
 
     @Autowired
     private final WebsiteMapper websiteMapper;
-
-    @Autowired
-    private final ExtremismUtil extremismUtil;
 
     @Transactional(readOnly = true)
     public List<WebsiteResponseDto> findWebsites() {
@@ -83,8 +78,6 @@ public class WebsiteService {
     public WebsiteResponseDto createWebsite(WebsiteCreateDto dto) {
         log.info("Creating website: {}...", dto.toString());
 
-        this.checkOnExtremism(dto.url());
-
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
@@ -104,8 +97,6 @@ public class WebsiteService {
         if (id == null) {
             return null;
         }
-
-        this.checkOnExtremism(udto.url());
 
         String userLogin = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal()).getUsername();
@@ -137,21 +128,5 @@ public class WebsiteService {
         }
 
         return false;
-    }
-
-    private void checkOnExtremism(String url) {
-        log.info("Checking website with url '{}' on extremism...", url);
-
-        boolean isExtremism = this.isExtremism(url);
-
-        if (isExtremism) {
-            log.info("Website URL is extremism!");
-
-            throw new WebsiteIsExtremismSourceException("Website '" + url + "' is extremism!");
-        }
-    }
-
-    private boolean isExtremism(String websiteUrl) {
-        return extremismUtil.checkOnExtremism(websiteUrl);
     }
 }
