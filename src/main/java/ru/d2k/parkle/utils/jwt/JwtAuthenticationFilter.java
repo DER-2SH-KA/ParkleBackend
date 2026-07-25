@@ -14,10 +14,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.service.security.cookie.CustomCookieService;
 import ru.d2k.parkle.service.security.jwt.JwtService;
@@ -42,56 +42,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-        log.debug("Request by path: {}", request.getContextPath() + request.getServletPath());
-
         Optional<Cookie> cookie = cookieService.fetchCookie(CookieNames.JWT_TOKEN, request);
 
         if (cookie.isEmpty()) {
-            log.warn("Cookie is empty. Do Filter.");
             filterChain.doFilter(request, response);
 
             return;
         }
 
-        Optional<String> jwtOptional = cookieService.getValueFromCookie(cookie.get());
+        Optional<String> jwt = cookieService.getValueFromCookie(cookie.get());
 
-        if (jwtOptional.isEmpty()) {
-            log.warn("JWT is empty. Do Filter.");
-
+        if (jwt.isEmpty() || jwt.get().isBlank()) {
             filterChain.doFilter(request, response);
+
             return;
         }
 
         try {
-            if (jwtOptional.get() instanceof String jwt) {
-                if (jwt.isBlank()) {
-                    log.warn("JWT is blank. Do Filter.");
-                    filterChain.doFilter(request, response);
+            String login = jwtService.getSubject(jwt.get());
 
-                    return;
-                }
+            if (login != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                CustomUserDetails customUserDetails =
+                        (CustomUserDetails) this.userDetailsService.loadUserByUsername(login);
 
-                String userLogin = jwtService.extractUsername(jwt);
+                if (jwtService.isTokenValid(jwt.get(), customUserDetails)) {
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails,
+                            null, customUserDetails.getAuthorities());
 
-                if (userLogin != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(userLogin);
-
-                    if (jwtService.isTokenValid(jwt, userDetails)) {
-                        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
-                                null, userDetails.getAuthorities());
-
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         } catch (Exception ex) {
             log.error("Exception when JWT filter authentication process", ex);
 
-            ResponseCookie responseCookie = jwtService.createJwtExpiredCookie();
+            ResponseCookie responseCookie = cookieService.createCookieWithExpiredJwt();
             response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
         } finally {
-            log.warn("At end. Do Filter.");
-
             filterChain.doFilter(request, response);
         }
     }

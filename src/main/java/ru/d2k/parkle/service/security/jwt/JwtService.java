@@ -7,16 +7,15 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import ru.d2k.parkle.service.security.cookie.CookieNames;
+import ru.d2k.parkle.entity.cache.UserCache;
+import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.service.security.cookie.CustomCookieService;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.function.Function;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -31,75 +30,68 @@ public class JwtService {
     @Autowired
     private final CustomCookieService cookieService;
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public String generateTokenByUserCache(UserCache userCache) {
+        Map<String, Object> claims = new HashMap<>();
+
+        return this.createToken(claims, userCache.login());
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsFunction) {
-        Claims claims = extractAllClaims(token);
-
-        return claimsFunction.apply(claims);
+    public String getSubject(String jwt) {
+        return this.getSubjectFromClaims(this.getClaims(jwt));
     }
 
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSignKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    public boolean isTokenValid(String jwt, CustomUserDetails customUserDetails) {
+        Claims claims = this.getClaims(jwt);
+
+        return this.getSubjectFromClaims(claims).equals(customUserDetails.getUsername()) &&
+                !this.isTokenExpiredByClaims(claims) && !this.isTokenUsedTooEarlyByClaims(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
-    }
-
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        extraClaims.put("roles", userDetails.getAuthorities().stream()
-                .map(grantedAuthority ->
-                        grantedAuthority.getAuthority().replace("ROLE_", ""))
-                .toList()
-        );
-
+    private String createToken(Map<String, Object> claims, String subject) {
         long currentTimeMillis = System.currentTimeMillis();
 
         return Jwts.builder()
-                .claims(extraClaims)
-                .subject(userDetails.getUsername())
+                .claims(claims)
+                .id(UuidGeneratorUtil.generateNewUuidV7().toString())
+                .subject(subject)
+                .notBefore(new Date(currentTimeMillis))
                 .issuedAt(new Date(currentTimeMillis))
                 .expiration(new Date(currentTimeMillis + expiration))
-                .signWith(getSignKey())
+                .signWith(this.getSignKey())
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String usernameFromToken = extractUsername(token);
-        final String usernameFromDetails = userDetails.getUsername();
-
-        return (usernameFromToken.equals(usernameFromDetails)) && !isTokenExpired(token);
+    private Claims getClaims(String jwt) {
+        return Jwts.parser()
+                .verifyWith(this.getSignKey())
+                .build()
+                .parseSignedClaims(jwt)
+                .getPayload();
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    private String getSubjectFromClaims(Claims claims) {
+        return claims.getSubject();
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    private Date getNotBeforeFromClaims(Claims claims) {
+        return claims.getNotBefore();
+    }
+
+    private Date getExpirationFromClaims(Claims claims) {
+        return claims.getExpiration();
+    }
+
+    private boolean isTokenUsedTooEarlyByClaims(Claims claims) {
+        return this.getNotBeforeFromClaims(claims).after(new Date(System.currentTimeMillis()));
+    }
+
+    private boolean isTokenExpiredByClaims(Claims claims) {
+        return this.getExpirationFromClaims(claims).before(new Date(System.currentTimeMillis()));
     }
 
     private SecretKey getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 
         return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    // Хрень. Почему запись JWT в Cookie должна находиться в классе, связанном только с JWT, когда есть Cookie сервис?
-    public ResponseCookie createJwtCookie(String jwt) {
-        return cookieService.createResponseCookie(CookieNames.JWT_TOKEN, jwt, true, false, "/",
-                (int) (expiration / 1000), "Lax");
-    }
-
-    public ResponseCookie createJwtExpiredCookie() {
-        return cookieService.createEmptyResponseCookie(CookieNames.JWT_TOKEN, true, false, "/",
-                "Lax");
     }
 }

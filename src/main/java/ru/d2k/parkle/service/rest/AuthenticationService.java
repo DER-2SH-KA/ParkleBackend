@@ -31,11 +31,11 @@ public class AuthenticationService {
     public Pair<String, Optional<UserResponseDto>> login(UserAuthenticationDto authenticateUserDto) {
         Authentication signedAuthentication = authenticationManagerService
                 .createHttpUnauthorizedAuthentication(authenticateUserDto);
-        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
+        CustomUserDetails customUserDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
-        String jwtToken = jwtService.generateToken(userDetails);
+        String jwtToken = jwtService.generateTokenByUserCache(customUserDetails.getCache());
 
-        Optional<UserResponseDto> responseUserDto = userService.getUserByUserCache(userDetails.getCache());
+        Optional<UserResponseDto> responseUserDto = userService.getUserByUserCache(customUserDetails.getCache());
 
         return new Pair<>(jwtToken, responseUserDto);
     }
@@ -47,7 +47,7 @@ public class AuthenticationService {
                 .createHttpUnauthorizedAuthentication(updateUserDto);
         CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
-        String jwtToken = jwtService.generateToken(userDetails);
+        String jwtToken = jwtService.generateTokenByUserCache(userDetails.getCache());
 
         return new Pair<>(jwtToken, dto);
     }

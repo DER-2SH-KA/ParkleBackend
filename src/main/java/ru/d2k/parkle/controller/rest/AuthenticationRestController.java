@@ -24,6 +24,7 @@ import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.service.rest.AuthenticationService;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
+import ru.d2k.parkle.service.security.cookie.CustomCookieService;
 import ru.d2k.parkle.service.security.jwt.JwtService;
 import ru.d2k.parkle.utils.type.Pair;
 import java.util.Optional;
@@ -35,7 +36,7 @@ import java.util.Optional;
 public class AuthenticationRestController {
 
     @Autowired
-    private final JwtService jwtService;
+    private final CustomCookieService cookieService;
 
     @Autowired
     private final AuthenticationService service;
@@ -48,7 +49,7 @@ public class AuthenticationRestController {
         String jwt = jwtAndUserResponseDto.getKey();
         Optional<UserResponseDto> userResponseDto = jwtAndUserResponseDto.getValue();
 
-        ResponseCookie jwtCookie = jwtService.createJwtCookie(jwt);
+        ResponseCookie jwtCookie = cookieService.createCookieWithJwt(jwt);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
         return userResponseDto.isPresent() ? ResponseEntity.ok(userResponseDto.get()) :
@@ -65,7 +66,7 @@ public class AuthenticationRestController {
         String jwt = jwtAndUserResponseDto.getKey();
         UserResponseDto userResponseDto = jwtAndUserResponseDto.getValue();
 
-        ResponseCookie jwtCookie = jwtService.createJwtCookie(jwt);
+        ResponseCookie jwtCookie = cookieService.createCookieWithJwt(jwt);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
         return ResponseEntity.ok(userResponseDto);
@@ -99,7 +100,7 @@ public class AuthenticationRestController {
 
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        response.addHeader(HttpHeaders.SET_COOKIE, jwtService.createJwtExpiredCookie().toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookieService.createCookieWithExpiredJwt().toString());
 
         return ResponseEntity.ok().build();
     }

@@ -7,12 +7,7 @@ import ru.d2k.parkle.dto.UserDtoInterface;
 import java.util.Collection;
 
 @Service
-public abstract class CustomAuthenticationManagerService {
+public interface CustomAuthenticationManagerService {
 
-    public abstract Authentication createHttpUnauthorizedAuthentication(String username, String password);
-
-    public abstract Authentication createHttpUnauthorizedAuthentication(UserDtoInterface userDto);
-
-    public abstract Authentication createHttpAuthorizedAuthentication(
-            String username, String password, Collection<? extends GrantedAuthority> authorities);
+    Authentication createHttpUnauthorizedAuthentication(UserDtoInterface userDto);
 }

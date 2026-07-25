@@ -11,27 +11,16 @@ import org.springframework.stereotype.Service;
 import ru.d2k.parkle.dto.UserDtoInterface;
 import java.util.Collection;
 
+@RequiredArgsConstructor
 @Primary
 @Service
-@RequiredArgsConstructor
-public class ManualAuthenticationManagerService extends CustomAuthenticationManagerService {
+public class ManualAuthenticationManagerService implements CustomAuthenticationManagerService {
 
     @Autowired
     private final AuthenticationManager manager;
 
     @Override
-    public Authentication createHttpUnauthorizedAuthentication(String username, String password) {
-        return manager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-    }
-
-    @Override
     public Authentication createHttpUnauthorizedAuthentication(UserDtoInterface userDto) {
         return manager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getLogin(), userDto.getPassword()));
-    }
-
-    @Override
-    public Authentication createHttpAuthorizedAuthentication(String username, String password,
-                                                             Collection<? extends GrantedAuthority> authorities) {
-        return manager.authenticate(new UsernamePasswordAuthenticationToken(username, password, authorities));
     }
 }
