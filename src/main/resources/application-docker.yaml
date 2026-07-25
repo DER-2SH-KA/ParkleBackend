@@ -8,15 +8,6 @@ spring:
     bcrypt:
       strength: ${SPRING_SECURITY_BCRYPT_STRENGTH}
 
-management:
-  endpoints:
-    web:
-      exposure:
-        exclude: "*"
-  endpoint:
-    health:
-      show-details: never
-
 jwt:
   secret-key: ${JWT_SECRET_KEY}
   expiration: ${JWT_EXPIRATION}

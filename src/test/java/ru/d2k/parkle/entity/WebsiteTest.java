@@ -3,19 +3,19 @@ package ru.d2k.parkle.entity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.UUID;
 
 public class WebsiteTest {
 
-    private final Role role = new Role(Uuid7Generator.generateNewUUID(), "TEMP", 0);
-    private final User user = new User(Uuid7Generator.generateNewUUID(), role, "login", "email@email.net",
+    private final Role role = new Role(UuidGeneratorUtil.generateNewUuidV7(), "TEMP", 0);
+    private final User user = new User(UuidGeneratorUtil.generateNewUuidV7(), role, "login", "email@email.net",
             "password");
 
     @DisplayName("hashCode -- hash codes of the same object are the same")
     @Test
     public void hashCode_sameObjectHashCodeEquals() {
-        Website website = new Website(Uuid7Generator.generateNewUUID(), user, "#fff", "title",
+        Website website = new Website(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title",
                 "description", "https://example.com");
 
         Assertions.assertEquals(website.hashCode(), website.hashCode());
@@ -24,7 +24,7 @@ public class WebsiteTest {
     @DisplayName("hashCode -- hash codes of objects with different non Id fields are equals")
     @Test
     public void hashCode_twoObjectWithSameIdAreEquals() {
-        UUID uuid = Uuid7Generator.generateNewUUID();
+        UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
 
         Website website1 = new Website(uuid, user, "#fff", "title1", "description1",
                 "https://example.com1");
@@ -49,7 +49,7 @@ public class WebsiteTest {
     @DisplayName("equals -- Same object are equals")
     @Test
     public void equals_sameObjectAreEquals() {
-        User user = new User(Uuid7Generator.generateNewUUID(), role, "login", "email@email.net",
+        User user = new User(UuidGeneratorUtil.generateNewUuidV7(), role, "login", "email@email.net",
                 "password");
 
         Assertions.assertEquals(user, user);
@@ -58,7 +58,7 @@ public class WebsiteTest {
     @DisplayName("equals -- Object equals with null is false")
     @Test
     public void equals_withNullObject() {
-        Website website = new Website(Uuid7Generator.generateNewUUID(), user, "#fff", "title",
+        Website website = new Website(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title",
                 "description", "https://example.com");
 
         Assertions.assertFalse(website.equals(null));
@@ -67,7 +67,7 @@ public class WebsiteTest {
     @DisplayName("equals -- Objects with same ID are equals")
     @Test
     public void equals_objectsWithSameIdAreEquals() {
-        UUID uuid = Uuid7Generator.generateNewUUID();
+        UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
 
         Website website1 = new Website(uuid, user, "#fff", "title1", "description1",
                 "https://example.com1");
@@ -80,7 +80,7 @@ public class WebsiteTest {
     @DisplayName("equals -- equals with object which ID is null is false")
     @Test
     public void equals_withObjectIdNull() {
-        Website website1 = new Website(Uuid7Generator.generateNewUUID(), user, "#fff", "title1",
+        Website website1 = new Website(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title1",
                 "description1", "https://example.com1");
         Website website2 = new Website(null, user, "#fff", "title2", "description2",
                 "https://example.com2");

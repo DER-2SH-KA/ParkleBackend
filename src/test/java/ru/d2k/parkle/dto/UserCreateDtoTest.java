@@ -44,7 +44,7 @@ public class UserCreateDtoTest {
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
         UserCreateDto dto = new UserCreateDto(ROLE, LOGIN, EMAIL, PASSWORD);
 
-        Assertions.assertNotEquals(dto, new UserAuthDto(null, null));
+        Assertions.assertNotEquals(dto, new UserAuthenticationDto(null, null));
     }
 
     @DisplayName("validate - return true with objects which has correct field's values")

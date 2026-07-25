@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface RoleDatabaseSource {
+public interface RoleDatabase {
 
     Role save(Role entity);
     List<Role> getAll();

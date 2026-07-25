@@ -2,5 +2,5 @@ package ru.d2k.parkle.service.security.cookie;
 
 public interface CookieNames {
 
-    String JwtToken = "jwt-token";
+    String JWT_TOKEN = "jwt-token";
 }

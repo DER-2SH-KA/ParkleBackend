@@ -21,17 +21,11 @@ public interface WebsiteMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "dto.url", target = "url")
     @Mapping(target = "description", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-    Website updateByDto(@MappingTarget Website entity, WebsiteUpdateDto dto, User user);
+    void updateEntityByDto(@MappingTarget Website entity, WebsiteUpdateDto dto, User user);
 
-    /**
-     * CACHE => DTO
-     * */
     @Mapping(target = "userLogin", source = "userLogin")
     WebsiteResponseDto toResponseDto(WebsiteCache cache);
 
-    /**
-     * ENTITY => CACHE
-     * */
     @Mapping(target = "userLogin", source = "user.login")
     @Mapping(target = "userId", source = "user.id")
     WebsiteCache toCache(Website entity);

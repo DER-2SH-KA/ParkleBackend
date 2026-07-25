@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class User {
     private List<Website> websites = new ArrayList<>();
 
     private User(Role role, String login, String email, String password, boolean isBlocked) {
-        this.id = Uuid7Generator.generateNewUUID();
+        this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.role = role;
         this.login = login;
         this.email = email;

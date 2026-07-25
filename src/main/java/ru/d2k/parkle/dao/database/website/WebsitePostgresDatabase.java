@@ -10,46 +10,46 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Primary
 @Component
-@RequiredArgsConstructor
-public class WebsitePostgresDatabase implements WebsiteDatabaseSource {
+public class WebsitePostgresDatabase implements WebsiteDatabase {
 
     @Autowired
-    private final WebsiteRepository websiteRepository;
+    private final WebsiteRepository repository;
 
     @Override
     public Website save(Website entity) {
-        return websiteRepository.save(entity);
+        return repository.save(entity);
     }
 
     @Override
     public List<Website> getAll() {
-        return websiteRepository.findAll();
+        return repository.findAll();
     }
 
     @Override
     public Optional<Website> getById(UUID id) {
-        return websiteRepository.findById(id);
+        return repository.findById(id);
     }
 
     @Override
     public List<Website> getByUserIdSortedByTitleAsc(UUID userId) {
-        return websiteRepository.findByUserIdOrderByTitleAsc(userId);
+        return repository.findByUserIdOrderByTitleAsc(userId);
     }
 
     @Override
     public Website getReferenceById(UUID id) {
-        return websiteRepository.getReferenceById(id);
+        return repository.getReferenceById(id);
     }
 
     @Override
     public void deleteById(UUID id) {
-        websiteRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return websiteRepository.existsById(id);
+        return repository.existsById(id);
     }
 }

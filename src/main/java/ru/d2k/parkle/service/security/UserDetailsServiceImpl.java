@@ -16,14 +16,14 @@ import java.util.Optional;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private final UserDao userDao;
+    private final UserDao dao;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserCache> user = userDao.getByLogin(username);
+        Optional<UserCache> userCache = dao.getByLogin(username);
 
-        if (user.isPresent()) {
-            return new CustomUserDetails(user.get());
+        if (userCache.isPresent()) {
+            return new CustomUserDetails(userCache.get());
         }
         else {
             throw new UsernameNotFoundException(String.format("User not found with username (login): %s", username));

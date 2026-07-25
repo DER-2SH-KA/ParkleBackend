@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.repository.RoleRepository;
-import ru.d2k.parkle.utils.generator.Uuid7Generator;
+import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -75,7 +75,7 @@ public class RolePostgresDatabaseTest {
     @Test
     @DisplayName("getById(UUID id) - Should return Optional.empty() by Id")
     void getById_shouldReturnEmptyByIdWhenNotPresent() {
-        UUID id = Uuid7Generator.generateNewUUID();
+        UUID id = UuidGeneratorUtil.generateNewUuidV7();
 
         when(roleRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -127,7 +127,7 @@ public class RolePostgresDatabaseTest {
     @Test
     @DisplayName("existsById(UUID id) - Should return true if entity exist by Id")
     void getReferenceById_shouldReturnTrueWhenExistsById() {
-        UUID id = Uuid7Generator.generateNewUUID();
+        UUID id = UuidGeneratorUtil.generateNewUuidV7();
 
         when(roleRepository.existsById(id)).thenReturn(true);
 
@@ -139,7 +139,7 @@ public class RolePostgresDatabaseTest {
     @Test
     @DisplayName("existsById(UUID id) - Should return false if entity not exist by Id")
     void getReferenceById_shouldReturnFalseWhenNotExistById() {
-        UUID id = Uuid7Generator.generateNewUUID();
+        UUID id = UuidGeneratorUtil.generateNewUuidV7();
 
         when(roleRepository.existsById(id)).thenReturn(false);
 

@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@Mapper(componentModel = "spring")
 @Component
+@Mapper(componentModel = "spring")
 public abstract class UserMapper {
 
     @Autowired
@@ -35,27 +35,21 @@ public abstract class UserMapper {
     @Mapping(source = "role", target = "role")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "websites", ignore = true)
-    @Mapping(target = "password", source = "dto.password", qualifiedByName = "hashPassword")
-    public abstract User updateByDto(@MappingTarget User entity, UserUpdateDto dto, Role role);
+    @Mapping(target = "password", source = "dto.password", qualifiedByName = "getHashOfPassword")
+    public abstract void updateEntityByDto(@MappingTarget User entity, UserUpdateDto dto, Role role);
 
-    /**
-     * CACHE => DTO
-     * */
     public abstract UserResponseDto toResponseDto(UserCache userCache);
 
-    /**
-     * ENTITY => CACHE
-     * */
     @Mapping(target = "roleId", source = "role.id")
     @Mapping(target = "roleName", source = "role.name")
     @Mapping(target = "rolePriority", source = "role.priority")
     @Mapping(target = "hashedPassword", source = "password")
     @Mapping(target = "isBlocked", source = "isBlocked")
-    @Mapping(target = "websiteIds", source = "websites", qualifiedByName = "fromWebsitesToUUID")
+    @Mapping(target = "websiteIds", source = "websites", qualifiedByName = "getWebsiteIds")
     public abstract UserCache toCache(User entity);
 
-    @Named("fromWebsitesToUUID")
-    List<UUID> fromWebsitesToUUID(List<Website> websites) {
+    @Named("getWebsiteIds")
+    List<UUID> getWebsiteIds(List<Website> websites) {
         if (Objects.isNull(websites) || websites.isEmpty()) {
             return new ArrayList<>();
         }
@@ -65,8 +59,8 @@ public abstract class UserMapper {
                 .toList();
     }
 
-    @Named("hashPassword")
-    String hashPassword(String password) {
+    @Named("getHashOfPassword")
+    String getHashOfPassword(String password) {
         return passwordEncoder.encode(password);
     }
 }

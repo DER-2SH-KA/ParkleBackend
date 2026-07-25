@@ -12,13 +12,13 @@ import ru.d2k.parkle.dto.ErrorResponseDto;
 public class AuthenticationControllerAdvice {
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponseDto> badCredentials(Exception ex) {
+    public ResponseEntity<ErrorResponseDto> handleBadCredentialsException(Exception ex) {
         return new ResponseEntity<>(new ErrorResponseDto("Пользователь не существует или введены " +
                 "неверные данные", ex.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDto> methodArgumentNotValidException(Exception ex) {
+    public ResponseEntity<ErrorResponseDto> handleMethodArgumentNotValidException(Exception ex) {
         return new ResponseEntity<>(new ErrorResponseDto("Переданы неподходящие данные", ex.getMessage()),
                 HttpStatus.UNAUTHORIZED);
     }

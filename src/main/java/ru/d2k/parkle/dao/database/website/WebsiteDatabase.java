@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface WebsiteDatabaseSource {
+public interface WebsiteDatabase {
 
     Website save(Website entity);
     List<Website> getAll();
