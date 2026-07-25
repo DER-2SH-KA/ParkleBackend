@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserDatabaseSource {
+public interface UserDatabase {
 
     User save(User entity);
     List<User> getAll();

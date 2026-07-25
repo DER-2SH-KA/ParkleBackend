@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.d2k.parkle.dto.UserAuthenticationDto;
-import ru.d2k.parkle.dto.UserCreateDto;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.model.CustomUserDetails;
@@ -16,9 +15,9 @@ import ru.d2k.parkle.utils.type.Pair;
 import java.util.Optional;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
-public class AuthService {
+@Service
+public class AuthenticationService {
 
     @Autowired
     private final UserService userService;
@@ -29,32 +28,23 @@ public class AuthService {
     @Autowired
     private final JwtService jwtService;
 
-    public Pair<String, Optional<UserResponseDto>> login(UserAuthenticationDto adto) {
-        Authentication signedAuthentication = authenticationManagerService.createHttpUnauthorizedAuthentication(adto);
+    public Pair<String, Optional<UserResponseDto>> login(UserAuthenticationDto authenticateUserDto) {
+        Authentication signedAuthentication = authenticationManagerService
+                .createHttpUnauthorizedAuthentication(authenticateUserDto);
         CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
         String jwtToken = jwtService.generateToken(userDetails);
 
-        Optional<UserResponseDto> dto = userService.getUserByUserCache(userDetails.getCache());
+        Optional<UserResponseDto> responseUserDto = userService.getUserByUserCache(userDetails.getCache());
 
-        return new Pair<>(jwtToken, dto);
+        return new Pair<>(jwtToken, responseUserDto);
     }
 
-    public Pair<String, UserResponseDto> registration(UserCreateDto cdto) {
-        UserResponseDto dto = userService.createUser(cdto);
+    public Pair<String, UserResponseDto> updateByLogin(String login, UserUpdateDto updateUserDto) {
+        UserResponseDto dto = userService.updateUser(login, updateUserDto);
 
-        Authentication signedAuthentication = authenticationManagerService.createHttpUnauthorizedAuthentication(cdto);
-        CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
-
-        String jwtToken = jwtService.generateToken(userDetails);
-
-        return new Pair<>(jwtToken, dto);
-    }
-
-    public Pair<String, UserResponseDto> update(String login, UserUpdateDto udto) {
-        UserResponseDto dto = userService.updateUser(login, udto);
-
-        Authentication signedAuthentication = authenticationManagerService.createHttpUnauthorizedAuthentication(udto);
+        Authentication signedAuthentication = authenticationManagerService
+                .createHttpUnauthorizedAuthentication(updateUserDto);
         CustomUserDetails userDetails = (CustomUserDetails) signedAuthentication.getPrincipal();
 
         String jwtToken = jwtService.generateToken(userDetails);
@@ -62,11 +52,11 @@ public class AuthService {
         return new Pair<>(jwtToken, dto);
     }
 
-    public boolean delete(String login) {
+    public boolean deleteByLogin(String login) {
         return userService.deleteUser(login);
     }
 
-    public Optional<UserResponseDto> getUserIfJwtPresent(String jwt) {
+    public Optional<UserResponseDto> getUserByJwt(String jwt) {
         return userService.getUserByJwt(jwt);
     }
 }

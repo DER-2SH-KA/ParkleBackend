@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.dao.database.website.WebsiteDatabaseSource;
+import ru.d2k.parkle.dao.database.website.WebsiteDatabase;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.Website;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class WebsiteDao {
 
     @Autowired
-    private final WebsiteDatabaseSource database;
+    private final WebsiteDatabase database;
 
     @Autowired
     private final WebsiteMapper mapper;

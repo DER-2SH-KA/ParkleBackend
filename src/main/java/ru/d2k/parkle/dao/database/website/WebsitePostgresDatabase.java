@@ -13,7 +13,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Primary
 @Component
-public class WebsitePostgresDatabase implements WebsiteDatabaseSource {
+public class WebsitePostgresDatabase implements WebsiteDatabase {
 
     @Autowired
     private final WebsiteRepository repository;

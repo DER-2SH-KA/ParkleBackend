@@ -22,7 +22,7 @@ import ru.d2k.parkle.dto.ErrorResponseDto;
 import ru.d2k.parkle.dto.UserAuthenticationDto;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
-import ru.d2k.parkle.service.rest.AuthService;
+import ru.d2k.parkle.service.rest.AuthenticationService;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.service.security.jwt.JwtService;
 import ru.d2k.parkle.utils.type.Pair;
@@ -38,7 +38,7 @@ public class AuthenticationRestController {
     private final JwtService jwtService;
 
     @Autowired
-    private final AuthService service;
+    private final AuthenticationService service;
 
     @PostMapping("/login")
     public ResponseEntity<?> authentication(@Valid @RequestBody UserAuthenticationDto authenticateUserDto,
@@ -59,7 +59,7 @@ public class AuthenticationRestController {
     public ResponseEntity<UserResponseDto> updateByLogin(@PathVariable("login") String login,
                                                          @Valid @RequestBody UserUpdateDto updateUserDto,
                                                          HttpServletResponse response) {
-        Pair<String, UserResponseDto> jwtAndDto = service.update(login, updateUserDto);
+        Pair<String, UserResponseDto> jwtAndDto = service.updateByLogin(login, updateUserDto);
 
         String jwt = jwtAndDto.getKey();
         UserResponseDto dto = jwtAndDto.getValue();
@@ -73,7 +73,7 @@ public class AuthenticationRestController {
     // TODO: Переделать с /{login} на /me
     @DeleteMapping("/delete/{login}")
     public ResponseEntity<?> deleteByLogin(@PathVariable("login") String login, HttpServletResponse response) {
-        boolean result = service.delete(login);
+        boolean result = service.deleteByLogin(login);
 
         this.logout(response);
 
@@ -84,7 +84,7 @@ public class AuthenticationRestController {
     @GetMapping("/isAuthed")
     public ResponseEntity<?> isAuthed(@CookieValue(name = CookieNames.JwtToken, defaultValue = "") String jwt) {
         if (!jwt.isBlank()) {
-            Optional<UserResponseDto> dto = service.getUserIfJwtPresent(jwt);
+            Optional<UserResponseDto> dto = service.getUserByJwt(jwt);
 
             return dto.isPresent() ? ResponseEntity.ok(dto.get()) : new ResponseEntity<>(new ErrorResponseDto(
                     "Пользователь не авторизован в системе",

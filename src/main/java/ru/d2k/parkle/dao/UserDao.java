@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.dao.database.user.UserDatabaseSource;
+import ru.d2k.parkle.dao.database.user.UserDatabase;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class UserDao {
 
     @Autowired
-    private final UserDatabaseSource database;
+    private final UserDatabase database;
 
     @Autowired
     private final UserMapper mapper;

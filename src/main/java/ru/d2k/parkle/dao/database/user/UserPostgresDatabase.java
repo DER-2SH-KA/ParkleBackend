@@ -13,7 +13,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Component
 @Primary
-public class UserPostgresDatabase implements UserDatabaseSource{
+public class UserPostgresDatabase implements UserDatabase {
 
     @Autowired
     private final UserRepository repository;

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.dao.database.role.RoleDatabaseSource;
+import ru.d2k.parkle.dao.database.role.RoleDatabase;
 import ru.d2k.parkle.dto.RoleCreateDto;
 import ru.d2k.parkle.dto.RoleUpdateDto;
 import ru.d2k.parkle.entity.Role;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class RoleDao {
 
     @Autowired
-    private final RoleDatabaseSource database;
+    private final RoleDatabase database;
 
     @Autowired
     private final RoleMapper mapper;
