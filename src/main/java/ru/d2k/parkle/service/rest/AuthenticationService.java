@@ -41,7 +41,7 @@ public class AuthenticationService {
     }
 
     public Pair<String, UserResponseDto> updateByLogin(String login, UserUpdateDto updateUserDto) {
-        UserResponseDto dto = userService.updateUser(login, updateUserDto);
+        UserResponseDto dto = userService.updateByLogin(login, updateUserDto);
 
         Authentication signedAuthentication = authenticationManagerService
                 .createHttpUnauthorizedAuthentication(updateUserDto);
@@ -53,7 +53,7 @@ public class AuthenticationService {
     }
 
     public boolean deleteByLogin(String login) {
-        return userService.deleteUser(login);
+        return userService.deleteByLogin(login);
     }
 
     public Optional<UserResponseDto> getUserByJwt(String jwt) {

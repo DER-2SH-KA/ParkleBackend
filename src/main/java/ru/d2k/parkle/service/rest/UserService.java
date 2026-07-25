@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,45 +33,32 @@ public class UserService {
     private final RoleDao roleDao;
 
     @Autowired
-    private final UserDao userDao;
+    private final UserDao dao;
 
     @Autowired
-    private final UserMapper userMapper;
+    private final UserMapper mapper;
 
     @Autowired
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    public Set<UserResponseDto> findUsers() {
-        log.info("Getting all users...");
-
-        Set<UserResponseDto> dtos = userDao.getAll().stream()
-                .map(userMapper::toResponseDto)
-                .collect(Collectors.toSet());
-
-        log.info("Users was founded: {}", dtos.size());
-
-        return dtos;
-    }
-
-    @Transactional(readOnly = true)
-    public UserResponseDto findUserByLogin(String login) {
+    public UserResponseDto findByLogin(String login) {
         log.info("Getting user by login '{}'...", login);
 
         if (Objects.isNull(login)) {
             return null;
         }
 
-        UserCache user = userDao.getByLogin(login)
+        UserCache user = dao.getByLogin(login)
                 .orElseThrow(() -> new UserNotFoundException("User was not found with login: " + login));
 
         log.info("User with login '{}' was founded", login);
 
-        return userMapper.toResponseDto(user);
+        return mapper.toResponseDto(user);
     }
 
     @Transactional
-    public UserResponseDto createUser(UserCreateDto dto) {
+    public UserResponseDto create(UserCreateDto dto) {
         log.info("Creating user: {}...", dto.toString());
 
         RoleCache role = roleDao.getByName(dto.getRoleName()).orElseThrow(() ->
@@ -80,20 +66,20 @@ public class UserService {
 
         User user = User.create(new Role(role.id(), role.name(), role.priority()), dto.getLogin(), dto.getEmail(),
                 passwordEncoder.encode(dto.getPassword()));
-        UserCache savedUser = userDao.create(user);
+        UserCache savedUser = dao.create(user);
 
         log.info("User was created: {}", user);
 
-        return userMapper.toResponseDto(savedUser);
+        return mapper.toResponseDto(savedUser);
     }
 
     @Transactional
-    public UserResponseDto updateUser(String login, UserUpdateDto udto) {
+    public UserResponseDto updateByLogin(String login, UserUpdateDto updateUserDto) {
         log.info("Updating user by login '{}'...", login);
 
-        Optional<UserCache> updatedUser = userDao.updateByLogin(login, udto);
+        Optional<UserCache> updatedUser = dao.updateByLogin(login, updateUserDto);
 
-        UserResponseDto dto = userMapper.toResponseDto(updatedUser.orElseThrow(() ->
+        UserResponseDto dto = mapper.toResponseDto(updatedUser.orElseThrow(() ->
                 new UserNotFoundException("User with login '{}' not found and not updated!")));
 
         log.info("User with login '{}' was updated", login);
@@ -102,11 +88,11 @@ public class UserService {
     }
 
     @Transactional
-    public boolean deleteUser(String login) {
+    public boolean deleteByLogin(String login) {
         log.info("Deleting user by login '{}'...", login);
 
         if (login != null) {
-            if (userDao.deleteByLogin(login)) {
+            if (dao.deleteByLogin(login)) {
                 log.info("User with login '{}' was deleted", login);
 
                 return true;
@@ -124,7 +110,7 @@ public class UserService {
     public Optional<UserResponseDto> getUserByUserCache(UserCache cache) {
         log.info("Start to getUserByUserCache() (login): {}", cache.login());
 
-        UserResponseDto dto = userMapper.toResponseDto(cache);
+        UserResponseDto dto = mapper.toResponseDto(cache);
 
         log.info("User was taken in getUserByUserCache() by login: {}", cache.login());
 
@@ -140,7 +126,7 @@ public class UserService {
                 .getPrincipal()).getCache();
 
         if (userCache != null) {
-            dto = Optional.of(userMapper.toResponseDto(userCache));
+            dto = Optional.of(mapper.toResponseDto(userCache));
         }
 
         return dto;

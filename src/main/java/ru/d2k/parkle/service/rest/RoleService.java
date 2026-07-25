@@ -65,14 +65,14 @@ public class RoleService {
     }
 
     @Transactional
-    public RoleResponseDto create(RoleCreateDto cdto) {
-        log.info("Creating role '{}'...", cdto.toString());
+    public RoleResponseDto create(RoleCreateDto createRoleDto) {
+        log.info("Creating role '{}'...", createRoleDto.toString());
 
-        if (dao.existsByName(cdto.name())) {
+        if (dao.existsByName(createRoleDto.name())) {
             throw new IllegalArgumentException("Role with this name is already exists");
         }
 
-        RoleCache role = dao.create(cdto);
+        RoleCache role = dao.create(createRoleDto);
 
         log.info("Role '{}' was created", role.name());
 
@@ -80,14 +80,14 @@ public class RoleService {
     }
 
     @Transactional
-    public RoleResponseDto update(UUID id, RoleUpdateDto udto) {
+    public RoleResponseDto updateById(UUID id, RoleUpdateDto updateRoleDto) {
         log.info("Updating role by id '{}'...", id);
 
         if (id == null) {
             throw new IllegalArgumentException("RoleUpdateDto ID is null");
         }
 
-        RoleCache updatedRole = dao.updateById(id, udto)
+        RoleCache updatedRole = dao.updateById(id, updateRoleDto)
                 .orElseThrow(() -> new RoleNotFoundException("Role with this ID is not exist!"));
 
         log.info("Role with id {} was updated to {}", id, updatedRole);
@@ -96,7 +96,7 @@ public class RoleService {
     }
 
     @Transactional
-    public boolean delete(UUID id) {
+    public boolean deleteById(UUID id) {
         log.info("Delete role by ID {}...", id);
 
         if (id != null) {

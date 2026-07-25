@@ -34,7 +34,7 @@ public class RoleRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RoleResponseDto> find(@PathVariable("id") UUID id) {
+    public ResponseEntity<RoleResponseDto> findById(@PathVariable("id") UUID id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
@@ -49,14 +49,14 @@ public class RoleRestController {
     }
 
     @PatchMapping("/update/{id}")
-    public ResponseEntity<RoleResponseDto> update(@PathVariable("id") UUID id,
-                                                  @Valid @RequestBody RoleUpdateDto updateRoleDto) {
-        return ResponseEntity.ok(service.update(id, updateRoleDto));
+    public ResponseEntity<RoleResponseDto> updateById(@PathVariable("id") UUID id,
+                                                      @Valid @RequestBody RoleUpdateDto updateRoleDto) {
+        return ResponseEntity.ok(service.updateById(id, updateRoleDto));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
-        boolean result = service.delete(id);
+    public ResponseEntity<?> deleteById(@PathVariable("id") UUID id) {
+        boolean result = service.deleteById(id);
 
         return result ? ResponseEntity.ok().build() : ResponseEntity.internalServerError()
                 .body("Role was not deleted or not exists!");

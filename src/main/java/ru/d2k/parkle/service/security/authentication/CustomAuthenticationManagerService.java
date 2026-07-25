@@ -11,7 +11,7 @@ public abstract class CustomAuthenticationManagerService {
 
     public abstract Authentication createHttpUnauthorizedAuthentication(String username, String password);
 
-    public abstract Authentication createHttpUnauthorizedAuthentication(UserDtoInterface dao);
+    public abstract Authentication createHttpUnauthorizedAuthentication(UserDtoInterface userDto);
 
     public abstract Authentication createHttpAuthorizedAuthentication(
             String username, String password, Collection<? extends GrantedAuthority> authorities);

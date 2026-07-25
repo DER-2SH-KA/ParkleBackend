@@ -41,17 +41,18 @@ public class AuthenticationRestController {
     private final AuthenticationService service;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authentication(@Valid @RequestBody UserAuthenticationDto authenticateUserDto,
-                                            HttpServletResponse response) {
-        Pair<String, Optional<UserResponseDto>> jwtAndDto = service.login(authenticateUserDto);
+    public ResponseEntity<?> authenticate(@Valid @RequestBody UserAuthenticationDto authenticateUserDto,
+                                          HttpServletResponse response) {
+        Pair<String, Optional<UserResponseDto>> jwtAndUserResponseDto = service.login(authenticateUserDto);
 
-        String jwt = jwtAndDto.getKey();
-        Optional<UserResponseDto> dto = jwtAndDto.getValue();
+        String jwt = jwtAndUserResponseDto.getKey();
+        Optional<UserResponseDto> userResponseDto = jwtAndUserResponseDto.getValue();
 
         ResponseCookie jwtCookie = jwtService.createJwtCookie(jwt);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-        return dto.isPresent() ? ResponseEntity.ok(dto.get()) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return userResponseDto.isPresent() ? ResponseEntity.ok(userResponseDto.get()) :
+                new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     // TODO: Переделать с /{login} на /me
@@ -59,15 +60,15 @@ public class AuthenticationRestController {
     public ResponseEntity<UserResponseDto> updateByLogin(@PathVariable("login") String login,
                                                          @Valid @RequestBody UserUpdateDto updateUserDto,
                                                          HttpServletResponse response) {
-        Pair<String, UserResponseDto> jwtAndDto = service.updateByLogin(login, updateUserDto);
+        Pair<String, UserResponseDto> jwtAndUserResponseDto = service.updateByLogin(login, updateUserDto);
 
-        String jwt = jwtAndDto.getKey();
-        UserResponseDto dto = jwtAndDto.getValue();
+        String jwt = jwtAndUserResponseDto.getKey();
+        UserResponseDto userResponseDto = jwtAndUserResponseDto.getValue();
 
         ResponseCookie jwtCookie = jwtService.createJwtCookie(jwt);
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(userResponseDto);
     }
 
     // TODO: Переделать с /{login} на /me
@@ -82,12 +83,13 @@ public class AuthenticationRestController {
     }
 
     @GetMapping("/isAuthed")
-    public ResponseEntity<?> isAuthed(@CookieValue(name = CookieNames.JwtToken, defaultValue = "") String jwt) {
+    public ResponseEntity<?> isUserAuthenticated(
+            @CookieValue(name = CookieNames.JWT_TOKEN, defaultValue = "") String jwt) {
         if (!jwt.isBlank()) {
-            Optional<UserResponseDto> dto = service.getUserByJwt(jwt);
+            Optional<UserResponseDto> userResponseDto = service.getUserByJwt(jwt);
 
-            return dto.isPresent() ? ResponseEntity.ok(dto.get()) : new ResponseEntity<>(new ErrorResponseDto(
-                    "Пользователь не авторизован в системе",
+            return userResponseDto.isPresent() ? ResponseEntity.ok(userResponseDto.get()) :
+                    new ResponseEntity<>(new ErrorResponseDto("Пользователь не авторизован в системе",
                     "User not exists in system by jwt in request"), HttpStatus.UNAUTHORIZED);
         }
 
@@ -97,8 +99,7 @@ public class AuthenticationRestController {
 
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        ResponseCookie emptyCookie = jwtService.createJwtExpiredCookie();
-        response.addHeader(HttpHeaders.SET_COOKIE, emptyCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtService.createJwtExpiredCookie().toString());
 
         return ResponseEntity.ok().build();
     }

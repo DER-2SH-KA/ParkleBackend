@@ -46,7 +46,7 @@ public class RoleDao {
 
     // TODO: сделать поиск по ID (нюанс в том, что ключ состоит из Name).
     public Optional<RoleCache> getById(UUID id) {
-        Optional<Role> entityFromDb = this.getFromDatabaseById(id);
+        Optional<Role> entityFromDb = this.getByIdFromDatabase(id);
 
         if (entityFromDb.isPresent()) {
             log.debug("Role with id '{}' taken from database!", id);
@@ -58,7 +58,7 @@ public class RoleDao {
     }
 
     public Optional<RoleCache> getByName(String name) {
-        Optional<Role> entityFromDb = this.getFromDatabaseByName(name);
+        Optional<Role> entityFromDb = this.getByNameFromDatabase(name);
 
         if (entityFromDb.isPresent()) {
             RoleCache cacheFromEntity = mapper.toCache(entityFromDb.get());
@@ -76,7 +76,7 @@ public class RoleDao {
     }
 
     public Optional<RoleCache> updateById(UUID id, RoleUpdateDto updateRoleDto) {
-        Optional<Role> entity = this.getFromDatabaseById(id);
+        Optional<Role> entity = this.getByIdFromDatabase(id);
 
         if (entity.isPresent()) {
             mapper.updateEntityByDto(entity.get(), updateRoleDto);
@@ -91,12 +91,12 @@ public class RoleDao {
     }
 
     public boolean deleteById(UUID id) {
-        Optional<Role> entityToDelete = this.getFromDatabaseById(id);
+        Optional<Role> entityToDelete = this.getByIdFromDatabase(id);
 
         if (entityToDelete.isPresent()) {
-            this.deleteFromDatabaseById(id);
+            this.deleteByIdFromDatabase(id);
 
-            return !this.existInDatabaseById(id);
+            return !this.existsByIdInDatabase(id);
         }
 
         log.error("Role to delete with id '{}' not exist!", id);
@@ -109,7 +109,7 @@ public class RoleDao {
 
         if (entityFromCache.isPresent()) return true;
 
-        return this.existInDatabaseById(id);
+        return this.existsByIdInDatabase(id);
     }
 
     public boolean existsByName(String name) {
@@ -124,19 +124,19 @@ public class RoleDao {
         return database.getAll();
     }
 
-    private Optional<Role> getFromDatabaseById(UUID id) {
+    private Optional<Role> getByIdFromDatabase(UUID id) {
         return database.getById(id);
     }
 
-    public Optional<Role> getFromDatabaseByName(String name) {
+    public Optional<Role> getByNameFromDatabase(String name) {
         return database.getByName(name);
     }
 
-    private void deleteFromDatabaseById(UUID id) {
+    private void deleteByIdFromDatabase(UUID id) {
         database.deleteById(id);
     }
 
-    private boolean existInDatabaseById(UUID id) {
+    private boolean existsByIdInDatabase(UUID id) {
         return database.existsById(id);
     }
 }

@@ -6,6 +6,6 @@ import java.util.UUID;
 public class UuidGeneratorUtil {
 
     public static UUID generateNewUuidV7() {
-        return Generators.timeBasedEpochRandomGenerator().generate();
+        return Generators.timeBasedEpochGenerator().generate();
     }
 }

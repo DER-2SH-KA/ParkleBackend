@@ -25,9 +25,9 @@ import ru.d2k.parkle.service.security.jwt.JwtService;
 import java.io.IOException;
 import java.util.Optional;
 
-@Component
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         log.debug("Request by path: {}", request.getContextPath() + request.getServletPath());
 
-        Optional<Cookie> cookie = cookieService.fetchCookie(CookieNames.JwtToken, request);
+        Optional<Cookie> cookie = cookieService.fetchCookie(CookieNames.JWT_TOKEN, request);
 
         if (cookie.isEmpty()) {
             log.warn("Cookie is empty. Do Filter.");

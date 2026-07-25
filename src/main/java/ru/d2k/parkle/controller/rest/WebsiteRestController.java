@@ -29,29 +29,29 @@ public class WebsiteRestController {
     private final WebsiteService service;
 
     @GetMapping("/me")
-    public ResponseEntity<List<WebsiteResponseDto>> findWebsitesByUserLogin() {
-        return ResponseEntity.ok(service.findWebsiteByUserLogin());
+    public ResponseEntity<List<WebsiteResponseDto>> findAllByUserLogin() {
+        return ResponseEntity.ok(service.findByUserLogin());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<WebsiteResponseDto> find(@PathVariable(name = "id") UUID id) {
-        return ResponseEntity.ok(service.findWebsiteById(id));
+    public ResponseEntity<WebsiteResponseDto> findById(@PathVariable(name = "id") UUID id) {
+        return ResponseEntity.ok(service.findById(id));
     }
 
     @PostMapping("/new")
     public ResponseEntity<WebsiteResponseDto> create(@Valid @RequestBody WebsiteCreateDto createWebsiteDto) {
-        return ResponseEntity.ok(service.createWebsite(createWebsiteDto));
+        return ResponseEntity.ok(service.create(createWebsiteDto));
     }
 
     @PatchMapping("/update/{id}")
-    public ResponseEntity<WebsiteResponseDto> update(@PathVariable("id") UUID id,
-                                                     @Valid @RequestBody WebsiteUpdateDto updateWebsiteDto) {
-        return ResponseEntity.ok(service.updateWebsite(id, updateWebsiteDto));
+    public ResponseEntity<WebsiteResponseDto> updateById(@PathVariable("id") UUID id,
+                                                         @Valid @RequestBody WebsiteUpdateDto updateWebsiteDto) {
+        return ResponseEntity.ok(service.updateById(id, updateWebsiteDto));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
-        boolean result = service.deleteWebsite(id);
+    public ResponseEntity<?> deleteById(@PathVariable("id") UUID id) {
+        boolean result = service.deleteById(id);
 
         return result ? ResponseEntity.ok().build() : ResponseEntity.internalServerError()
                 .body("Website was not deleted or not exists!");

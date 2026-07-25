@@ -66,7 +66,7 @@ public class WebsiteDao {
     }
 
     public Optional<WebsiteCache> getById(UUID id) {
-        Optional<Website> fromDatabase = this.getFromDatabaseById(id);
+        Optional<Website> fromDatabase = this.getByIdFromDatabase(id);
 
         if (fromDatabase.isEmpty()) {
             throw new WebsiteNotFoundException(String.format("Website not found by ID '%s'!", id));
@@ -84,8 +84,8 @@ public class WebsiteDao {
     }
 
     public Optional<WebsiteCache> updateById(UUID id, WebsiteUpdateDto updateWebsiteDto, String userLogin) {
-        Optional<Website> entity = this.getFromDatabaseById(id);
-        Optional<User> userEntity = userDao.getFromDatabaseByLogin(userLogin); // TODO: переделать в будущем без публичного login метода.
+        Optional<Website> entity = this.getByIdFromDatabase(id);
+        Optional<User> userEntity = userDao.getByLoginFromDatabase(userLogin); // TODO: переделать в будущем без публичного login метода.
 
 
         if (entity.isPresent() && userEntity.isPresent()) {
@@ -117,28 +117,28 @@ public class WebsiteDao {
     }
 
     public boolean deleteById(UUID id) {
-        this.deleteFromDatabase(id);
+        this.deleteByIdFromDatabase(id);
 
-        return !this.existInDatabaseById(id);
+        return !this.existsByIdInDatabase(id);
     }
 
     public boolean existsById(UUID id) {
-        return this.existInDatabaseById(id);
+        return this.existsByIdInDatabase(id);
     }
 
     private Website saveToDatabase(Website entity) {
         return database.save(entity);
     }
 
-    private Optional<Website> getFromDatabaseById(UUID id) {
+    private Optional<Website> getByIdFromDatabase(UUID id) {
         return database.getById(id);
     }
 
-    private void deleteFromDatabase(UUID id) {
+    private void deleteByIdFromDatabase(UUID id) {
         database.deleteById(id);
     }
 
-    private boolean existInDatabaseById(UUID id) {
+    private boolean existsByIdInDatabase(UUID id) {
         return database.existsById(id);
     }
 }

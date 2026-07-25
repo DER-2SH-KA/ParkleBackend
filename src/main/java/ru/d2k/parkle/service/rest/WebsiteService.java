@@ -30,68 +30,56 @@ public class WebsiteService {
     private final UserDao userDao;
 
     @Autowired
-    private final WebsiteDao websiteDao;
+    private final WebsiteDao dao;
 
     @Autowired
-    private final WebsiteMapper websiteMapper;
+    private final WebsiteMapper mapper;
 
     @Transactional(readOnly = true)
-    public List<WebsiteResponseDto> findWebsites() {
-        log.info("Getting all websites...");
-
-        List<WebsiteResponseDto> dtos = websiteDao.getAll().stream()
-                .map(websiteMapper::toResponseDto)
-                .toList();
-
-        log.info("Websites was founded: {}", dtos.size());
-
-        return dtos;
-    }
-
-    @Transactional(readOnly = true)
-    public WebsiteResponseDto findWebsiteById(UUID id) {
+    public WebsiteResponseDto findById(UUID id) {
         log.info("Getting website by ID: {}...", id);
 
-        WebsiteCache website = websiteDao.getById(id).orElseThrow(() ->
+        WebsiteCache website = dao.getById(id).orElseThrow(() ->
                 new WebsiteNotFoundException("Website was not found with ID: " + id));
 
         log.info("Website with ID '{}' was founded", id);
 
-        return websiteMapper.toResponseDto(website);
+        return mapper.toResponseDto(website);
     }
 
     @Transactional(readOnly = true)
-    public List<WebsiteResponseDto> findWebsiteByUserLogin() {
+    public List<WebsiteResponseDto> findByUserLogin() {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
         log.info("Getting websites by user login: {}...", userDetails.getUsername());
 
-        List<WebsiteCache> websites = websiteDao.getAllByUserLogin(userDetails.getCache());
+        List<WebsiteCache> websites = dao.getAllByUserLogin(userDetails.getCache());
 
         log.info("Websites was found: {}", websites.size());
 
-        return websites.stream().map(websiteMapper::toResponseDto).toList();
+        return websites.stream().map(mapper::toResponseDto).toList();
     }
 
     @Transactional
-    public WebsiteResponseDto createWebsite(WebsiteCreateDto dto) {
-        log.info("Creating website: {}...", dto.toString());
+    public WebsiteResponseDto create(WebsiteCreateDto createWebsiteDto) {
+        log.info("Creating website: {}...", createWebsiteDto.toString());
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        Website website = Website.create(userDao.getReferenceById(userDetails.getCache().id()), dto.hexColor(),
-                dto.title(), dto.description(), dto.url());
-        WebsiteCache savedWebsite = websiteDao.create(website);
+        Website website = Website.create(userDao.getReferenceById(userDetails.getCache().id()),
+                createWebsiteDto.hexColor(), createWebsiteDto.title(), createWebsiteDto.description(),
+                createWebsiteDto.url());
+        WebsiteCache savedWebsite = dao.create(website);
 
         log.info("Website was created: {}", savedWebsite);
 
-        return websiteMapper.toResponseDto(savedWebsite);
+        return mapper.toResponseDto(savedWebsite);
     }
 
     @Transactional
-    public WebsiteResponseDto updateWebsite(UUID id, WebsiteUpdateDto udto) {
+    public WebsiteResponseDto updateById(UUID id, WebsiteUpdateDto updateWebsiteDto) {
         log.info("Updating website by ID '{}'...", id);
 
         if (id == null) {
@@ -101,19 +89,19 @@ public class WebsiteService {
         String userLogin = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal()).getUsername();
 
-        Optional<WebsiteCache> updatedWebsite = websiteDao.updateById(id, udto, userLogin);
+        Optional<WebsiteCache> updatedWebsite = dao.updateById(id, updateWebsiteDto, userLogin);
 
         log.info("Website with ID '{}' was updated", id);
 
-        return websiteMapper.toResponseDto(updatedWebsite.orElseThrow(() ->
+        return mapper.toResponseDto(updatedWebsite.orElseThrow(() ->
                 new WebsiteNotFoundException(String.format("Website with ID '%s' not found and not updated!", id))));
     }
 
-    public boolean deleteWebsite(UUID id) {
+    public boolean deleteById(UUID id) {
         log.info("Deleting website by ID '{}'", id);
 
         if (Objects.nonNull(id)) {
-            if (websiteDao.deleteById(id)) {
+            if (dao.deleteById(id)) {
                 log.info("Website with ID  '{}' was deleted", id);
 
                 return true;

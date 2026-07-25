@@ -47,7 +47,7 @@ public class UserDao {
 
     // TODO: сделать поиск по ID (нюанс в том, что ключ состоит из Name).
     public Optional<UserCache> getById(UUID id) {
-        Optional<User> entityFromDb = this.getFromDatabaseById(id);
+        Optional<User> entityFromDb = this.getByIdFromDatabase(id);
 
         if (entityFromDb.isPresent()) {
             log.debug("User by id {} was taken from database!", id);
@@ -59,7 +59,7 @@ public class UserDao {
     }
 
     public Optional<UserCache> getByLogin(String login) {
-        Optional<User> entityFromDb = this.getFromDatabaseByLogin(login);
+        Optional<User> entityFromDb = this.getByLoginFromDatabase(login);
 
         if (entityFromDb.isPresent()) {
             UserCache cacheFromEntity = mapper.toCache(entityFromDb.get());
@@ -78,9 +78,9 @@ public class UserDao {
 
     // TODO: Не обновляется роль. Роль сохраняется не в захэшированном виде.
     public Optional<UserCache> updateByLogin(String login, UserUpdateDto updateUserDto) {
-        Optional<User> entity = this.getFromDatabaseByLogin(login);
+        Optional<User> entity = this.getByLoginFromDatabase(login);
 
-        Optional<Role> role = roleDao.getFromDatabaseByName(updateUserDto.getRoleName());
+        Optional<Role> role = roleDao.getByNameFromDatabase(updateUserDto.getRoleName());
 
         if (entity.isPresent() && role.isPresent()) {
             mapper.updateEntityByDto(entity.get(), updateUserDto, role.get());
@@ -95,12 +95,12 @@ public class UserDao {
     }
 
     public boolean deleteByLogin(String login) {
-        Optional<User> entityToDelete = this.getFromDatabaseByLogin(login);
+        Optional<User> entityToDelete = this.getByLoginFromDatabase(login);
 
         if (entityToDelete.isPresent()) {
-            this.deleteFromDatabaseByLogin(login);
+            this.deleteByLoginFromDatabase(login);
 
-            return !this.existInDatabaseByLogin(login);
+            return !this.existsByLoginInDatabase(login);
         }
 
         log.error("User to delete with login '{}' not exist!", login);
@@ -116,19 +116,19 @@ public class UserDao {
         return database.getAll();
     }
 
-    private Optional<User> getFromDatabaseById(UUID id) {
+    private Optional<User> getByIdFromDatabase(UUID id) {
         return database.getById(id);
     }
 
-    public Optional<User> getFromDatabaseByLogin(String login) {
+    public Optional<User> getByLoginFromDatabase(String login) {
         return database.getByLogin(login);
     }
 
-    private void deleteFromDatabaseByLogin(String login) {
+    private void deleteByLoginFromDatabase(String login) {
         database.deleteByLogin(login);
     }
 
-    private boolean existInDatabaseByLogin(String login) {
+    private boolean existsByLoginInDatabase(String login) {
         return database.existsByLogin(login);
     }
 }

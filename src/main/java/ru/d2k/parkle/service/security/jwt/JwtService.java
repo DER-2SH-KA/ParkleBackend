@@ -92,13 +92,14 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // Хрень. Почему запись JWT в Cookie должна находиться в классе, связанном только с JWT, когда есть Cookie сервис?
     public ResponseCookie createJwtCookie(String jwt) {
-        return cookieService.createResponseCookie(CookieNames.JwtToken, jwt, true, false, "/",
+        return cookieService.createResponseCookie(CookieNames.JWT_TOKEN, jwt, true, false, "/",
                 (int) (expiration / 1000), "Lax");
     }
 
     public ResponseCookie createJwtExpiredCookie() {
-        return cookieService.createEmptyResponseCookie(CookieNames.JwtToken, true, false, "/",
+        return cookieService.createEmptyResponseCookie(CookieNames.JWT_TOKEN, true, false, "/",
                 "Lax");
     }
 }
