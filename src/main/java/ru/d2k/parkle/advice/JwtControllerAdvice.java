@@ -13,9 +13,18 @@ import ru.d2k.parkle.exception.JwtNotIncludeUserLoginException;
 @RestControllerAdvice
 public class JwtControllerAdvice {
 
-    @ExceptionHandler({JwtNotExistInRequestException.class, JwtNotIncludeUserLoginException.class})
+    @ExceptionHandler(JwtNotExistInRequestException.class)
     public ResponseEntity<ErrorResponseDto> handleJwtNotExistInRequestException(RuntimeException ex) {
-        log.error("JWT error. Message: {}", ex.getMessage());
+        log.error("JWT not exist in request error. Message: {}", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponseDto("Браузер не отправил токен авторизации!", ex.getMessage()));
+    }
+
+    @ExceptionHandler(JwtNotIncludeUserLoginException.class)
+    public ResponseEntity<ErrorResponseDto> handleJwtNotIncludeUserLoginException(JwtNotIncludeUserLoginException ex) {
+        log.error("JWT not include user login error. Message: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)

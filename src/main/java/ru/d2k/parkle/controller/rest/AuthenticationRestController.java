@@ -22,10 +22,10 @@ import ru.d2k.parkle.dto.ErrorResponseDto;
 import ru.d2k.parkle.dto.UserAuthenticationDto;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
+import ru.d2k.parkle.exception.JwtNotExistInRequestException;
 import ru.d2k.parkle.service.rest.AuthenticationService;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.service.security.cookie.CustomCookieService;
-import ru.d2k.parkle.service.security.jwt.JwtService;
 import ru.d2k.parkle.utils.type.Pair;
 import java.util.Optional;
 
@@ -94,8 +94,7 @@ public class AuthenticationRestController {
                     "User not exists in system by jwt in request"), HttpStatus.UNAUTHORIZED);
         }
 
-        return new ResponseEntity<>(new ErrorResponseDto("Пользователь не авторизован в системе",
-                "User's request hasn't jwt cookie for authentication"), HttpStatus.UNAUTHORIZED);
+        throw new JwtNotExistInRequestException("User's request hasn't jwt cookie for authentication");
     }
 
     @GetMapping("/logout")
