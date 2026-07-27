@@ -9,6 +9,7 @@ import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.Role;
 import ru.d2k.parkle.entity.User;
 import ru.d2k.parkle.entity.cache.UserCache;
+import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.utils.mapper.UserMapper;
 import java.util.List;
 import java.util.Optional;
@@ -77,7 +78,7 @@ public class UserDao {
     }
 
     // TODO: Не обновляется роль. Роль сохраняется не в захэшированном виде.
-    public Optional<UserCache> updateByLogin(String login, UserUpdateDto updateUserDto) {
+    public UserCache updateByLogin(String login, UserUpdateDto updateUserDto) {
         Optional<User> entity = this.getByLoginFromDatabase(login);
 
         Optional<Role> role = roleDao.getByNameFromDatabase(updateUserDto.getRoleName());
@@ -86,12 +87,11 @@ public class UserDao {
             mapper.updateEntityByDto(entity.get(), updateUserDto, role.get());
 
             User updatedEntity = this.saveToDatabase(entity.get());
-            UserCache cache = mapper.toCache(updatedEntity);
 
-            return Optional.of(cache);
+            return mapper.toCache(updatedEntity);
         }
 
-        return Optional.empty();
+        throw new UserNotFoundException("Can't find user with login " + login + " for update user entity");
     }
 
     public boolean deleteByLogin(String login) {
