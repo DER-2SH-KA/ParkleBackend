@@ -5,10 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.d2k.parkle.controller.ApiRoutes;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping
+@RequestMapping(ApiRoutes.API)
 public class ApplicationRestController {
 
     @GetMapping("/ping")
