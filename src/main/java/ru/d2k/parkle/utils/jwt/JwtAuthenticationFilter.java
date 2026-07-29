@@ -20,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.service.security.cookie.CustomCookieService;
+import ru.d2k.parkle.service.security.cookie.JwtCookieService;
 import ru.d2k.parkle.service.security.jwt.JwtService;
 
 import java.io.IOException;
@@ -34,6 +35,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomCookieService cookieService;
 
     @Autowired
+    private final JwtCookieService jwtCookieService;
+
+    @Autowired
     private final JwtService jwtService;
 
     @Autowired
@@ -45,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Optional<Cookie> cookie = cookieService.fetchCookie(CookieNames.JWT_TOKEN, request);
 
         if (cookie.isEmpty()) {
-            filterChain.doFilter(request, response);
+            this.doFilterRequest(filterChain, request, response);
 
             return;
         }
@@ -53,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Optional<String> jwt = cookieService.getValueFromCookie(cookie.get());
 
         if (jwt.isEmpty() || jwt.get().isBlank()) {
-            filterChain.doFilter(request, response);
+            this.doFilterRequest(filterChain, request, response);
 
             return;
         }
@@ -75,10 +79,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             log.error("Exception when JWT filter authentication process", ex);
 
-            ResponseCookie responseCookie = cookieService.createCookieWithExpiredJwt();
-            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+            jwtCookieService.setExpiredJwtCookieInResponse(response);
         } finally {
-            filterChain.doFilter(request, response);
+            this.doFilterRequest(filterChain, request, response);
         }
     }
 
@@ -88,5 +91,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         return path.equals("/api/auth/login") || path.equals("/api/auth/registration")
                 || path.equals("/api/auth/ping");
+    }
+
+    private void doFilterRequest(FilterChain filterChain, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        filterChain.doFilter(request, response);
     }
 }
