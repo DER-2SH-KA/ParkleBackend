@@ -11,7 +11,7 @@ import ru.d2k.parkle.dao.WebsiteDao;
 import ru.d2k.parkle.dto.WebsiteCreateDto;
 import ru.d2k.parkle.dto.WebsiteResponseDto;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
-import ru.d2k.parkle.entity.Website;
+import ru.d2k.parkle.entity.WebsiteEntity;
 import ru.d2k.parkle.entity.cache.WebsiteCache;
 import ru.d2k.parkle.exception.WebsiteNotFoundException;
 import ru.d2k.parkle.model.CustomUserDetails;
@@ -40,9 +40,9 @@ public class WebsiteService {
         log.info("Getting website by ID: {}...", id);
 
         WebsiteCache website = dao.getById(id).orElseThrow(() ->
-                new WebsiteNotFoundException("Website was not found with ID: " + id));
+                new WebsiteNotFoundException("WebsiteEntity was not found with ID: " + id));
 
-        log.info("Website with ID '{}' was founded", id);
+        log.info("WebsiteEntity with ID '{}' was founded", id);
 
         return mapper.toResponseDto(website);
     }
@@ -68,12 +68,12 @@ public class WebsiteService {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
-        Website website = Website.create(userDao.getReferenceById(userDetails.getCache().id()),
+        WebsiteEntity website = WebsiteEntity.create(userDao.getReferenceById(userDetails.getCache().id()),
                 createWebsiteDto.hexColor(), createWebsiteDto.title(), createWebsiteDto.description(),
                 createWebsiteDto.url());
         WebsiteCache savedWebsite = dao.create(website);
 
-        log.info("Website was created: {}", savedWebsite);
+        log.info("WebsiteEntity was created: {}", savedWebsite);
 
         return mapper.toResponseDto(savedWebsite);
     }
@@ -91,10 +91,10 @@ public class WebsiteService {
 
         Optional<WebsiteCache> updatedWebsite = dao.updateById(id, updateWebsiteDto, userLogin);
 
-        log.info("Website with ID '{}' was updated", id);
+        log.info("WebsiteEntity with ID '{}' was updated", id);
 
         return mapper.toResponseDto(updatedWebsite.orElseThrow(() ->
-                new WebsiteNotFoundException(String.format("Website with ID '%s' not found and not updated!", id))));
+                new WebsiteNotFoundException(String.format("WebsiteEntity with ID '%s' not found and not updated!", id))));
     }
 
     public boolean deleteById(UUID id) {
@@ -102,14 +102,14 @@ public class WebsiteService {
 
         if (Objects.nonNull(id)) {
             if (dao.deleteById(id)) {
-                log.info("Website with ID  '{}' was deleted", id);
+                log.info("WebsiteEntity with ID  '{}' was deleted", id);
 
                 return true;
             } else {
-                log.error("Website with ID '{}' wasn't deleted", id);
+                log.error("WebsiteEntity with ID '{}' wasn't deleted", id);
             }
         } else {
-            log.error("Website's ID equals null");
+            log.error("WebsiteEntity's ID equals null");
         }
 
         return false;

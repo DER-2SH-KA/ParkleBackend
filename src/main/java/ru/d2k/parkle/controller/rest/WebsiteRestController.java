@@ -54,6 +54,6 @@ public class WebsiteRestController {
         boolean result = service.deleteById(id);
 
         return result ? ResponseEntity.ok().build() : ResponseEntity.internalServerError()
-                .body("Website was not deleted or not exists!");
+                .body("WebsiteEntity was not deleted or not exists!");
     }
 }

@@ -28,15 +28,15 @@ public class UserService {
 
         if (login != null) {
             if (dao.deleteByLogin(login)) {
-                log.info("User with login '{}' was deleted", login);
+                log.info("UserEntity with login '{}' was deleted", login);
 
                 return true;
             } else {
-                log.error("User with login '{}' wasn't deleted", login);
+                log.error("UserEntity with login '{}' wasn't deleted", login);
             }
 
         } else {
-            log.error("User login equals null");
+            log.error("UserEntity login equals null");
         }
 
         return false;

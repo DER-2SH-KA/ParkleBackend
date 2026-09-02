@@ -25,7 +25,7 @@ import java.util.UUID;
 @ToString(of = {"id", "user", "hexColor", "title", "description", "url"})
 @EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Website {
+public class WebsiteEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
@@ -33,7 +33,7 @@ public class Website {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private UserEntity user;
 
     @Column(name = "hexColor", nullable = false, length = 7)
     private String hexColor;
@@ -47,7 +47,7 @@ public class Website {
     @Column(name = "url", nullable = false, length = 2048)
     private String url;
 
-    private Website(User user, String hexColor, String title, String description, String url) {
+    private WebsiteEntity(UserEntity user, String hexColor, String title, String description, String url) {
         this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.user = user;
         this.hexColor = hexColor;
@@ -59,13 +59,13 @@ public class Website {
     /**
      * Constructor only for tests.
      * @param id ID.
-     * @param user {@link User} user owner.
+     * @param user {@link UserEntity} user owner.
      * @param hexColor HEX color of first letter.
      * @param title title of website.
      * @param description description of website.
      * @param url URL of website in Internet.
      * **/
-    Website(UUID id, User user, String hexColor, String title, String description, String url) {
+    WebsiteEntity(UUID id, UserEntity user, String hexColor, String title, String description, String url) {
         this.id = id;
         this.user = user;
         this.hexColor = hexColor;
@@ -75,15 +75,15 @@ public class Website {
     }
 
     /**
-     * Fabric method for create new {@link Website} with generated ID by UUID generator.
-     * @param user {@link User} user owner.
+     * Fabric method for create new {@link WebsiteEntity} with generated ID by UUID generator.
+     * @param user {@link UserEntity} user owner.
      * @param hexColor HEX color of first letter.
      * @param title title of website.
      * @param description description of website.
      * @param url URL of website in Internet.
-     * @return Created {@link Website} object.
+     * @return Created {@link WebsiteEntity} object.
      * **/
-    public static Website create(User user, String hexColor, String title, String description, String url) {
-        return new Website(user, hexColor, title, description, url);
+    public static WebsiteEntity create(UserEntity user, String hexColor, String title, String description, String url) {
+        return new WebsiteEntity(user, hexColor, title, description, url);
     }
 }

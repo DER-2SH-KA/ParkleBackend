@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.entity.Role;
+import ru.d2k.parkle.entity.RoleEntity;
 import ru.d2k.parkle.repository.RoleRepository;
 import java.util.List;
 import java.util.Optional;
@@ -19,27 +19,27 @@ public class RolePostgresDatabase implements RoleDatabase {
     private final RoleRepository repository;
 
     @Override
-    public Role save(Role entity) {
+    public RoleEntity save(RoleEntity entity) {
         return repository.save(entity);
     }
 
     @Override
-    public List<Role> getAll() {
+    public List<RoleEntity> getAll() {
         return repository.findAll();
     }
 
     @Override
-    public Optional<Role> getById(UUID id) {
+    public Optional<RoleEntity> getById(UUID id) {
         return repository.findById(id);
     }
 
     @Override
-    public Optional<Role> getByName(String name) {
+    public Optional<RoleEntity> getByName(String name) {
         return repository.findByName(name);
     }
 
     @Override
-    public Role getReferenceById(UUID id) {
+    public RoleEntity getReferenceById(UUID id) {
         return repository.getReferenceById(id);
     }
 

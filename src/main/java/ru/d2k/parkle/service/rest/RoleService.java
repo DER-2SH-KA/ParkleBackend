@@ -45,9 +45,9 @@ public class RoleService {
         log.info("Getting role by ID: {}...", id);
 
         RoleCache roleCache = dao.getById(id)
-                .orElseThrow(() -> new RoleNotFoundException("Role was not found with ID: " + id));
+                .orElseThrow(() -> new RoleNotFoundException("RoleEntity was not found with ID: " + id));
 
-        log.info("Role with ID {} was founded", id);
+        log.info("RoleEntity with ID {} was founded", id);
 
         return mapper.toResponseDto(roleCache);
     }
@@ -57,9 +57,9 @@ public class RoleService {
         log.info("Getting roles by Name '{}'...", name);
 
         RoleCache roleCache = dao.getByName(name)
-                .orElseThrow(() -> new RoleNotFoundException("Role was not found with name: " + name));
+                .orElseThrow(() -> new RoleNotFoundException("RoleEntity was not found with name: " + name));
 
-        log.info("Role with name '{}' was founded", name);
+        log.info("RoleEntity with name '{}' was founded", name);
 
         return mapper.toResponseDto(roleCache);
     }
@@ -69,12 +69,12 @@ public class RoleService {
         log.info("Creating role '{}'...", createRoleDto.toString());
 
         if (dao.existsByName(createRoleDto.name())) {
-            throw new IllegalArgumentException("Role with this name is already exists");
+            throw new IllegalArgumentException("RoleEntity with this name is already exists");
         }
 
         RoleCache role = dao.create(createRoleDto);
 
-        log.info("Role '{}' was created", role.name());
+        log.info("RoleEntity '{}' was created", role.name());
 
         return mapper.toResponseDto(role);
     }
@@ -88,9 +88,9 @@ public class RoleService {
         }
 
         RoleCache updatedRole = dao.updateById(id, updateRoleDto)
-                .orElseThrow(() -> new RoleNotFoundException("Role with this ID is not exist!"));
+                .orElseThrow(() -> new RoleNotFoundException("RoleEntity with this ID is not exist!"));
 
-        log.info("Role with id {} was updated to {}", id, updatedRole);
+        log.info("RoleEntity with id {} was updated to {}", id, updatedRole);
 
         return mapper.toResponseDto(updatedRole);
     }
@@ -103,14 +103,14 @@ public class RoleService {
             boolean isDeleted = dao.deleteById(id);
 
             if (isDeleted) {
-                log.info("Role by ID {} was deleted", id);
+                log.info("RoleEntity by ID {} was deleted", id);
 
                 return true;
             } else {
-                log.error("Role by ID {} wasn't deleted", id);
+                log.error("RoleEntity by ID {} wasn't deleted", id);
             }
         } else {
-            log.error("Role's ID equals null");
+            log.error("RoleEntity's ID equals null");
         }
 
         return false;

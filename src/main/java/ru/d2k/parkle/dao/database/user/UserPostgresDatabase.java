@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.entity.User;
+import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -19,27 +19,27 @@ public class UserPostgresDatabase implements UserDatabase {
     private final UserRepository repository;
 
     @Override
-    public User save(User entity) {
+    public UserEntity save(UserEntity entity) {
         return repository.save(entity);
     }
 
     @Override
-    public List<User> getAll() {
+    public List<UserEntity> getAll() {
         return repository.findAll();
     }
 
     @Override
-    public Optional<User> getById(UUID id) {
+    public Optional<UserEntity> getById(UUID id) {
         return repository.findById(id);
     }
 
     @Override
-    public Optional<User> getByLogin(String login) {
+    public Optional<UserEntity> getByLogin(String login) {
         return repository.findByLogin(login);
     }
 
     @Override
-    public User getReferenceById(UUID id) {
+    public UserEntity getReferenceById(UUID id) {
         return repository.getReferenceById(id);
     }
 

@@ -26,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return new CustomUserDetails(userCache.get());
         }
         else {
-            throw new UsernameNotFoundException(String.format("User not found with username (login): %s", username));
+            throw new UsernameNotFoundException(String.format("UserEntity not found with username (login): %s", username));
         }
     }
 }

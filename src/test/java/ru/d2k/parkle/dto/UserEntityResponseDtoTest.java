@@ -11,7 +11,7 @@ import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class UserResponseDtoTest {
+public class UserEntityResponseDtoTest {
 
     private static final UUID UUID = UuidGeneratorUtil.generateNewUuidV7();
     private static final String ROLE_NAME = "role";

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RoleUpdateDtoTest {
+public class RoleEntityUpdateDtoTest {
 
     private static final UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -28,8 +28,8 @@ public class RoleUpdateDtoTest {
     @DisplayName("hashCode/equals - return true with similar objects")
     @Test
     public void shouldBeTrueWhenEqualsAndHashCodeWithSimilarObjects() {
-        RoleUpdateDto roleUpdateDto1 = new RoleUpdateDto(uuid, "Role", 1);
-        RoleUpdateDto roleUpdateDto2 = new RoleUpdateDto(uuid, "Role", 1);
+        RoleUpdateDto roleUpdateDto1 = new RoleUpdateDto(uuid, "RoleEntity", 1);
+        RoleUpdateDto roleUpdateDto2 = new RoleUpdateDto(uuid, "RoleEntity", 1);
 
         assertEquals(roleUpdateDto1.hashCode(), roleUpdateDto2.hashCode());
         assertEquals(roleUpdateDto1, roleUpdateDto2);
@@ -38,7 +38,7 @@ public class RoleUpdateDtoTest {
     @DisplayName("equals - return false with null")
     @Test
     public void shouldBeFalseWhenEqualsWithNull() {
-        RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "Role", 1);
+        RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "RoleEntity", 1);
 
         assertFalse(roleUpdateDto == null);
     }
@@ -46,7 +46,7 @@ public class RoleUpdateDtoTest {
     @DisplayName("equals - return false with object which has null fields")
     @Test
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
-        RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "Role", 1);
+        RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "RoleEntity", 1);
 
         assertNotEquals(roleUpdateDto, new RoleUpdateDto(null, null, null));
     }
@@ -93,8 +93,8 @@ public class RoleUpdateDtoTest {
                 Arguments.of(new RoleUpdateDto(uuid, "", 1), "Name is blank test"),
                 Arguments.of(new RoleUpdateDto(uuid, "12345123451234512345123451234512345", 1),
                         "Name is too long test"),
-                Arguments.of(new RoleUpdateDto(uuid, "Role", null), "Priority is null test"),
-                Arguments.of(new RoleUpdateDto(uuid, "Role", -1), "Priority is negative test"),
-                Arguments.of(new RoleUpdateDto(uuid, "Role", 0), "Priority equals zero test"));
+                Arguments.of(new RoleUpdateDto(uuid, "RoleEntity", null), "Priority is null test"),
+                Arguments.of(new RoleUpdateDto(uuid, "RoleEntity", -1), "Priority is negative test"),
+                Arguments.of(new RoleUpdateDto(uuid, "RoleEntity", 0), "Priority equals zero test"));
     }
 }

@@ -6,16 +6,16 @@ import org.junit.jupiter.api.Test;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.UUID;
 
-public class WebsiteTest {
+public class WebsiteEntityTest {
 
-    private final Role role = new Role(UuidGeneratorUtil.generateNewUuidV7(), "TEMP", 0);
-    private final User user = new User(UuidGeneratorUtil.generateNewUuidV7(), role, "login", "email@email.net",
+    private final RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP", 0);
+    private final UserEntity user = new UserEntity(UuidGeneratorUtil.generateNewUuidV7(), role, "login", "email@email.net",
             "password");
 
     @DisplayName("hashCode -- hash codes of the same object are the same")
     @Test
     public void hashCode_sameObjectHashCodeEquals() {
-        Website website = new Website(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title",
+        WebsiteEntity website = new WebsiteEntity(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title",
                 "description", "https://example.com");
 
         Assertions.assertEquals(website.hashCode(), website.hashCode());
@@ -26,9 +26,9 @@ public class WebsiteTest {
     public void hashCode_twoObjectWithSameIdAreEquals() {
         UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
 
-        Website website1 = new Website(uuid, user, "#fff", "title1", "description1",
+        WebsiteEntity website1 = new WebsiteEntity(uuid, user, "#fff", "title1", "description1",
                 "https://example.com1");
-        Website website2 = new Website(uuid, user, "#fff", "title2", "description2",
+        WebsiteEntity website2 = new WebsiteEntity(uuid, user, "#fff", "title2", "description2",
                 "https://example.com2");
 
         Assertions.assertEquals(website1.hashCode(), website2.hashCode());
@@ -40,7 +40,7 @@ public class WebsiteTest {
     @DisplayName("hashCode -- hash codes of null ID is null")
     @Test
     public void hashCode_objectIdIsNull() {
-        Website website = new Website(null, user, "#fff", "title", "description",
+        WebsiteEntity website = new WebsiteEntity(null, user, "#fff", "title", "description",
                 "https://example.com");
 
         Assertions.assertEquals(102, website.hashCode());
@@ -49,7 +49,7 @@ public class WebsiteTest {
     @DisplayName("equals -- Same object are equals")
     @Test
     public void equals_sameObjectAreEquals() {
-        User user = new User(UuidGeneratorUtil.generateNewUuidV7(), role, "login", "email@email.net",
+        UserEntity user = new UserEntity(UuidGeneratorUtil.generateNewUuidV7(), role, "login", "email@email.net",
                 "password");
 
         Assertions.assertEquals(user, user);
@@ -58,7 +58,7 @@ public class WebsiteTest {
     @DisplayName("equals -- Object equals with null is false")
     @Test
     public void equals_withNullObject() {
-        Website website = new Website(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title",
+        WebsiteEntity website = new WebsiteEntity(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title",
                 "description", "https://example.com");
 
         Assertions.assertFalse(website.equals(null));
@@ -69,9 +69,9 @@ public class WebsiteTest {
     public void equals_objectsWithSameIdAreEquals() {
         UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
 
-        Website website1 = new Website(uuid, user, "#fff", "title1", "description1",
+        WebsiteEntity website1 = new WebsiteEntity(uuid, user, "#fff", "title1", "description1",
                 "https://example.com1");
-        Website website2 = new Website(uuid, user, "#fff", "title2", "description2",
+        WebsiteEntity website2 = new WebsiteEntity(uuid, user, "#fff", "title2", "description2",
                 "https://example.com2");
 
         Assertions.assertEquals(website1, website2);
@@ -80,9 +80,9 @@ public class WebsiteTest {
     @DisplayName("equals -- equals with object which ID is null is false")
     @Test
     public void equals_withObjectIdNull() {
-        Website website1 = new Website(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title1",
+        WebsiteEntity website1 = new WebsiteEntity(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title1",
                 "description1", "https://example.com1");
-        Website website2 = new Website(null, user, "#fff", "title2", "description2",
+        WebsiteEntity website2 = new WebsiteEntity(null, user, "#fff", "title2", "description2",
                 "https://example.com2");
 
         Assertions.assertFalse(website1.equals(website2));

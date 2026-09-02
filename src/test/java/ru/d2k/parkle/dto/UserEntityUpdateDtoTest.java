@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class UserUpdateDtoTest {
+public class UserEntityUpdateDtoTest {
 
     private static final UUID ID = UuidGeneratorUtil.generateNewUuidV7();
     private static final String ROLE_NAME = "role";

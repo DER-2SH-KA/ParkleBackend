@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.entity.Website;
+import ru.d2k.parkle.entity.WebsiteEntity;
 import ru.d2k.parkle.repository.WebsiteRepository;
 import java.util.List;
 import java.util.Optional;
@@ -19,27 +19,27 @@ public class WebsitePostgresDatabase implements WebsiteDatabase {
     private final WebsiteRepository repository;
 
     @Override
-    public Website save(Website entity) {
+    public WebsiteEntity save(WebsiteEntity entity) {
         return repository.save(entity);
     }
 
     @Override
-    public List<Website> getAll() {
+    public List<WebsiteEntity> getAll() {
         return repository.findAll();
     }
 
     @Override
-    public Optional<Website> getById(UUID id) {
+    public Optional<WebsiteEntity> getById(UUID id) {
         return repository.findById(id);
     }
 
     @Override
-    public List<Website> getByUserIdSortedByTitleAsc(UUID userId) {
+    public List<WebsiteEntity> getByUserIdSortedByTitleAsc(UUID userId) {
         return repository.findByUserIdOrderByTitleAsc(userId);
     }
 
     @Override
-    public Website getReferenceById(UUID id) {
+    public WebsiteEntity getReferenceById(UUID id) {
         return repository.getReferenceById(id);
     }
 

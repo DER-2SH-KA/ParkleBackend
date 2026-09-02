@@ -10,7 +10,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
-import ru.d2k.parkle.entity.Role;
+import ru.d2k.parkle.entity.RoleEntity;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ import java.util.Optional;
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class RoleRepositoryTest {
+public class RoleEntityRepositoryTest {
 
     @Container
     @ServiceConnection
@@ -32,11 +32,11 @@ public class RoleRepositoryTest {
 
     @Test
     void findByName_shouldSaveAndFindByNameNewRole() {
-        Role newRole = Role.create("Test", 10);
+        RoleEntity newRole = RoleEntity.create("Test", 10);
 
         testEntityManager.persistAndFlush(newRole);
 
-        Optional<Role> savedRole = roleRepository.findByName("Test");
+        Optional<RoleEntity> savedRole = roleRepository.findByName("Test");
 
         Assertions.assertThat(savedRole).isPresent();
         Assertions.assertThat(savedRole.get().getName()).isEqualTo("Test");
@@ -44,18 +44,18 @@ public class RoleRepositoryTest {
 
     @Test
     void findByName_shouldReturnOptionalEmptyWhenUserByLoginNotExists() {
-        Role newRole = Role.create("Test1", 10);
+        RoleEntity newRole = RoleEntity.create("Test1", 10);
 
         testEntityManager.persistAndFlush(newRole);
 
-        Optional<Role> savedRole = roleRepository.findByName("Test");
+        Optional<RoleEntity> savedRole = roleRepository.findByName("Test");
 
         Assertions.assertThat(savedRole).isEmpty();
     }
 
     @Test
     void existsByName_shouldBeTrueWhenSaveAndExistByNameNewRole() {
-        Role newRole = Role.create("Test", 10);
+        RoleEntity newRole = RoleEntity.create("Test", 10);
 
         testEntityManager.persistAndFlush(newRole);
 
@@ -66,7 +66,7 @@ public class RoleRepositoryTest {
 
     @Test
     void existsByName_shouldBeFalseWhenSaveAndExistByNameNewRole() {
-        Role newRole = Role.create("Test1", 10);
+        RoleEntity newRole = RoleEntity.create("Test1", 10);
 
         testEntityManager.persistAndFlush(newRole);
 
@@ -77,7 +77,7 @@ public class RoleRepositoryTest {
 
     @Test
     void existsById_shouldSaveAndExistsByIdNewRole() {
-        Role newRole = Role.create("Test", 10);
+        RoleEntity newRole = RoleEntity.create("Test", 10);
 
         testEntityManager.persistAndFlush(newRole);
 
@@ -88,7 +88,7 @@ public class RoleRepositoryTest {
 
     @Test
     void existsById_shouldBeFalseWhenSaveAndExistByIdNewRole() {
-        Role newRole = Role.create("Test1", 10);
+        RoleEntity newRole = RoleEntity.create("Test1", 10);
 
         testEntityManager.persistAndFlush(newRole);
 

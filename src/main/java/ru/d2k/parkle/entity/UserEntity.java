@@ -30,7 +30,7 @@ import java.util.UUID;
 @ToString(of = {"id", "role", "login", "email"})
 @EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class UserEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
@@ -38,7 +38,7 @@ public class User {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
+    private RoleEntity role;
 
     @Column(name = "login", unique = true, nullable = false, length = 50)
     private String login;
@@ -53,9 +53,9 @@ public class User {
     private Boolean isBlocked;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Website> websites = new ArrayList<>();
+    private List<WebsiteEntity> websites = new ArrayList<>();
 
-    private User(Role role, String login, String email, String password, boolean isBlocked) {
+    private UserEntity(RoleEntity role, String login, String email, String password, boolean isBlocked) {
         this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.role = role;
         this.login = login;
@@ -67,12 +67,12 @@ public class User {
     /**
      * Constructor only for tests ({@code isBlocked = false}).
      * @param id ID.
-     * @param role {@link Role} role.
+     * @param role {@link RoleEntity} role.
      * @param login login.
      * @param email email.
      * @param password hashed by BCrypt password.
      * **/
-    User(UUID id, Role role, String login, String email, String password) {
+    UserEntity(UUID id, RoleEntity role, String login, String email, String password) {
         this.id = id;
         this.role = role;
         this.login = login;
@@ -84,12 +84,12 @@ public class User {
     /**
      * Constructor only for tests.
      * @param id ID.
-     * @param role {@link Role} role.
+     * @param role {@link RoleEntity} role.
      * @param login login.
      * @param email email.
      * @param password hashed by BCrypt password.
      * **/
-    User(UUID id, Role role, String login, String email, String password, boolean isBlocked) {
+    UserEntity(UUID id, RoleEntity role, String login, String email, String password, boolean isBlocked) {
         this.id = id;
         this.role = role;
         this.login = login;
@@ -99,26 +99,26 @@ public class User {
     }
 
     /**
-     * Fabric method for create new {@link User} with generated ID by UUID generator ({@code isBlocked = false}).
-     * @param role {@link Role} role.
+     * Fabric method for create new {@link UserEntity} with generated ID by UUID generator ({@code isBlocked = false}).
+     * @param role {@link RoleEntity} role.
      * @param login login.
      * @param email email.
      * @param password hashed by BCrypt password.
-     * @return Created {@link User} object.
+     * @return Created {@link UserEntity} object.
      * **/
-    public static User create(Role role, String login, String email, String password) {
-        return new User(role, login, email, password, false);
+    public static UserEntity create(RoleEntity role, String login, String email, String password) {
+        return new UserEntity(role, login, email, password, false);
     }
 
     /**
-     * Fabric method for create new {@link User} with generated ID by UUID generator.
-     * @param role {@link Role} role.
+     * Fabric method for create new {@link UserEntity} with generated ID by UUID generator.
+     * @param role {@link RoleEntity} role.
      * @param login login.
      * @param email email.
      * @param password hashed by BCrypt password.
-     * @return Created {@link User} object.
+     * @return Created {@link UserEntity} object.
      * **/
-    public static User create(Role role, String login, String email, String password, boolean isBlocked) {
-        return new User(role, login, email, password, isBlocked);
+    public static UserEntity create(RoleEntity role, String login, String email, String password, boolean isBlocked) {
+        return new UserEntity(role, login, email, password, isBlocked);
     }
 }

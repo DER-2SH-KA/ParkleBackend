@@ -2,9 +2,7 @@ package ru.d2k.parkle.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -13,8 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
-import java.util.HashSet;
-import java.util.Set;
+
 import java.util.UUID;
 
 /** Entity for role. **/
@@ -25,7 +22,7 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @ToString(of = {"id", "name", "priority"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Role {
+public class RoleEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
@@ -37,7 +34,7 @@ public class Role {
     @Column(name = "priority", nullable = false)
     private Integer priority;
 
-    private Role(String name, Integer priority) {
+    private RoleEntity(String name, Integer priority) {
         this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.name = name;
         this.priority = priority;
@@ -48,17 +45,17 @@ public class Role {
      * @param name name.
      * @param priority priority.
      * **/
-    public Role(UUID id, String name, Integer priority) {
+    public RoleEntity(UUID id, String name, Integer priority) {
         this.id = id;
         this.name = name;
         this.priority = priority;
     }
 
     /**
-     * Fabric method for create new {@link Role} with generated ID by UUID generator.
+     * Fabric method for create new {@link RoleEntity} with generated ID by UUID generator.
      * @param name name.
      * @param priority priority.
-     * @return Created {@link Role} object.
+     * @return Created {@link RoleEntity} object.
      * **/
-    public static Role create(String name, Integer priority) { return new Role(name, priority); }
+    public static RoleEntity create(String name, Integer priority) { return new RoleEntity(name, priority); }
 }

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
-import ru.d2k.parkle.entity.Role;
+import ru.d2k.parkle.entity.RoleEntity;
 import ru.d2k.parkle.repository.RoleRepository;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.Arrays;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
-public class RolePostgresDatabaseTest {
+public class RoleEntityPostgresDatabaseTest {
 
     @Mock
     private RoleRepository roleRepository;
@@ -28,29 +28,29 @@ public class RolePostgresDatabaseTest {
     private RolePostgresDatabase rolePostgresDatabase;
 
     @Test
-    @DisplayName("save(Role entity) - Should return saved Role entity")
+    @DisplayName("save(RoleEntity entity) - Should return saved RoleEntity entity")
     void save_shouldReturnRoleEntity() {
-        Role entity = Role.create("USER", 10);
+        RoleEntity entity = RoleEntity.create("USER", 10);
 
         when(roleRepository.save(entity)).thenReturn(entity);
 
-        Role savedEntity = rolePostgresDatabase.save(entity);
+        RoleEntity savedEntity = rolePostgresDatabase.save(entity);
 
         assertEquals(entity, savedEntity);
     }
 
     @Test
-    @DisplayName("getAll() - Should return list of Role entities")
+    @DisplayName("getAll() - Should return list of RoleEntity entities")
     void getAll_shouldReturnListOfRoleEntities() {
-        List<Role> entities = List.of(
-                Role.create("USER", 10),
-                Role.create("ADMIN", 1)
+        List<RoleEntity> entities = List.of(
+                RoleEntity.create("USER", 10),
+                RoleEntity.create("ADMIN", 1)
         );
 
         when(roleRepository.findAll())
                 .thenReturn(entities);
 
-        List<Role> foundedEntity = rolePostgresDatabase.getAll();
+        List<RoleEntity> foundedEntity = rolePostgresDatabase.getAll();
 
         assertTrue(Arrays.deepEquals(
                 entities.toArray(),
@@ -59,15 +59,15 @@ public class RolePostgresDatabaseTest {
     }
 
     @Test
-    @DisplayName("getById(UUID id) - Should return Role entity by Id")
+    @DisplayName("getById(UUID id) - Should return RoleEntity entity by Id")
     void getById_shouldReturnRoleEntityById() {
-        Role entity = Role.create("USER", 10);
+        RoleEntity entity = RoleEntity.create("USER", 10);
 
         UUID id = entity.getId();
 
         when(roleRepository.findById(id)).thenReturn(Optional.of(entity));
 
-        Optional<Role> foundedEntity = rolePostgresDatabase.getById(id);
+        Optional<RoleEntity> foundedEntity = rolePostgresDatabase.getById(id);
 
         assertEquals(entity, foundedEntity.get());
     }
@@ -79,20 +79,20 @@ public class RolePostgresDatabaseTest {
 
         when(roleRepository.findById(id)).thenReturn(Optional.empty());
 
-        Optional<Role> foundedEntity = rolePostgresDatabase.getById(id);
+        Optional<RoleEntity> foundedEntity = rolePostgresDatabase.getById(id);
 
         assertEquals(Optional.empty(), foundedEntity);
     }
 
     @Test
-    @DisplayName("getByName(String name) - Should return Role entity by name")
+    @DisplayName("getByName(String name) - Should return RoleEntity entity by name")
     void getByName_shouldReturnRoleEntityByName() {
         String name = "USER";
-        Role entity = Role.create(name, 10);
+        RoleEntity entity = RoleEntity.create(name, 10);
 
         when(roleRepository.findByName(name)).thenReturn(Optional.of(entity));
 
-        Optional<Role> foundedEntity = rolePostgresDatabase.getByName(name);
+        Optional<RoleEntity> foundedEntity = rolePostgresDatabase.getByName(name);
 
         assertFalse(foundedEntity.isEmpty());
         assertEquals(entity, foundedEntity.get());
@@ -105,21 +105,21 @@ public class RolePostgresDatabaseTest {
 
         when(roleRepository.findByName(name)).thenReturn(Optional.empty());
 
-        Optional<Role> foundedEntity = rolePostgresDatabase.getByName(name);
+        Optional<RoleEntity> foundedEntity = rolePostgresDatabase.getByName(name);
 
         assertEquals(Optional.empty(), foundedEntity);
     }
 
     @Test
-    @DisplayName("getReferenceById(String name) - Should return Role entity reference by Id")
+    @DisplayName("getReferenceById(String name) - Should return RoleEntity entity reference by Id")
     void getReferenceById_shouldReturnRoleReferenceById() {
-        Role entity = Role.create("USER", 10);
+        RoleEntity entity = RoleEntity.create("USER", 10);
 
         UUID id = entity.getId();
 
         when(roleRepository.getReferenceById(id)).thenReturn(entity);
 
-        Role foundedEntity = rolePostgresDatabase.getReferenceById(id);
+        RoleEntity foundedEntity = rolePostgresDatabase.getReferenceById(id);
 
         assertEquals(entity, foundedEntity);
     }

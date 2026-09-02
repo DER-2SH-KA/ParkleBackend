@@ -4,10 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import ru.d2k.parkle.entity.Role;
+import ru.d2k.parkle.entity.RoleEntity;
+
 import java.util.UUID;
 
-/** DTO of {@link Role} **/
+/** DTO of {@link RoleEntity} **/
 public record RoleUpdateDto(
 
         @NotNull

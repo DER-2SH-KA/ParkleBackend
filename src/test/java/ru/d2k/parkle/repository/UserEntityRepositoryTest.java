@@ -10,16 +10,17 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
-import ru.d2k.parkle.entity.Role;
-import ru.d2k.parkle.entity.User;
+import ru.d2k.parkle.entity.RoleEntity;
+import ru.d2k.parkle.entity.UserEntity;
 import java.util.Optional;
+
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 
 // @Disabled
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class UserRepositoryTest {
+public class UserEntityRepositoryTest {
 
     @Container
     @ServiceConnection
@@ -33,13 +34,13 @@ public class UserRepositoryTest {
 
     @Test
     void findByLogin_shouldFindUserByLogin() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login", "Mail@mail.ru", "Password");
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login", "Mail@mail.ru", "Password");
 
         testEntityManager.persistAndFlush(newRole);
         testEntityManager.persistAndFlush(newUser);
 
-        Optional<User> savedUser = userRepository.findByLogin("Login");
+        Optional<UserEntity> savedUser = userRepository.findByLogin("Login");
 
         Assertions.assertThat(savedUser).isPresent();
         Assertions.assertThat(savedUser.get().getLogin()).isEqualTo("Login");
@@ -47,21 +48,21 @@ public class UserRepositoryTest {
 
     @Test
     void findByLogin_shouldReturnEmptyWhenFindUserByLogin() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login1", "Mail@mail.ru", "Password");
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login1", "Mail@mail.ru", "Password");
 
         testEntityManager.persistAndFlush(newRole);
         testEntityManager.persistAndFlush(newUser);
 
-        Optional<User> savedUser = userRepository.findByLogin("Login");
+        Optional<UserEntity> savedUser = userRepository.findByLogin("Login");
 
         Assertions.assertThat(savedUser).isEmpty();
     }
 
     @Test
     void existsById_shouldReturnTrueWhenUserExistById() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login", "Mail@mail.ru", "Password");
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login", "Mail@mail.ru", "Password");
 
         testEntityManager.persistAndFlush(newRole);
         testEntityManager.persistAndFlush(newUser);
@@ -73,8 +74,8 @@ public class UserRepositoryTest {
 
     @Test
     void existsById_shouldReturnFalseWhenUserNotExistById() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login", "Mail@mail.ru", "Password");
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login", "Mail@mail.ru", "Password");
 
         testEntityManager.persistAndFlush(newRole);
         testEntityManager.persistAndFlush(newUser);
@@ -86,8 +87,8 @@ public class UserRepositoryTest {
 
     @Test
     void existsByLogin_shouldReturnTrueWhenUserExistByLogin() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login", "Mail@mail.ru", "Password");
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login", "Mail@mail.ru", "Password");
 
         testEntityManager.persistAndFlush(newRole);
         testEntityManager.persistAndFlush(newUser);
@@ -99,8 +100,8 @@ public class UserRepositoryTest {
 
     @Test
     void existsByLogin_shouldReturnFalseWhenUserNotExistByLogin() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login1", "Mail@mail.ru", "Password");
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login1", "Mail@mail.ru", "Password");
 
         testEntityManager.persistAndFlush(newRole);
         testEntityManager.persistAndFlush(newUser);
@@ -112,8 +113,8 @@ public class UserRepositoryTest {
 
     @Test
     void deleteByLogin_shouldSaveAndExistsByLoginNewUser() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login", "Mail@mail.ru", "Password");
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login", "Mail@mail.ru", "Password");
 
         testEntityManager.persistAndFlush(newRole);
         testEntityManager.persistAndFlush(newUser);

@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class UserCreateDtoTest {
+public class UserEntityCreateDtoTest {
 
     private static final String ROLE = "role";
     private static final String LOGIN = "login";

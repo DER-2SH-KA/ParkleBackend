@@ -10,9 +10,9 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
-import ru.d2k.parkle.entity.Role;
-import ru.d2k.parkle.entity.User;
-import ru.d2k.parkle.entity.Website;
+import ru.d2k.parkle.entity.RoleEntity;
+import ru.d2k.parkle.entity.UserEntity;
+import ru.d2k.parkle.entity.WebsiteEntity;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 @DataJpaTest
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class WebsiteRepositoryTest {
+public class WebsiteEntityRepositoryTest {
 
     @Container
     @ServiceConnection
@@ -35,14 +35,14 @@ public class WebsiteRepositoryTest {
 
     @Test
     void findByUserIdOrderByTitleAsc_shouldReturnListSizeThreeOfWebsites() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login", "Email@mail.ru", "Password");
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login", "Email@mail.ru", "Password");
 
-        Website website1 = Website.create(newUser, "#000", "Website1", null,
+        WebsiteEntity website1 = WebsiteEntity.create(newUser, "#000", "Website1", null,
                 "http://example.com");
-        Website website2 = Website.create(newUser, "#F00", "Website2", "Description 1",
+        WebsiteEntity website2 = WebsiteEntity.create(newUser, "#F00", "Website2", "Description 1",
                 "http://example2.com");
-        Website website3 = Website.create(newUser, "#0F0", "Website3", null,
+        WebsiteEntity website3 = WebsiteEntity.create(newUser, "#0F0", "Website3", null,
                 "http://example3.com");
 
         testEntityManager.persistAndFlush(newRole);
@@ -52,21 +52,21 @@ public class WebsiteRepositoryTest {
         testEntityManager.persistAndFlush(website2);
         testEntityManager.persistAndFlush(website3);
 
-        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(newUser.getId());
+        List<WebsiteEntity> websites = websiteRepository.findByUserIdOrderByTitleAsc(newUser.getId());
 
         Assertions.assertThat(websites.size()).isEqualTo(3);
     }
 
     @Test
     void findByUserIdOrderByTitleAsc_shouldReturnEmptyListOfWebsites() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login", "Email@mail.ru", "Password");
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login", "Email@mail.ru", "Password");
 
-        Website website1 = Website.create(newUser, "#000", "Website1", null,
+        WebsiteEntity website1 = WebsiteEntity.create(newUser, "#000", "Website1", null,
                 "http://example.com");
-        Website website2 = Website.create(newUser, "#F00", "Website2", "Description 1",
+        WebsiteEntity website2 = WebsiteEntity.create(newUser, "#F00", "Website2", "Description 1",
                 "http://example2.com");
-        Website website3 = Website.create(newUser, "#0F0", "Website3", null,
+        WebsiteEntity website3 = WebsiteEntity.create(newUser, "#0F0", "Website3", null,
                 "http://example3.com");
 
         testEntityManager.persistAndFlush(newRole);
@@ -76,16 +76,16 @@ public class WebsiteRepositoryTest {
         testEntityManager.persistAndFlush(website2);
         testEntityManager.persistAndFlush(website3);
 
-        List<Website> websites = websiteRepository.findByUserIdOrderByTitleAsc(UuidGeneratorUtil.generateNewUuidV7());
+        List<WebsiteEntity> websites = websiteRepository.findByUserIdOrderByTitleAsc(UuidGeneratorUtil.generateNewUuidV7());
 
         Assertions.assertThat(websites.size()).isEqualTo(0);
     }
 
     @Test
     void existsById_shouldBeTrueWhenWebsiteByIdExists() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login", "Email@mail.ru", "Password");
-        Website website = Website.create(newUser, "#000", "Website1", null,
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login", "Email@mail.ru", "Password");
+        WebsiteEntity website = WebsiteEntity.create(newUser, "#000", "Website1", null,
                 "http://example.com");
 
         testEntityManager.persistAndFlush(newRole);
@@ -99,9 +99,9 @@ public class WebsiteRepositoryTest {
 
     @Test
     void existsById_shouldBeFalseWhenWebsiteNotExistById() {
-        Role newRole = Role.create("Test", 10);
-        User newUser = User.create(newRole, "Login", "Email@mail.ru", "Password");
-        Website website = Website.create(newUser, "#000", "Website1", null,
+        RoleEntity newRole = RoleEntity.create("Test", 10);
+        UserEntity newUser = UserEntity.create(newRole, "Login", "Email@mail.ru", "Password");
+        WebsiteEntity website = WebsiteEntity.create(newUser, "#000", "Website1", null,
                 "http://example.com");
 
         testEntityManager.persistAndFlush(newRole);

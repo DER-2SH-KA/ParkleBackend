@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class RoleResponseDtoTest {
+public class RoleEntityResponseDtoTest {
 
     @DisplayName("equals -- Two different objects with same field's values")
     @Test
