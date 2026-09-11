@@ -1,15 +1,11 @@
 package ru.d2k.parkle.utils.mapper;
 
-import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dto.WebsiteResponseDto;
-import ru.d2k.parkle.dto.WebsiteUpdateDto;
-import ru.d2k.parkle.entity.UserEntity;
+import ru.d2k.parkle.dto.WebsiteTagResponseDto;
 import ru.d2k.parkle.entity.WebsiteEntity;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
 import ru.d2k.parkle.entity.cache.WebsiteCache;
@@ -21,16 +17,10 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public abstract class WebsiteMapper {
 
-    @Mapping(target = "userLogin", source = "user.login")
+    @Mapping(target = "tags", source = "tags", qualifiedByName = "getWebsiteTagDtosByEntities")
     public abstract WebsiteResponseDto toResponseDto(WebsiteEntity dto);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(source = "dto.url", target = "url")
-    @Mapping(target = "description", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-    public abstract void updateEntityByDto(@MappingTarget WebsiteEntity entity, WebsiteUpdateDto dto, UserEntity user);
-
-    @Mapping(target = "userLogin", source = "userLogin")
+    @Mapping(target = "tags", source = "tags", qualifiedByName = "getWebsiteTagDtosByCaches")
     public abstract WebsiteResponseDto toResponseDto(WebsiteCache cache);
 
     @Mapping(target = "tags", source = "tags", qualifiedByName = "getWebsiteTagCachesByEntities")
@@ -40,5 +30,19 @@ public abstract class WebsiteMapper {
     Set<WebsiteTagCache> getWebsiteTagCachesByEntities(Set<WebsiteTagEntity> entities) {
         return entities.stream().map(entity ->
                 new WebsiteTagCache(entity.getId(), entity.getTitle(), entity.getHex())).collect(Collectors.toSet());
+    }
+
+    @Named("getWebsiteTagDtosByEntities")
+    Set<WebsiteTagResponseDto> getWebsiteTagDtosByEntities(Set<WebsiteTagEntity> entities) {
+        return entities.stream().map(entity ->
+                        new WebsiteTagResponseDto(entity.getId(), entity.getTitle(), entity.getHex())
+                ).collect(Collectors.toSet());
+    }
+
+    @Named("getWebsiteTagDtosByCaches")
+    Set<WebsiteTagResponseDto> getWebsiteTagDtosByCaches(Set<WebsiteTagCache> caches) {
+        return caches.stream().map(cache ->
+                new WebsiteTagResponseDto(cache.id(), cache.title(), cache.hex())
+        ).collect(Collectors.toSet());
     }
 }
