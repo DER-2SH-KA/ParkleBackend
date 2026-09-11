@@ -26,9 +26,7 @@
             </addColumn>
 
             <addColumn tableName="users">
-                <column name="email" type="VARCHAR(320)">
-                    <constraints nullable="false" unique="true" />
-                </column>
+                <column name="email" type="VARCHAR(320)" />
             </addColumn>
 
             <addForeignKeyConstraint
