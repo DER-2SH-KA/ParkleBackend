@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="2026-09-11-17_40-remove-email-is_blocked-and-role_id-in-users-table" author="DER-2SH-KA">
+        <dropForeignKeyConstraint baseTableName="users" constraintName="FK_users_from_roles" />
+
+        <dropColumn tableName="users" columnName="email"/>
+        <dropColumn tableName="users" columnName="role_id"/>
+        <dropColumn tableName="users" columnName="is_blocked"/>
+
+        <rollback>
+            <addColumn tableName="users">
+                <column name="is_blocked" type="boolean" value="false">
+                    <constraints nullable="false" />
+                </column>
+            </addColumn>
+
+            <addColumn tableName="users">
+                <column name="role_id" type="uuid">
+                    <constraints nullable="true" /> <!-- Исключительно в рамках роллбэка -->
+                </column>
+            </addColumn>
+
+            <addColumn tableName="users">
+                <column name="email" type="VARCHAR(320)">
+                    <constraints nullable="false" unique="true" />
+                </column>
+            </addColumn>
+
+            <addForeignKeyConstraint
+                    baseTableName="users"
+                    baseColumnNames="role_id"
+                    constraintName="FK_users_from_roles"
+                    referencedTableName="roles"
+                    referencedColumnNames="id"
+                    onDelete="CASCADE"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
