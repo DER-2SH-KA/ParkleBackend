@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CustomUserDetails implements UserDetails, CredentialsContainer {
 
@@ -27,8 +26,8 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
         this.cache = cache;
         this.username = cache.login();
         this.password = cache.hashedPassword();
-        this.grantedAuthorities = Stream.of(cache.roleName())
-                .map(SimpleGrantedAuthority::new)
+        this.grantedAuthorities = cache.roles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toSet());
     }
 
