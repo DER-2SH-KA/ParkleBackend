@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="2026-09-11-17_57-add-website_and_tags-table" author="DER-2SH-KA">
+        <createTable tableName="website_and_tags">
+            <column name="website_id" type="uuid">
+                <constraints nullable="false" unique="false" />
+            </column>
+
+            <column name="website_tag_id" type="uuid">
+                <constraints nullable="false" unique="false" />
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="website_and_tags" columnNames="website_id, website_tag_id" constraintName="PK__website_and_tags" />
+
+        <addForeignKeyConstraint
+                baseTableName="website_and_tags"
+                baseColumnNames="website_id"
+                constraintName="FK__website_and_tags__website_id"
+                referencedTableName="websites"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE" />
+
+        <addForeignKeyConstraint
+                baseTableName="website_and_tags"
+                baseColumnNames="website_tag_id"
+                constraintName="FK__website_and_tags__website_tag_id"
+                referencedTableName="website_tags"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE" />
+
+        <createIndex tableName="website_and_tags" indexName="IDX__website_and_tags__website_tag_id">
+            <column name="website_tag_id" />
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="website_and_tags" indexName="IDX__website_and_tags__website_tag_id" />
+
+            <dropForeignKeyConstraint baseTableName="website_and_tags" constraintName="FK__website_and_tags__website_tag_id" />
+            <dropForeignKeyConstraint baseTableName="website_and_tags" constraintName="FK__website_and_tags__website_id" />
+
+            <dropPrimaryKey tableName="website_and_tags" constraintName="PK__website_and_tags" />
+
+            <dropTable tableName="website_and_tags" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
