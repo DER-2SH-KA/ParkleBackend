@@ -36,11 +36,7 @@
                 onDelete="CASCADE"
                 onUpdate="CASCADE" />
 
-        <addUniqueConstraint tableName="user_and_roles" columnNames="user_id, role_id" constraintName="UNIQUE__user_and_roles__user_id_and_role_id" />
-
         <rollback>
-            <dropUniqueConstraint tableName="user_and_roles" constraintName="UNIQUE__user_and_roles__user_id_and_role_id" />
-
             <dropForeignKeyConstraint baseTableName="user_and_roles" constraintName="FK__user_and_roles__role_id" />
             <dropForeignKeyConstraint baseTableName="user_and_roles" constraintName="FK__user_and_roles__user_id" />
 
