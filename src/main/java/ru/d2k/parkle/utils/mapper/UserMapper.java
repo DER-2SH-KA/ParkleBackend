@@ -14,11 +14,14 @@ import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.RoleEntity;
 import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.entity.WebsiteEntity;
+import ru.d2k.parkle.entity.cache.RoleCache;
 import ru.d2k.parkle.entity.cache.UserCache;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @Mapper(componentModel = "spring")
@@ -40,11 +43,8 @@ public abstract class UserMapper {
 
     public abstract UserResponseDto toResponseDto(UserCache userCache);
 
-    @Mapping(target = "roleId", source = "role.id")
-    @Mapping(target = "roleName", source = "role.name")
-    @Mapping(target = "rolePriority", source = "role.priority")
+    @Mapping(target = "roles", source = "roles", qualifiedByName = "getRoleCachesByEntities")
     @Mapping(target = "hashedPassword", source = "password")
-    @Mapping(target = "isBlocked", source = "isBlocked")
     @Mapping(target = "websiteIds", source = "websites", qualifiedByName = "getWebsiteIds")
     public abstract UserCache toCache(UserEntity entity);
 
@@ -62,5 +62,11 @@ public abstract class UserMapper {
     @Named("getHashOfPassword")
     String getHashOfPassword(String password) {
         return passwordEncoder.encode(password);
+    }
+
+    @Named("getRoleCachesByEntities")
+    Set<RoleCache> getRoleCachesByEntities(Set<RoleEntity> entities) {
+        return entities.stream().map(entity ->
+                new RoleCache(entity.getId(), entity.getName())).collect(Collectors.toSet());
     }
 }
