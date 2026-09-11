@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="2026-09-09-20_24-add-website-tags-table" author="DER-2SH-KA">
+        <createTable tableName="website_tags">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK__website_tags" />
+            </column>
+
+            <column name="user_id" type="uuid">
+                <constraints nullable="false" unique="false" />
+            </column>
+
+            <column name="title" type="VARCHAR(50)">
+                <constraints nullable="false" unique="false" />
+            </column>
+
+            <column name="hex" type="VARCHAR(7)">
+                <constraints nullable="false" unique="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="website_tags"
+                baseColumnNames="user_id"
+                constraintName="FK__website_tags__user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE" />
+
+        <addUniqueConstraint tableName="website_tags" columnNames="user_id, title" constraintName="UNIQUE__website_tags__user_id_and_title" />
+
+        <rollback>
+            <dropUniqueConstraint tableName="website_tags" constraintName="UNIQUE__website_tags__user_id_and_title" />
+
+            <dropForeignKeyConstraint baseTableName="website_tags" constraintName="FK__website_tags__user_id" />
+
+            <dropTable tableName="website_tags" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
