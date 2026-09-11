@@ -1,8 +1,10 @@
 package ru.d2k.parkle.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.util.Set;
 
 public record WebsiteCreateDto(
 
@@ -22,5 +24,8 @@ public record WebsiteCreateDto(
         String description,
 
         @NotBlank(message = "WebsiteCreateDto URL can't be null or blank")
-        String url
+        String url,
+
+        @NotNull(message = "WebsiteCreateDto tags cannot be null")
+        Set<WebsiteTagResponseDto> tags
 ) { }

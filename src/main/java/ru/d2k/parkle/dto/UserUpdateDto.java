@@ -12,6 +12,7 @@ import lombok.Setter;
 import lombok.ToString;
 import java.util.UUID;
 
+// TODO: пока забил, не пользуюсь
 @Getter
 @Setter
 @ToString(exclude = "password")

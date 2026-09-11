@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.util.Set;
 import java.util.UUID;
 
 public record WebsiteUpdateDto(
@@ -27,5 +28,8 @@ public record WebsiteUpdateDto(
         String description,
 
         @NotBlank(message = "WebsiteUpdateDto URL can't be null or blank")
-        String url
+        String url,
+
+        @NotNull(message = "WebsiteUpdateDto tags cannot be null")
+        Set<WebsiteTagResponseDto> tags
 ) { }
