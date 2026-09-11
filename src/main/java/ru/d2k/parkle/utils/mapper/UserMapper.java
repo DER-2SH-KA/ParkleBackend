@@ -1,16 +1,13 @@
 package ru.d2k.parkle.utils.mapper;
 
-import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import ru.d2k.parkle.dto.RoleResponseDto;
 import ru.d2k.parkle.dto.UserResponseDto;
-import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.RoleEntity;
 import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.entity.WebsiteEntity;
@@ -30,17 +27,10 @@ public abstract class UserMapper {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Mapping(target = "roleName", source = "role.name")
-    @Mapping(target = "rolePriority", source = "role.priority")
+    @Mapping(target = "roles", source = "roles", qualifiedByName = "getRoleDtosByEntities")
     public abstract UserResponseDto toResponseDto(UserEntity entity);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(source = "role", target = "role")
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "websites", ignore = true)
-    @Mapping(target = "password", source = "dto.password", qualifiedByName = "getHashOfPassword")
-    public abstract void updateEntityByDto(@MappingTarget UserEntity entity, UserUpdateDto dto, RoleEntity role);
-
+    @Mapping(target = "roles", source = "roles", qualifiedByName = "getRoleDtosByCaches")
     public abstract UserResponseDto toResponseDto(UserCache userCache);
 
     @Mapping(target = "roles", source = "roles", qualifiedByName = "getRoleCachesByEntities")
@@ -68,5 +58,17 @@ public abstract class UserMapper {
     Set<RoleCache> getRoleCachesByEntities(Set<RoleEntity> entities) {
         return entities.stream().map(entity ->
                 new RoleCache(entity.getId(), entity.getName())).collect(Collectors.toSet());
+    }
+
+    @Named("getRoleDtosByEntities")
+    Set<RoleResponseDto> getRoleDtosByEntities(Set<RoleEntity> entities) {
+        return entities.stream().map(entity ->
+                new RoleResponseDto(entity.getId(), entity.getName())).collect(Collectors.toSet());
+    }
+
+    @Named("getRoleDtosByCaches")
+    Set<RoleResponseDto> getRoleDtosByCaches(Set<RoleCache> caches) {
+        return caches.stream().map(cache ->
+                new RoleResponseDto(cache.id(), cache.name())).collect(Collectors.toSet());
     }
 }
