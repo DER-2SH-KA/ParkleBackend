@@ -3,6 +3,7 @@ package ru.d2k.parkle.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -11,51 +12,38 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
-
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
-/** Entity for role. **/
 @Entity
 @Table(name = "roles")
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
-@ToString(of = {"id", "name", "priority"})
+@ToString(of = {"id", "name"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RoleEntity {
 
     @Id
-    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
+    @Column(name = "id", columnDefinition = "UUID")
     private UUID id;
 
     @Column(name = "name", unique = true, nullable = false, length = 32)
     private String name;
 
-    @Column(name = "priority", nullable = false)
-    private Integer priority;
+    @ManyToMany(mappedBy = "roles")
+    private Set<UserEntity> users = new HashSet<>();
 
-    private RoleEntity(String name, Integer priority) {
+    private RoleEntity(String name) {
         this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.name = name;
-        this.priority = priority;
     }
 
-    /**
-     * Constructor only for tests.
-     * @param name name.
-     * @param priority priority.
-     * **/
-    public RoleEntity(UUID id, String name, Integer priority) {
+    public RoleEntity(UUID id, String name) {
         this.id = id;
         this.name = name;
-        this.priority = priority;
     }
 
-    /**
-     * Fabric method for create new {@link RoleEntity} with generated ID by UUID generator.
-     * @param name name.
-     * @param priority priority.
-     * @return Created {@link RoleEntity} object.
-     * **/
-    public static RoleEntity create(String name, Integer priority) { return new RoleEntity(name, priority); }
+    public static RoleEntity create(String name) { return new RoleEntity(name); }
 }

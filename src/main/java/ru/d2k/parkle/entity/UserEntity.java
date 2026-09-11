@@ -7,7 +7,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -17,108 +18,54 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
-/** Entity for user. **/
 @Entity
 @Table(name = "users", indexes = { @Index(columnList = "role_id") })
 @Getter
 @Setter
-@ToString(of = {"id", "role", "login", "email"})
+@ToString(of = {"id", "login", "roles"})
 @EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserEntity {
 
     @Id
-    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
+    @Column(name = "id", columnDefinition = "UUID")
     private UUID id;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
-    private RoleEntity role;
 
     @Column(name = "login", unique = true, nullable = false, length = 50)
     private String login;
 
-    @Column(name = "email", unique = true, length = 320)
-    private String email;
-
     @Column(name = "password", length = 60)
     private String password;
 
-    @Column(name = "is_blocked", nullable = false)
-    private Boolean isBlocked;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_and_roles", joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<RoleEntity> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WebsiteEntity> websites = new ArrayList<>();
 
-    private UserEntity(RoleEntity role, String login, String email, String password, boolean isBlocked) {
+    private UserEntity(String login, String password, Set<RoleEntity> roles) {
         this.id = UuidGeneratorUtil.generateNewUuidV7();
-        this.role = role;
+        this.roles = roles;
         this.login = login;
-        this.email = email;
         this.password = password;
-        this.isBlocked = isBlocked;
     }
 
-    /**
-     * Constructor only for tests ({@code isBlocked = false}).
-     * @param id ID.
-     * @param role {@link RoleEntity} role.
-     * @param login login.
-     * @param email email.
-     * @param password hashed by BCrypt password.
-     * **/
-    UserEntity(UUID id, RoleEntity role, String login, String email, String password) {
+    UserEntity(UUID id, String login, String password, Set<RoleEntity> roles) {
         this.id = id;
-        this.role = role;
+        this.roles = roles;
         this.login = login;
-        this.email = email;
         this.password = password;
-        this.isBlocked = false;
     }
 
-    /**
-     * Constructor only for tests.
-     * @param id ID.
-     * @param role {@link RoleEntity} role.
-     * @param login login.
-     * @param email email.
-     * @param password hashed by BCrypt password.
-     * **/
-    UserEntity(UUID id, RoleEntity role, String login, String email, String password, boolean isBlocked) {
-        this.id = id;
-        this.role = role;
-        this.login = login;
-        this.email = email;
-        this.password = password;
-        this.isBlocked = isBlocked;
-    }
-
-    /**
-     * Fabric method for create new {@link UserEntity} with generated ID by UUID generator ({@code isBlocked = false}).
-     * @param role {@link RoleEntity} role.
-     * @param login login.
-     * @param email email.
-     * @param password hashed by BCrypt password.
-     * @return Created {@link UserEntity} object.
-     * **/
-    public static UserEntity create(RoleEntity role, String login, String email, String password) {
-        return new UserEntity(role, login, email, password, false);
-    }
-
-    /**
-     * Fabric method for create new {@link UserEntity} with generated ID by UUID generator.
-     * @param role {@link RoleEntity} role.
-     * @param login login.
-     * @param email email.
-     * @param password hashed by BCrypt password.
-     * @return Created {@link UserEntity} object.
-     * **/
-    public static UserEntity create(RoleEntity role, String login, String email, String password, boolean isBlocked) {
-        return new UserEntity(role, login, email, password, isBlocked);
+    public static UserEntity create(String login, String password, Set<RoleEntity> roles) {
+        return new UserEntity(login, password, roles);
     }
 }

@@ -6,6 +6,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -15,9 +17,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
-/** Entity for website. **/
 @Entity
 @Table(name = "websites", indexes = @Index(columnList = "user_id"))
 @Getter
@@ -28,7 +31,7 @@ import java.util.UUID;
 public class WebsiteEntity {
 
     @Id
-    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
+    @Column(name = "id", columnDefinition = "UUID")
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,43 +50,35 @@ public class WebsiteEntity {
     @Column(name = "url", nullable = false, length = 2048)
     private String url;
 
-    private WebsiteEntity(UserEntity user, String hexColor, String title, String description, String url) {
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "website_and_tags", joinColumns = @JoinColumn(name = "website_id"),
+            inverseJoinColumns = @JoinColumn(name = "website_tag_id"))
+    private Set<WebsiteTagEntity> tags = new HashSet<>();
+
+    private WebsiteEntity(UserEntity user, String hexColor, String title, String description, String url,
+                          Set<WebsiteTagEntity> tags) {
         this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.user = user;
         this.hexColor = hexColor;
         this.title = title;
         this.description = description;
         this.url = url;
+        this.tags = tags;
     }
 
-    /**
-     * Constructor only for tests.
-     * @param id ID.
-     * @param user {@link UserEntity} user owner.
-     * @param hexColor HEX color of first letter.
-     * @param title title of website.
-     * @param description description of website.
-     * @param url URL of website in Internet.
-     * **/
-    WebsiteEntity(UUID id, UserEntity user, String hexColor, String title, String description, String url) {
+    WebsiteEntity(UUID id, UserEntity user, String hexColor, String title, String description, String url,
+                  Set<WebsiteTagEntity> tags) {
         this.id = id;
         this.user = user;
         this.hexColor = hexColor;
         this.title = title;
         this.description = description;
         this.url = url;
+        this.tags = tags;
     }
 
-    /**
-     * Fabric method for create new {@link WebsiteEntity} with generated ID by UUID generator.
-     * @param user {@link UserEntity} user owner.
-     * @param hexColor HEX color of first letter.
-     * @param title title of website.
-     * @param description description of website.
-     * @param url URL of website in Internet.
-     * @return Created {@link WebsiteEntity} object.
-     * **/
-    public static WebsiteEntity create(UserEntity user, String hexColor, String title, String description, String url) {
-        return new WebsiteEntity(user, hexColor, title, description, url);
+    public static WebsiteEntity create(UserEntity user, String hexColor, String title, String description, String url,
+                                       Set<WebsiteTagEntity> tags) {
+        return new WebsiteEntity(user, hexColor, title, description, url, tags);
     }
 }
