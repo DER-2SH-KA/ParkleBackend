@@ -8,8 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,7 +20,6 @@ import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.service.security.cookie.CustomCookieService;
 import ru.d2k.parkle.service.security.cookie.JwtCookieService;
 import ru.d2k.parkle.service.security.jwt.JwtService;
-
 import java.io.IOException;
 import java.util.Optional;
 
