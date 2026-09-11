@@ -11,7 +11,7 @@
 
 	<groupId>ru.d2k</groupId>
 	<artifactId>parkle</artifactId>
-	<version>0.0.10</version>
+	<version>0.0.11</version>
 	<name>Parkle Project Jun 2025</name>
 	<description>This is backend for Parkle Project</description>
 	<url/>
@@ -245,6 +245,25 @@
 					</archive>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>4.33.0</version>
+			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<properties>
+				<spring.profiles.active>dev</spring.profiles.active>
+				<!-- Если нужно, здесь же можно переопределить url для maven-плагина -->
+				<liquibase.url>jdbc:postgresql://localhost:5432/start_page_test_db</liquibase.url>
+				<liquibase.username>cock</liquibase.username>
+				<liquibase.password>cockMaster</liquibase.password>
+				<liquibase.changeLogFile>db/changelog/db.changelog-master.xml</liquibase.changeLogFile>
+			</properties>
+		</profile>
+	</profiles>
 </project>
