@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public abstract class WebsiteMapper {
 
-    @Mapping(target = "tags", source = "tags", qualifiedByName = "getWebsiteTagDtosByEntities")
-    public abstract WebsiteResponseDto toResponseDto(WebsiteEntity dto);
-
     @Mapping(target = "tags", source = "tags", qualifiedByName = "getWebsiteTagDtosByCaches")
     public abstract WebsiteResponseDto toResponseDto(WebsiteCache cache);
 
@@ -30,13 +27,6 @@ public abstract class WebsiteMapper {
     Set<WebsiteTagCache> getWebsiteTagCachesByEntities(Set<WebsiteTagEntity> entities) {
         return entities.stream().map(entity ->
                 new WebsiteTagCache(entity.getId(), entity.getTitle(), entity.getHex())).collect(Collectors.toSet());
-    }
-
-    @Named("getWebsiteTagDtosByEntities")
-    Set<WebsiteTagResponseDto> getWebsiteTagDtosByEntities(Set<WebsiteTagEntity> entities) {
-        return entities.stream().map(entity ->
-                        new WebsiteTagResponseDto(entity.getId(), entity.getTitle(), entity.getHex())
-                ).collect(Collectors.toSet());
     }
 
     @Named("getWebsiteTagDtosByCaches")

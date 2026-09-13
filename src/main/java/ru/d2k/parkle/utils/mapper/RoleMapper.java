@@ -18,6 +18,5 @@ public interface RoleMapper {
     void updateEntityByDto(@MappingTarget RoleEntity role, RoleUpdateDto dto);
 
     RoleResponseDto toResponseDto(RoleCache cache);
-
     RoleCache toCache(RoleEntity entity);
 }
