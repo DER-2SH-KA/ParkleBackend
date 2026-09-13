@@ -94,13 +94,11 @@ public class WebsiteServiceImpl implements WebsiteService {
         String userLogin = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal()).getUsername();
 
-        Optional<WebsiteCache> updatedWebsite = dao.updateById(updateWebsiteDto.id(), updateWebsiteDto, userLogin);
+        WebsiteCache updatedWebsite = dao.updateById(updateWebsiteDto.id(), updateWebsiteDto, userLogin);
 
         log.info("WebsiteEntity with ID '{}' was updated", updateWebsiteDto.id());
 
-        return mapper.toResponseDto(updatedWebsite.orElseThrow(() ->
-                new WebsiteNotFoundException(String.format("WebsiteEntity with ID '%s' not found and not updated!",
-                        updateWebsiteDto.id()))));
+        return mapper.toResponseDto(updatedWebsite);
     }
 
     @Override

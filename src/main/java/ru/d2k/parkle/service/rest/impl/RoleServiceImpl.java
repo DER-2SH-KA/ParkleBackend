@@ -85,8 +85,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleResponseDto updateById(RoleUpdateDto updateRoleDto) {
         log.debug("Updating role by id '{}'...", updateRoleDto.id());
 
-        RoleCache updatedRole = dao.updateById(updateRoleDto.id(), updateRoleDto)
-                .orElseThrow(() -> new RoleNotFoundException("RoleEntity with this ID is not exist!"));
+        RoleCache updatedRole = dao.updateById(updateRoleDto.id(), updateRoleDto);
 
         log.debug("RoleEntity with id {} was updated to {}", updateRoleDto.id(), updatedRole);
 
