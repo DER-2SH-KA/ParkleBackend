@@ -3,6 +3,7 @@ package ru.d2k.parkle.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dao.database.user.UserDatabase;
 import ru.d2k.parkle.dto.UserUpdateDto;
@@ -30,6 +31,9 @@ public class UserDao {
 
     @Autowired
     private final RoleDao roleDao;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UserCache create(UserEntity entity) {
         return mapper.toCache(this.saveToDatabase(entity));
@@ -75,21 +79,26 @@ public class UserDao {
         return database.getReferenceById(id);
     }
 
-    // TODO: Не обновляется роль. Роль сохраняется не в захэшированном виде.
+    // TODO: Пока забей. Всё равно нет обновления сущности пользователя.
     public UserCache updateByLogin(String login, UserUpdateDto updateUserDto) {
-        Optional<UserEntity> entity = this.getByLoginFromDatabase(login);
+        UserEntity entity = this.getByLoginFromDatabase(login)
+                .orElseThrow(() ->
+                        new UserNotFoundException("Can't find user with login " + login + " for update user entity"));
 
-        Optional<RoleEntity> role = roleDao.getByNameFromDatabase(updateUserDto.getRoleName());
+        /*RoleEntity role = roleDao.getByNameFromDatabase(updateUserDto.getRoleName())
+                .orElseThrow(() ->
+                        new UserNotFoundException("Can't find role by name " + updateUserDto.getRoleName() +
+                                " for update user entity"));
 
-        if (entity.isPresent() && role.isPresent()) {
-            mapper.updateEntityByDto(entity.get(), updateUserDto, role.get());
+        String newPasswordHashed = passwordEncoder.encode(updateUserDto.getPassword());
 
-            UserEntity updatedEntity = this.saveToDatabase(entity.get());
+        UserEntity updatedEntity = this.saveToDatabase(entity);
 
-            return mapper.toCache(updatedEntity);
-        }
+        return mapper.toCache(updatedEntity);*/
 
-        throw new UserNotFoundException("Can't find user with login " + login + " for update user entity");
+        log.warn("Updating user entity is not implemented in UserDao!");
+
+        return mapper.toCache(entity);
     }
 
     public boolean deleteByLogin(String login) {

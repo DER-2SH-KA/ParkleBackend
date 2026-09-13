@@ -28,7 +28,7 @@ public class RoleDao {
     private final RoleMapper mapper;
 
     public RoleCache create(RoleCreateDto createRoleDto) {
-        RoleEntity entityToCreate = RoleEntity.create(createRoleDto.name(), createRoleDto.priority());
+        RoleEntity entityToCreate = RoleEntity.create(createRoleDto.name());
 
         RoleEntity createdEntity = this.saveToDatabase(entityToCreate);
 
