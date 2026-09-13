@@ -1,9 +1,9 @@
 package ru.d2k.parkle.utils.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dto.RoleResponseDto;
 import ru.d2k.parkle.dto.UserResponseDto;
@@ -17,12 +17,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Component
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {RoleMapper.class})
 public abstract class UserMapper {
 
-    private final RoleMapper roleMapper;
+    @Autowired
+    private RoleMapper roleMapper;
 
     @Mapping(target = "roles", source = "roles", qualifiedByName = "getRoleDtosByCaches")
     public abstract UserResponseDto toResponseDto(UserCache userCache);
