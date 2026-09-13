@@ -1,14 +1,18 @@
 package ru.d2k.parkle.service.rest.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.d2k.parkle.dao.UserDao;
 import ru.d2k.parkle.dao.WebsiteTagDao;
 import ru.d2k.parkle.dto.WebsiteTagCreateDto;
 import ru.d2k.parkle.dto.WebsiteTagResponseDto;
 import ru.d2k.parkle.dto.WebsiteTagUpdateDto;
+import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
 import ru.d2k.parkle.entity.cache.WebsiteTagCache;
+import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.service.rest.WebsiteTagService;
 import ru.d2k.parkle.utils.mapper.WebsiteTagMapper;
 import java.util.List;
@@ -20,11 +24,15 @@ public class WebsiteTagServiceImpl implements WebsiteTagService {
 
     private final WebsiteTagDao dao;
     private final WebsiteTagMapper mapper;
+    private final UserDao userDao;
 
     @Override
     @Transactional(readOnly = true)
-    public List<WebsiteTagResponseDto> findAllByUserLogin(String login) {
-        return dao.getAllByUserLogin(login).stream()
+    public List<WebsiteTagResponseDto> findAllByUserLogin() {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+
+        return dao.getAllByUserLogin(userDetails.getUsername()).stream()
                 .map(mapper::toResponseDto)
                 .toList();
     }
@@ -32,7 +40,9 @@ public class WebsiteTagServiceImpl implements WebsiteTagService {
     @Override
     @Transactional
     public WebsiteTagResponseDto create(WebsiteTagCreateDto createDto) {
-        WebsiteTagEntity entity = WebsiteTagEntity.create(createDto.userId(), createDto.title(), createDto.hex());
+        UserEntity userEntity = userDao.getReferenceById(createDto.userId());
+
+        WebsiteTagEntity entity = WebsiteTagEntity.create(userEntity, createDto.title(), createDto.hex());
 
         return mapper.toResponseDto(dao.create(entity));
     }
