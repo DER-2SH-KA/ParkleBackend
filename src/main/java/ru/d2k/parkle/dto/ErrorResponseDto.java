@@ -1,3 +1,12 @@
 package ru.d2k.parkle.dto;
 
-public record ErrorResponseDto(String messageForClient, String messageForDev) { }
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record ErrorResponseDto(
+
+        @JsonProperty("messageForClient")
+        String messageForClient,
+
+        @JsonProperty("messageForDev")
+        String messageForDev
+) { }
