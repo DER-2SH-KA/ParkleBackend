@@ -61,7 +61,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public boolean deleteByLoginAndUnauthorizeUser(String login, HttpServletResponse response) {
-        boolean isUserDeleted = userService.deleteByLogin(login);
+        userService.deleteByLogin(login);
+
+        boolean isUserDeleted = !userService.existsByLogin(login);
 
         if (isUserDeleted) {
             jwtCookieService.setExpiredJwtCookieInResponse(response);

@@ -24,46 +24,50 @@ public class RoleServiceImpl implements RoleService {
     private final RoleDao dao;
     private final RoleMapper mapper;
 
+    @Override
     @Transactional(readOnly = true)
     public Set<RoleResponseDto> findAll() {
-        log.info("Getting all roles...");
+        log.debug("Getting all roles...");
 
         Set<RoleCache> roleCaches = dao.getAll();
 
-        log.info("Roles was founded: {}", roleCaches.size());
+        log.debug("Roles was founded: {}", roleCaches.size());
 
         return roleCaches.stream()
                 .map(mapper::toResponseDto)
                 .collect(Collectors.toSet());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public RoleResponseDto findById(UUID id) {
-        log.info("Getting role by ID: {}...", id);
+        log.debug("Getting role by ID: {}...", id);
 
         RoleCache roleCache = dao.getById(id)
                 .orElseThrow(() -> new RoleNotFoundException("RoleEntity was not found with ID: " + id));
 
-        log.info("RoleEntity with ID {} was founded", id);
+        log.debug("RoleEntity with ID {} was founded", id);
 
         return mapper.toResponseDto(roleCache);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public RoleResponseDto findByName(String name) {
-        log.info("Getting roles by Name '{}'...", name);
+        log.debug("Getting roles by Name '{}'...", name);
 
         RoleCache roleCache = dao.getByName(name)
                 .orElseThrow(() -> new RoleNotFoundException("RoleEntity was not found with name: " + name));
 
-        log.info("RoleEntity with name '{}' was founded", name);
+        log.debug("RoleEntity with name '{}' was founded", name);
 
         return mapper.toResponseDto(roleCache);
     }
 
+    @Override
     @Transactional
     public RoleResponseDto create(RoleCreateDto createRoleDto) {
-        log.info("Creating role '{}'...", createRoleDto.toString());
+        log.debug("Creating role '{}'...", createRoleDto.toString());
 
         if (dao.existsByName(createRoleDto.name())) {
             throw new IllegalArgumentException("RoleEntity with this name is already exists");
@@ -71,14 +75,15 @@ public class RoleServiceImpl implements RoleService {
 
         RoleCache role = dao.create(createRoleDto);
 
-        log.info("RoleEntity '{}' was created", role.name());
+        log.debug("RoleEntity '{}' was created", role.name());
 
         return mapper.toResponseDto(role);
     }
 
+    @Override
     @Transactional
     public RoleResponseDto updateById(UUID id, RoleUpdateDto updateRoleDto) {
-        log.info("Updating role by id '{}'...", id);
+        log.debug("Updating role by id '{}'...", id);
 
         if (id == null) {
             throw new IllegalArgumentException("RoleUpdateDto ID is null");
@@ -87,29 +92,26 @@ public class RoleServiceImpl implements RoleService {
         RoleCache updatedRole = dao.updateById(id, updateRoleDto)
                 .orElseThrow(() -> new RoleNotFoundException("RoleEntity with this ID is not exist!"));
 
-        log.info("RoleEntity with id {} was updated to {}", id, updatedRole);
+        log.debug("RoleEntity with id {} was updated to {}", id, updatedRole);
 
         return mapper.toResponseDto(updatedRole);
     }
 
+    @Override
     @Transactional
-    public boolean deleteById(UUID id) {
-        log.info("Delete role by ID {}...", id);
+    public void deleteById(UUID id) {
+        log.debug("Delete role by ID {}...", id);
 
         if (id != null) {
-            boolean isDeleted = dao.deleteById(id);
-
-            if (isDeleted) {
-                log.info("RoleEntity by ID {} was deleted", id);
-
-                return true;
-            } else {
-                log.error("RoleEntity by ID {} wasn't deleted", id);
-            }
+            dao.deleteById(id);
         } else {
             log.error("RoleEntity's ID equals null");
         }
+    }
 
-        return false;
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsById(UUID id) {
+        return dao.existsById(id);
     }
 }

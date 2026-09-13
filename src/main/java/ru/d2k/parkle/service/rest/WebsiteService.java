@@ -11,6 +11,7 @@ public interface WebsiteService {
     WebsiteResponseDto findById(UUID id);
     List<WebsiteResponseDto> findByUserLogin();
     WebsiteResponseDto create(WebsiteCreateDto createWebsiteDto);
-    WebsiteResponseDto updateById(UUID id, WebsiteUpdateDto updateWebsiteDto);
-    boolean deleteById(UUID id);
+    WebsiteResponseDto updateById(WebsiteUpdateDto updateWebsiteDto);
+    void deleteById(UUID id);
+    boolean existsById(UUID id);
 }

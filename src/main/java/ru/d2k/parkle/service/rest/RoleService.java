@@ -13,5 +13,6 @@ public interface RoleService {
     RoleResponseDto findByName(String name);
     RoleResponseDto create(RoleCreateDto createRoleDto);
     RoleResponseDto updateById(UUID id, RoleUpdateDto updateRoleDto);
-    boolean deleteById(UUID id);
+    void deleteById(UUID id);
+    boolean existsById(UUID id);
 }

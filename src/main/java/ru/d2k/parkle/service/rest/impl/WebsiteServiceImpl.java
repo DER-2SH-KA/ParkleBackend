@@ -36,6 +36,7 @@ public class WebsiteServiceImpl implements WebsiteService {
     private final UserDao userDao;
     private final WebsiteTagDao websiteTagDao;
 
+    @Override
     @Transactional(readOnly = true)
     public WebsiteResponseDto findById(UUID id) {
         log.info("Getting website by ID: {}...", id);
@@ -48,6 +49,7 @@ public class WebsiteServiceImpl implements WebsiteService {
         return mapper.toResponseDto(website);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<WebsiteResponseDto> findByUserLogin() {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
@@ -62,6 +64,7 @@ public class WebsiteServiceImpl implements WebsiteService {
         return websites.stream().map(mapper::toResponseDto).toList();
     }
 
+    @Override
     @Transactional
     public WebsiteResponseDto create(WebsiteCreateDto createWebsiteDto) {
         log.info("Creating website: {}...", createWebsiteDto.toString());
@@ -83,41 +86,38 @@ public class WebsiteServiceImpl implements WebsiteService {
         return mapper.toResponseDto(savedWebsite);
     }
 
+    @Override
     @Transactional
-    public WebsiteResponseDto updateById(UUID id, WebsiteUpdateDto updateWebsiteDto) {
-        log.info("Updating website by ID '{}'...", id);
-
-        if (id == null) {
-            return null;
-        }
+    public WebsiteResponseDto updateById(WebsiteUpdateDto updateWebsiteDto) {
+        log.info("Updating website by ID '{}'...", updateWebsiteDto.id());
 
         String userLogin = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal()).getUsername();
 
-        Optional<WebsiteCache> updatedWebsite = dao.updateById(id, updateWebsiteDto, userLogin);
+        Optional<WebsiteCache> updatedWebsite = dao.updateById(updateWebsiteDto.id(), updateWebsiteDto, userLogin);
 
-        log.info("WebsiteEntity with ID '{}' was updated", id);
+        log.info("WebsiteEntity with ID '{}' was updated", updateWebsiteDto.id());
 
         return mapper.toResponseDto(updatedWebsite.orElseThrow(() ->
-                new WebsiteNotFoundException(String.format("WebsiteEntity with ID '%s' not found and not updated!", id))));
+                new WebsiteNotFoundException(String.format("WebsiteEntity with ID '%s' not found and not updated!",
+                        updateWebsiteDto.id()))));
     }
 
+    @Override
     @Transactional
-    public boolean deleteById(UUID id) {
+    public void deleteById(UUID id) {
         log.info("Deleting website by ID '{}'", id);
 
         if (Objects.nonNull(id)) {
-            if (dao.deleteById(id)) {
-                log.info("WebsiteEntity with ID  '{}' was deleted", id);
-
-                return true;
-            } else {
-                log.error("WebsiteEntity with ID '{}' wasn't deleted", id);
-            }
+            dao.deleteById(id);
         } else {
             log.error("WebsiteEntity's ID equals null");
         }
+    }
 
-        return false;
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsById(UUID id) {
+        return dao.existsById(id);
     }
 }

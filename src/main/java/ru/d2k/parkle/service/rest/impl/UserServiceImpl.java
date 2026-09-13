@@ -16,28 +16,27 @@ public class UserServiceImpl implements UserService {
 
     private final UserDao dao;
 
+    @Override
     @Transactional
     public UserCache updateByLogin(String login, UserUpdateDto updateUserDto) {
         return dao.updateByLogin(login, updateUserDto);
     }
 
+    @Override
     @Transactional
-    public boolean deleteByLogin(String login) {
-        log.info("Deleting user by login '{}'...", login);
+    public void deleteByLogin(String login) {
+        log.debug("Deleting user by login '{}'...", login);
 
         if (login != null) {
-            if (dao.deleteByLogin(login)) {
-                log.info("UserEntity with login '{}' was deleted", login);
-
-                return true;
-            } else {
-                log.error("UserEntity with login '{}' wasn't deleted", login);
-            }
-
+            dao.deleteByLogin(login);
         } else {
             log.error("UserEntity login equals null");
         }
+    }
 
-        return false;
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsByLogin(String login) {
+        return dao.existsByLogin(login);
     }
 }

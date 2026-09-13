@@ -6,5 +6,6 @@ import ru.d2k.parkle.entity.cache.UserCache;
 public interface UserService {
 
     UserCache updateByLogin(String login, UserUpdateDto updateUserDto);
-    boolean deleteByLogin(String login);
+    void deleteByLogin(String login);
+    boolean existsByLogin(String login);
 }
