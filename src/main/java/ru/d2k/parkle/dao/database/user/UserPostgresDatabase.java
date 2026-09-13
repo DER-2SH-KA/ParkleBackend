@@ -44,8 +44,18 @@ public class UserPostgresDatabase implements UserDatabase {
     }
 
     @Override
+    public void deleteById(UUID uuid) {
+        repository.deleteById(uuid);
+    }
+
+    @Override
     public void deleteByLogin(String login) {
         repository.deleteByLogin(login);
+    }
+
+    @Override
+    public boolean existsById(UUID uuid) {
+        return repository.existsById(uuid);
     }
 
     @Override
