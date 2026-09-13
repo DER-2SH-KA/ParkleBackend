@@ -35,7 +35,7 @@ public class WebsiteTagEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private UUID userId;
+    private UserEntity user;
 
     @Column(name = "title", nullable = false, length = 50)
     private String title;
@@ -48,23 +48,23 @@ public class WebsiteTagEntity {
             inverseJoinColumns = @JoinColumn(name = "website_id"))
     private Set<WebsiteEntity> websites = new HashSet<>();
 
-    private WebsiteTagEntity(UUID userId, String title, String hex, Set<WebsiteEntity> websites) {
+    private WebsiteTagEntity(UserEntity user, String title, String hex, Set<WebsiteEntity> websites) {
         this.id = UuidGeneratorUtil.generateNewUuidV7();
-        this.userId = userId;
+        this.user = user;
         this.title = title;
         this.hex = hex;
         this.websites = websites;
     }
 
-    WebsiteTagEntity(UUID id, UUID userId, String title, String hex, Set<WebsiteEntity> websites) {
+    WebsiteTagEntity(UUID id, UserEntity user, String title, String hex, Set<WebsiteEntity> websites) {
         this.id = id;
-        this.userId = userId;
+        this.user = user;
         this.title = title;
         this.hex = hex;
         this.websites = websites;
     }
 
-    public static WebsiteTagEntity create(UUID userId, String title, String hex) {
-        return new WebsiteTagEntity(userId, title, hex, new HashSet<>());
+    public static WebsiteTagEntity create(UserEntity user, String title, String hex) {
+        return new WebsiteTagEntity(user, title, hex, new HashSet<>());
     }
 }
