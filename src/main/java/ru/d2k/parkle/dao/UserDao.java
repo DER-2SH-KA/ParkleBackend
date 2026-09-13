@@ -115,6 +115,10 @@ public class UserDao {
         return true;
     }
 
+    public boolean existsByLogin(String login) {
+        return this.existsByLoginInDatabase(login);
+    }
+
     private UserEntity saveToDatabase(UserEntity entity) {
         return database.save(entity);
     }
