@@ -1,3 +1,5 @@
 package ru.d2k.parkle.dto;
 
-public record WebsiteTagCreateDto(String title, String hex) { }
+import java.util.UUID;
+
+public record WebsiteTagCreateDto(UUID userId, String title, String hex) { }
