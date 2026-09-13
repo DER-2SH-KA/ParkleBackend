@@ -81,7 +81,7 @@ public class WebsiteDao {
         return database.getReferenceById(id);
     }
 
-    public Optional<WebsiteCache> updateById(UUID id, WebsiteUpdateDto updateWebsiteDto, String userLogin) {
+    public WebsiteCache updateById(UUID id, WebsiteUpdateDto updateWebsiteDto, String userLogin) {
         WebsiteEntity entity = this.getByIdFromDatabase(id)
                 .orElseThrow(() ->
                         new WebsiteNotFoundException(String.format("WebsiteEntity not found by ID '%s'!", id)));
@@ -103,7 +103,7 @@ public class WebsiteDao {
 
         log.debug("WebsiteEntity with id {} was updated", id);
 
-        return Optional.of(cache);
+        return cache;
     }
 
     public boolean deleteById(UUID id) {

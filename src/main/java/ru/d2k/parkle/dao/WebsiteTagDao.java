@@ -4,20 +4,17 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.d2k.parkle.dao.database.user.UserDatabase;
 import ru.d2k.parkle.dao.database.websitetag.WebsiteTagDatabase;
 import ru.d2k.parkle.dto.WebsiteTagUpdateDto;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
 import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.entity.cache.WebsiteTagCache;
+import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.exception.WebsiteNotFoundException;
 import ru.d2k.parkle.utils.mapper.WebsiteTagMapper;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,6 +23,7 @@ public class WebsiteTagDao {
 
     private final WebsiteTagDatabase database;
     private final WebsiteTagMapper mapper;
+    private final UserDao userDao;
 
     public WebsiteTagCache create(WebsiteTagEntity entity) {
         WebsiteTagEntity createdEntity = this.saveToDatabase(entity);
@@ -41,8 +39,10 @@ public class WebsiteTagDao {
                 .toList();
     }
 
-    public List<WebsiteTagCache> getAllByUserLogin(UserCache userCache) {
-        List<WebsiteTagEntity> tags = database.getByUserIdSortedByTitleAsc(userCache.id());
+    public List<WebsiteTagCache> getAllByUserLogin(String login) {
+        UserCache user = userDao.getByLogin(login)
+                .orElseThrow(() -> new UserNotFoundException("User entity not found by login: " + login));
+        List<WebsiteTagEntity> tags = database.getByUserIdSortedByTitleAsc(user.id());
 
         return tags.stream()
                 .map(mapper::toCache)
@@ -61,7 +61,7 @@ public class WebsiteTagDao {
         return database.getReferenceById(id);
     }
 
-    public Optional<WebsiteTagCache> updateById(UUID id, WebsiteTagUpdateDto updateDto) {
+    public WebsiteTagCache updateById(UUID id, WebsiteTagUpdateDto updateDto) {
         WebsiteTagEntity entity = this.getByIdFromDatabase(id)
                 .orElseThrow(() ->
                         new WebsiteNotFoundException(String.format("WebsiteTagEntity not found by ID '%s'!", id)));
@@ -76,7 +76,7 @@ public class WebsiteTagDao {
 
         log.debug("WebsiteTagEntity with id {} was updated", id);
 
-        return Optional.of(cache);
+        return cache;
     }
 
     public boolean deleteById(UUID id) {
