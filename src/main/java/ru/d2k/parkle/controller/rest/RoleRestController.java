@@ -48,17 +48,16 @@ public class RoleRestController {
         return ResponseEntity.ok(service.create(createRoleDto));
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<RoleResponseDto> updateById(@PathVariable("id") UUID id,
-                                                      @Valid @RequestBody RoleUpdateDto updateRoleDto) {
-        return ResponseEntity.ok(service.updateById(id, updateRoleDto));
+    @PatchMapping("/update")
+    public ResponseEntity<RoleResponseDto> updateById(@Valid @RequestBody RoleUpdateDto updateRoleDto) {
+        return ResponseEntity.ok(service.updateById(updateRoleDto));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteById(@PathVariable("id") UUID id) {
-        boolean result = service.deleteById(id);
+        service.deleteById(id);
 
-        return result ? ResponseEntity.ok().build() : ResponseEntity.internalServerError()
+        return !service.existsById(id) ? ResponseEntity.ok().build() : ResponseEntity.internalServerError()
                 .body("RoleEntity was not deleted or not exists!");
     }
 }

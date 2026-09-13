@@ -82,17 +82,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public RoleResponseDto updateById(UUID id, RoleUpdateDto updateRoleDto) {
-        log.debug("Updating role by id '{}'...", id);
+    public RoleResponseDto updateById(RoleUpdateDto updateRoleDto) {
+        log.debug("Updating role by id '{}'...", updateRoleDto.id());
 
-        if (id == null) {
-            throw new IllegalArgumentException("RoleUpdateDto ID is null");
-        }
-
-        RoleCache updatedRole = dao.updateById(id, updateRoleDto)
+        RoleCache updatedRole = dao.updateById(updateRoleDto.id(), updateRoleDto)
                 .orElseThrow(() -> new RoleNotFoundException("RoleEntity with this ID is not exist!"));
 
-        log.debug("RoleEntity with id {} was updated to {}", id, updatedRole);
+        log.debug("RoleEntity with id {} was updated to {}", updateRoleDto.id(), updatedRole);
 
         return mapper.toResponseDto(updatedRole);
     }
