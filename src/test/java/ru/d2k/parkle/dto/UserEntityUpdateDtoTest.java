@@ -48,7 +48,7 @@ public class UserEntityUpdateDtoTest {
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
         UserUpdateDto dto = new UserUpdateDto(ID, ROLE_NAME, LOGIN, EMAIL, PASSWORD);
 
-        Assertions.assertNotEquals(dto, new RoleUpdateDto(null, null, null));
+        Assertions.assertNotEquals(dto, new RoleUpdateDto(null, null));
     }
 
     @DisplayName("equals - return false with objects which has different fields")

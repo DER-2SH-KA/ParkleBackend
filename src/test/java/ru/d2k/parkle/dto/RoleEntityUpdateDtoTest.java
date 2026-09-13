@@ -28,8 +28,8 @@ public class RoleEntityUpdateDtoTest {
     @DisplayName("hashCode/equals - return true with similar objects")
     @Test
     public void shouldBeTrueWhenEqualsAndHashCodeWithSimilarObjects() {
-        RoleUpdateDto roleUpdateDto1 = new RoleUpdateDto(uuid, "RoleEntity", 1);
-        RoleUpdateDto roleUpdateDto2 = new RoleUpdateDto(uuid, "RoleEntity", 1);
+        RoleUpdateDto roleUpdateDto1 = new RoleUpdateDto(uuid, "RoleEntity");
+        RoleUpdateDto roleUpdateDto2 = new RoleUpdateDto(uuid, "RoleEntity");
 
         assertEquals(roleUpdateDto1.hashCode(), roleUpdateDto2.hashCode());
         assertEquals(roleUpdateDto1, roleUpdateDto2);
@@ -38,7 +38,7 @@ public class RoleEntityUpdateDtoTest {
     @DisplayName("equals - return false with null")
     @Test
     public void shouldBeFalseWhenEqualsWithNull() {
-        RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "RoleEntity", 1);
+        RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "RoleEntity");
 
         assertFalse(roleUpdateDto == null);
     }
@@ -46,16 +46,16 @@ public class RoleEntityUpdateDtoTest {
     @DisplayName("equals - return false with object which has null fields")
     @Test
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
-        RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "RoleEntity", 1);
+        RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "RoleEntity");
 
-        assertNotEquals(roleUpdateDto, new RoleUpdateDto(null, null, null));
+        assertNotEquals(roleUpdateDto, new RoleUpdateDto(null, null));
     }
 
     @DisplayName("equals - return false with objects which has different fields")
     @ParameterizedTest
     @MethodSource("shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields")
     public void shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields(RoleUpdateDto roleUpdateDto2) {
-        RoleUpdateDto roleUpdateDto1 = new RoleUpdateDto(uuid, "Role1", 1);
+        RoleUpdateDto roleUpdateDto1 = new RoleUpdateDto(uuid, "Role1");
 
         assertNotEquals(roleUpdateDto1, roleUpdateDto2);
     }
@@ -74,7 +74,7 @@ public class RoleEntityUpdateDtoTest {
     @DisplayName("validate - return true with objects which has correct field's values")
     @Test
     public void shouldBeTrueWhenValidationObjectHasCorrectFieldsValues() {
-        RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "Developer", 1);
+        RoleUpdateDto roleUpdateDto = new RoleUpdateDto(uuid, "Developer");
         Set<ConstraintViolation<RoleUpdateDto>> violations = validator.validate(roleUpdateDto);
 
         assertTrue(violations.isEmpty());
@@ -82,19 +82,16 @@ public class RoleEntityUpdateDtoTest {
 
     private static Stream<Arguments> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
         return Stream.of(
-                Arguments.of(new RoleUpdateDto(UuidGeneratorUtil.generateNewUuidV7(), "Role1", 1)),
-                Arguments.of(new RoleUpdateDto(uuid, "Role2", 1)),
-                Arguments.of(new RoleUpdateDto(uuid, "Role1", 2)));
+                Arguments.of(new RoleUpdateDto(UuidGeneratorUtil.generateNewUuidV7(), "Role1")),
+                Arguments.of(new RoleUpdateDto(uuid, "Role2")),
+                Arguments.of(new RoleUpdateDto(uuid, "Role1")));
     }
 
     private static Stream<Arguments> shouldBeFalseWhenValidationObjectHasWrongFieldsValues() {
         return Stream.of(
-                Arguments.of(new RoleUpdateDto(uuid, null, 1), "Name is null test"),
-                Arguments.of(new RoleUpdateDto(uuid, "", 1), "Name is blank test"),
-                Arguments.of(new RoleUpdateDto(uuid, "12345123451234512345123451234512345", 1),
-                        "Name is too long test"),
-                Arguments.of(new RoleUpdateDto(uuid, "RoleEntity", null), "Priority is null test"),
-                Arguments.of(new RoleUpdateDto(uuid, "RoleEntity", -1), "Priority is negative test"),
-                Arguments.of(new RoleUpdateDto(uuid, "RoleEntity", 0), "Priority equals zero test"));
+                Arguments.of(new RoleUpdateDto(uuid, null), "Name is null test"),
+                Arguments.of(new RoleUpdateDto(uuid, ""), "Name is blank test"),
+                Arguments.of(new RoleUpdateDto(uuid, "12345123451234512345123451234512345"),
+                        "Name is too long test"));
     }
 }

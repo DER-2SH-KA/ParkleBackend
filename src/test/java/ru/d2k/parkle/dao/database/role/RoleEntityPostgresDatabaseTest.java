@@ -1,5 +1,6 @@
 package ru.d2k.parkle.dao.database.role;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +31,7 @@ public class RoleEntityPostgresDatabaseTest {
     @Test
     @DisplayName("save(RoleEntity entity) - Should return saved RoleEntity entity")
     void save_shouldReturnRoleEntity() {
-        RoleEntity entity = RoleEntity.create("USER", 10);
+        RoleEntity entity = RoleEntity.create("USER");
 
         when(roleRepository.save(entity)).thenReturn(entity);
 
@@ -43,8 +44,8 @@ public class RoleEntityPostgresDatabaseTest {
     @DisplayName("getAll() - Should return list of RoleEntity entities")
     void getAll_shouldReturnListOfRoleEntities() {
         List<RoleEntity> entities = List.of(
-                RoleEntity.create("USER", 10),
-                RoleEntity.create("ADMIN", 1)
+                RoleEntity.create("USER"),
+                RoleEntity.create("ADMIN")
         );
 
         when(roleRepository.findAll())
@@ -61,7 +62,7 @@ public class RoleEntityPostgresDatabaseTest {
     @Test
     @DisplayName("getById(UUID id) - Should return RoleEntity entity by Id")
     void getById_shouldReturnRoleEntityById() {
-        RoleEntity entity = RoleEntity.create("USER", 10);
+        RoleEntity entity = RoleEntity.create("USER");
 
         UUID id = entity.getId();
 
@@ -88,7 +89,7 @@ public class RoleEntityPostgresDatabaseTest {
     @DisplayName("getByName(String name) - Should return RoleEntity entity by name")
     void getByName_shouldReturnRoleEntityByName() {
         String name = "USER";
-        RoleEntity entity = RoleEntity.create(name, 10);
+        RoleEntity entity = RoleEntity.create(name);
 
         when(roleRepository.findByName(name)).thenReturn(Optional.of(entity));
 
@@ -113,7 +114,7 @@ public class RoleEntityPostgresDatabaseTest {
     @Test
     @DisplayName("getReferenceById(String name) - Should return RoleEntity entity reference by Id")
     void getReferenceById_shouldReturnRoleReferenceById() {
-        RoleEntity entity = RoleEntity.create("USER", 10);
+        RoleEntity entity = RoleEntity.create("USER");
 
         UUID id = entity.getId();
 

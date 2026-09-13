@@ -32,7 +32,7 @@ public class RoleEntityRepositoryTest {
 
     @Test
     void findByName_shouldSaveAndFindByNameNewRole() {
-        RoleEntity newRole = RoleEntity.create("Test", 10);
+        RoleEntity newRole = RoleEntity.create("Test");
 
         testEntityManager.persistAndFlush(newRole);
 
@@ -44,7 +44,7 @@ public class RoleEntityRepositoryTest {
 
     @Test
     void findByName_shouldReturnOptionalEmptyWhenUserByLoginNotExists() {
-        RoleEntity newRole = RoleEntity.create("Test1", 10);
+        RoleEntity newRole = RoleEntity.create("Test1");
 
         testEntityManager.persistAndFlush(newRole);
 
@@ -55,7 +55,7 @@ public class RoleEntityRepositoryTest {
 
     @Test
     void existsByName_shouldBeTrueWhenSaveAndExistByNameNewRole() {
-        RoleEntity newRole = RoleEntity.create("Test", 10);
+        RoleEntity newRole = RoleEntity.create("Test");
 
         testEntityManager.persistAndFlush(newRole);
 
@@ -66,7 +66,7 @@ public class RoleEntityRepositoryTest {
 
     @Test
     void existsByName_shouldBeFalseWhenSaveAndExistByNameNewRole() {
-        RoleEntity newRole = RoleEntity.create("Test1", 10);
+        RoleEntity newRole = RoleEntity.create("Test1");
 
         testEntityManager.persistAndFlush(newRole);
 
@@ -77,7 +77,7 @@ public class RoleEntityRepositoryTest {
 
     @Test
     void existsById_shouldSaveAndExistsByIdNewRole() {
-        RoleEntity newRole = RoleEntity.create("Test", 10);
+        RoleEntity newRole = RoleEntity.create("Test");
 
         testEntityManager.persistAndFlush(newRole);
 
@@ -88,7 +88,7 @@ public class RoleEntityRepositoryTest {
 
     @Test
     void existsById_shouldBeFalseWhenSaveAndExistByIdNewRole() {
-        RoleEntity newRole = RoleEntity.create("Test1", 10);
+        RoleEntity newRole = RoleEntity.create("Test1");
 
         testEntityManager.persistAndFlush(newRole);
 

@@ -11,7 +11,7 @@ public class RoleEntityTest {
     @DisplayName("hashCode -- hash codes of the same object are the same")
     @Test
     public void hashCode_sameObjectHashCodeEquals() {
-        RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP", 0);
+        RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP");
 
         Assertions.assertEquals(role.hashCode(), role.hashCode());
     }
@@ -20,8 +20,8 @@ public class RoleEntityTest {
     @Test
     public void hashCode_twoObjectWithSameIdAreEquals() {
         UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
-        RoleEntity role1 = new RoleEntity(uuid, "TEMP1", 1);
-        RoleEntity role2 = new RoleEntity(uuid, "TEMP2", 2);
+        RoleEntity role1 = new RoleEntity(uuid, "TEMP1");
+        RoleEntity role2 = new RoleEntity(uuid, "TEMP2");
 
         Assertions.assertEquals(role1.hashCode(), role2.hashCode());
     }
@@ -32,7 +32,7 @@ public class RoleEntityTest {
     @DisplayName("hashCode -- hash codes of null ID is null")
     @Test
     public void hashCode_objectIdIsNull() {
-        RoleEntity role = new RoleEntity(null, "TEMP", 0);
+        RoleEntity role = new RoleEntity(null, "TEMP");
 
         // !! 102, а не 0, по каким-то причинам. !!
         // Я из будущего: Hibernate и Lombok не ладят.
@@ -42,7 +42,7 @@ public class RoleEntityTest {
     @DisplayName("equals -- Same object are equals")
     @Test
     public void equals_sameObjectAreEquals() {
-        RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP", 0);
+        RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP");
 
         Assertions.assertEquals(role, role);
     }
@@ -50,7 +50,7 @@ public class RoleEntityTest {
     @DisplayName("equals -- Object equals with null is false")
     @Test
     public void equals_withNullObject() {
-        RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP", 0);
+        RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP");
 
         Assertions.assertFalse(role.equals(null));
     }
@@ -59,8 +59,8 @@ public class RoleEntityTest {
     @Test
     public void equals_objectsWithSameIdAreEquals() {
         UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
-        RoleEntity role1 = new RoleEntity(uuid, "TEMP1", 1);
-        RoleEntity role2 = new RoleEntity(uuid, "TEMP2", 2);
+        RoleEntity role1 = new RoleEntity(uuid, "TEMP1");
+        RoleEntity role2 = new RoleEntity(uuid, "TEMP2");
 
         Assertions.assertEquals(role1, role2);
     }
@@ -68,8 +68,8 @@ public class RoleEntityTest {
     @DisplayName("equals -- equals with object which ID is null is false")
     @Test
     public void equals_withObjectIdNull() {
-        RoleEntity role1 = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP1", 1);
-        RoleEntity role2 = new RoleEntity(null, "TEMP2", 2);
+        RoleEntity role1 = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP1");
+        RoleEntity role2 = new RoleEntity(null, "TEMP2");
 
         Assertions.assertFalse(role1.equals(role2));
     }

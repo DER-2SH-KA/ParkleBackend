@@ -4,17 +4,19 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
+import java.util.Set;
 import java.util.UUID;
 
 public class UserEntityTest {
 
-    private final RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP", 0);
+    private final RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP");
+    private final Set<RoleEntity> ROLES = Set.of(role);
 
     @DisplayName("hashCode -- hash codes of the same object are the same")
     @Test
     public void hashCode_sameObjectHashCodeEquals() {
-        UserEntity user = new UserEntity(UuidGeneratorUtil.generateNewUuidV7(), role, "login", "email@email.net",
-                "password");
+        UserEntity user = new UserEntity(UuidGeneratorUtil.generateNewUuidV7(), "login", "password",
+                ROLES);
 
         Assertions.assertEquals(user.hashCode(), user.hashCode());
     }
@@ -24,8 +26,8 @@ public class UserEntityTest {
     public void hashCode_twoObjectWithSameIdAreEquals() {
         UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
 
-        UserEntity user1 = new UserEntity(uuid, role, "login1", "email1@email.net", "password1");
-        UserEntity user2 = new UserEntity(uuid, role, "login2", "email2@email.net", "password2");
+        UserEntity user1 = new UserEntity(uuid, "login1", "password1", ROLES);
+        UserEntity user2 = new UserEntity(uuid, "login2", "password2", ROLES);
 
         Assertions.assertEquals(user1.hashCode(), user2.hashCode());
     }
@@ -36,7 +38,7 @@ public class UserEntityTest {
     @DisplayName("hashCode -- hash codes of null ID is null")
     @Test
     public void hashCode_objectIdIsNull() {
-        UserEntity user = new UserEntity(null, role, "login", "email@email.net", "password");
+        UserEntity user = new UserEntity(null, "login", "password", ROLES);
 
         Assertions.assertEquals(102, user.hashCode());
     }
@@ -44,8 +46,8 @@ public class UserEntityTest {
     @DisplayName("equals -- Same object are equals")
     @Test
     public void equals_sameObjectAreEquals() {
-        UserEntity user = new UserEntity(UuidGeneratorUtil.generateNewUuidV7(), role, "login", "email@email.net",
-                "password");
+        UserEntity user = new UserEntity(UuidGeneratorUtil.generateNewUuidV7(), "login", "password",
+                ROLES);
 
         Assertions.assertEquals(user, user);
     }
@@ -53,7 +55,7 @@ public class UserEntityTest {
     @DisplayName("equals -- Object equals with null is false")
     @Test
     public void equals_withNullObject() {
-        UserEntity user = new UserEntity(null, role, "login", "email@email.net", "password");
+        UserEntity user = new UserEntity(null, "login", "password", ROLES);
 
         Assertions.assertFalse(user.equals(null));
     }
@@ -63,8 +65,8 @@ public class UserEntityTest {
     public void equals_objectsWithSameIdAreEquals() {
         UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
 
-        UserEntity user1 = new UserEntity(uuid, role, "login1", "email1@email.net", "password1");
-        UserEntity user2 = new UserEntity(uuid, role, "login2", "email2@email.net", "password2");
+        UserEntity user1 = new UserEntity(uuid, "login1",  "password1", ROLES);
+        UserEntity user2 = new UserEntity(uuid, "login2",  "password2", ROLES);
 
         Assertions.assertEquals(user1, user2);
     }
@@ -72,9 +74,9 @@ public class UserEntityTest {
     @DisplayName("equals -- equals with object which ID is null is false")
     @Test
     public void equals_withObjectIdNull() {
-        UserEntity user1 = new UserEntity(UuidGeneratorUtil.generateNewUuidV7(), role, "login1", "email1@email.net",
-                "password1");
-        UserEntity user2 = new UserEntity(null, role, "login2", "email2@email.net", "password2");
+        UserEntity user1 = new UserEntity(UuidGeneratorUtil.generateNewUuidV7(),"login1",
+                "password1", ROLES);
+        UserEntity user2 = new UserEntity(null, "login2", "password2", ROLES);
 
         Assertions.assertFalse(user1.equals(user2));
     }
