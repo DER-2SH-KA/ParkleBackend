@@ -42,21 +42,16 @@ public class RoleEntityCreateDtoTest {
 
 
     static Stream<Arguments> positiveData() {
-        Integer ROLE_MIN_PRIORITY = 1;
-
         return Stream.of(
-                Arguments.of(new RoleCreateDto(ROLE_NAME, ROLE_PRIORITY), "Ordinary positive test"),
-                Arguments.of(new RoleCreateDto(ROLE_MAX_NAME, ROLE_PRIORITY), "Name 32 symbols test"),
-                Arguments.of(new RoleCreateDto(ROLE_NAME, ROLE_MIN_PRIORITY), "Min priority test"));
+                Arguments.of(new RoleCreateDto(ROLE_NAME), "Ordinary positive test"),
+                Arguments.of(new RoleCreateDto(ROLE_MAX_NAME), "Name 32 symbols test"));
     }
 
     static Stream<Arguments> negativeData() {
         return Stream.of(
-                Arguments.of(new RoleCreateDto(null, ROLE_PRIORITY), "Name is null"),
-                Arguments.of(new RoleCreateDto("", ROLE_PRIORITY), "Name is blank"),
-                Arguments.of(new RoleCreateDto(ROLE_MAX_NAME + "3", ROLE_PRIORITY),
-                        "Name bigger than 32 symbols"),
-                Arguments.of(new RoleCreateDto(ROLE_NAME, null), "Priority is null"),
-                Arguments.arguments(new RoleCreateDto(ROLE_NAME, 0), "Priority non-positive value"));
+                Arguments.of(new RoleCreateDto(null), "Name is null"),
+                Arguments.of(new RoleCreateDto(""), "Name is blank"),
+                Arguments.of(new RoleCreateDto(ROLE_MAX_NAME + "3"),
+                        "Name bigger than 32 symbols"));
     }
 }

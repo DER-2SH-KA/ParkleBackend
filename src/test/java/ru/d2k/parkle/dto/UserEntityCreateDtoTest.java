@@ -8,24 +8,26 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import ru.d2k.parkle.entity.RoleEntity;
+
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
 public class UserEntityCreateDtoTest {
 
-    private static final String ROLE = "role";
     private static final String LOGIN = "login";
-    private static final String EMAIL = "email";
     private static final String PASSWORD = "password";
+    private static final Set<RoleResponseDto> ROLES = new HashSet<>();
 
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @DisplayName("equals/hashCode - Should be True with similar objects")
     @Test
     public void shouldBeTrueWhenEqualsAndHashCodeWithSimilarObjects() {
-        UserCreateDto dto1 = new UserCreateDto(ROLE, LOGIN, EMAIL, PASSWORD);
-        UserCreateDto dto2 = new UserCreateDto(ROLE, LOGIN, EMAIL, PASSWORD);
+        UserCreateDto dto1 = new UserCreateDto(LOGIN, PASSWORD, ROLES);
+        UserCreateDto dto2 = new UserCreateDto(LOGIN, PASSWORD, ROLES);
 
         Assertions.assertEquals(dto1.hashCode(), dto2.hashCode());
         Assertions.assertEquals(dto1, dto2);
@@ -34,7 +36,7 @@ public class UserEntityCreateDtoTest {
     @DisplayName("equals - return false with null")
     @Test
     public void shouldBeFalseWhenEqualsWithNull() {
-        UserCreateDto dto = new UserCreateDto(ROLE, LOGIN, EMAIL, PASSWORD);
+        UserCreateDto dto = new UserCreateDto(LOGIN, PASSWORD, ROLES);
 
         Assertions.assertFalse(dto.equals(null));
     }
@@ -42,7 +44,7 @@ public class UserEntityCreateDtoTest {
     @DisplayName("equals - return false with object which has null fields")
     @Test
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
-        UserCreateDto dto = new UserCreateDto(ROLE, LOGIN, EMAIL, PASSWORD);
+        UserCreateDto dto = new UserCreateDto(LOGIN, PASSWORD, ROLES);
 
         Assertions.assertNotEquals(dto, new UserAuthenticationDto(null, null));
     }
@@ -50,8 +52,7 @@ public class UserEntityCreateDtoTest {
     @DisplayName("validate - return true with objects which has correct field's values")
     @Test
     public void shouldBeTrueWhenValidationObjectHasCorrectFieldsValues() {
-        UserCreateDto dto = new UserCreateDto("Dev", "Developer", "developer@mail.ru",
-                "5GdS4FaVtgS");
+        UserCreateDto dto = new UserCreateDto("Developer", "5GdS4FaVtgS", ROLES);
         Set<ConstraintViolation<UserCreateDto>> violations = validator.validate(dto);
 
         Assertions.assertTrue(violations.isEmpty());
@@ -61,7 +62,7 @@ public class UserEntityCreateDtoTest {
     @ParameterizedTest
     @MethodSource
     public void shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields(UserCreateDto dto2) {
-        UserCreateDto dto1 = new UserCreateDto(ROLE, LOGIN, EMAIL, PASSWORD);
+        UserCreateDto dto1 = new UserCreateDto(LOGIN, PASSWORD, ROLES);
 
         Assertions.assertNotEquals(dto1, dto2);
     }
@@ -77,37 +78,28 @@ public class UserEntityCreateDtoTest {
 
     private static Stream<UserCreateDto> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
         return Stream.of(
-                new UserCreateDto("role2", LOGIN, EMAIL, PASSWORD),
-                new UserCreateDto(ROLE, "login2", EMAIL, PASSWORD),
-                new UserCreateDto(ROLE, LOGIN, "email2", PASSWORD));
+                new UserCreateDto(LOGIN, PASSWORD, ROLES),
+                new UserCreateDto("login2", PASSWORD, ROLES));
     }
 
     private static Stream<UserCreateDto> shouldBeFalseWhenValidationObjectHasWrongFieldsValues() {
         char[] overMaxLoginChars = new char[101];
-        char[] overMaxEmailChars = new char[321];
         char[] overMaxPasswordChars = new char[73];
 
         Arrays.fill(overMaxLoginChars, 'l');
-        Arrays.fill(overMaxEmailChars, 'e');
         Arrays.fill(overMaxPasswordChars, 'p');
 
         String overMaxLogin = new String(overMaxLoginChars);
-        String overMaxEmail = new String(overMaxEmailChars);
         String overMaxPassword = new String(overMaxPasswordChars);
 
         return Stream.of(
-                new UserCreateDto(null, LOGIN, EMAIL, PASSWORD),
-                new UserCreateDto("", LOGIN, EMAIL, PASSWORD),
-                new UserCreateDto(ROLE, null, EMAIL, PASSWORD),
-                new UserCreateDto(ROLE, "", EMAIL, PASSWORD),
-                new UserCreateDto(ROLE, overMaxLogin, EMAIL, PASSWORD),
-                new UserCreateDto(ROLE, LOGIN, null, PASSWORD),
-                new UserCreateDto(ROLE, LOGIN, "", PASSWORD),
-                new UserCreateDto(ROLE, LOGIN, overMaxEmail, PASSWORD),
-                new UserCreateDto(ROLE, LOGIN, "invalid.email.example.com", PASSWORD),
-                new UserCreateDto(ROLE, LOGIN, EMAIL, null),
-                new UserCreateDto(ROLE, LOGIN, EMAIL, ""),
-                new UserCreateDto(ROLE, LOGIN, EMAIL, "1234567"),
-                new UserCreateDto(ROLE, LOGIN, EMAIL, overMaxPassword));
+                new UserCreateDto(null, PASSWORD, ROLES),
+                new UserCreateDto("", PASSWORD, ROLES),
+                new UserCreateDto(overMaxLogin, PASSWORD, ROLES),
+                new UserCreateDto(LOGIN, PASSWORD, ROLES),
+                new UserCreateDto(LOGIN, null, ROLES),
+                new UserCreateDto(LOGIN, "", ROLES),
+                new UserCreateDto(LOGIN, "1234567", ROLES),
+                new UserCreateDto(LOGIN, overMaxPassword, ROLES));
     }
 }
