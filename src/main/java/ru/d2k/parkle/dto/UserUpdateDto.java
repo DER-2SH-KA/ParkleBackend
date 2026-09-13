@@ -1,6 +1,7 @@
 package ru.d2k.parkle.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -10,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import java.util.Set;
 import java.util.UUID;
 
 // TODO: пока забил, не пользуюсь
@@ -36,4 +38,9 @@ public class UserUpdateDto implements UserDtoInterface {
     @Pattern(regexp = "^[a-zA-Z0-9`=!@#$%^&*()_+№;:?\\-\\\\/|]{8,72}$",
             message = "UserCreateDto password isn't allowed by regexp pattern")
     private String password;
+
+    @JsonProperty("roles")
+    @NotNull(message = "UserCreateDto roles cannot be null")
+    @NotEmpty(message = "UserCreateDto roles cannot be null")
+    private Set<RoleResponseDto> roles;
 }

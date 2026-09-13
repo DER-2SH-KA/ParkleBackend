@@ -14,10 +14,6 @@ public record WebsiteUpdateDto(
         @NotNull(message = "WebsiteUpdateDto id can't be null!")
         UUID id,
 
-        @JsonProperty("userLogin")
-        @NotBlank(message = "WebsiteUpdateDto userLogin can't be null or blank!")
-        String userLogin,
-
         @JsonProperty("hexColor")
         @NotBlank(message = "WebsiteUpdateDto hexColorValue cannot be null or blank")
         @Pattern(regexp = "^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$",

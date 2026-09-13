@@ -2,16 +2,13 @@ package ru.d2k.parkle.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dao.database.website.WebsiteDatabase;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
-import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.entity.WebsiteEntity;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
 import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.entity.cache.WebsiteCache;
-import ru.d2k.parkle.exception.UserNotFoundException;
 import ru.d2k.parkle.exception.WebsiteNotFoundException;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
 import java.util.ArrayList;
@@ -81,7 +78,7 @@ public class WebsiteDao {
         return database.getReferenceById(id);
     }
 
-    public WebsiteCache updateById(UUID id, WebsiteUpdateDto updateWebsiteDto, String userLogin) {
+    public WebsiteCache updateById(UUID id, WebsiteUpdateDto updateWebsiteDto) {
         WebsiteEntity entity = this.getByIdFromDatabase(id)
                 .orElseThrow(() ->
                         new WebsiteNotFoundException(String.format("WebsiteEntity not found by ID '%s'!", id)));

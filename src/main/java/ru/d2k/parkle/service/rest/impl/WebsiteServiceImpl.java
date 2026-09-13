@@ -94,7 +94,7 @@ public class WebsiteServiceImpl implements WebsiteService {
         String userLogin = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal()).getUsername();
 
-        WebsiteCache updatedWebsite = dao.updateById(updateWebsiteDto.id(), updateWebsiteDto, userLogin);
+        WebsiteCache updatedWebsite = dao.updateById(updateWebsiteDto.id(), updateWebsiteDto);
 
         log.info("WebsiteEntity with ID '{}' was updated", updateWebsiteDto.id());
 
