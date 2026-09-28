@@ -44,12 +44,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return userMapper.toResponseDto(userCache);
         }
 
-        throw new UserEntityNotFoundException("Can't find user by UserAuthenticationDto: " + userAuthenticationDto.toString());
+        throw new UserEntityNotFoundException("Can't find user by UserAuthenticationDto: " +
+                userAuthenticationDto.toString());
     }
 
     @Override
     @Transactional
-    public UserResponseDto updateByLoginAndUpdateJwt(String login, UserUpdateDto userUpdateDto, HttpServletResponse response) {
+    public UserResponseDto updateByLoginAndUpdateJwt(String login, UserUpdateDto userUpdateDto,
+                                                     HttpServletResponse response) {
         UserCache updatedUserCache = userService.updateByLogin(login, userUpdateDto);
 
         String jwt = jwtService.generateTokenByUserCache(updatedUserCache);
