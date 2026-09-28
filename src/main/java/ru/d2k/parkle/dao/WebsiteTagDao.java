@@ -1,6 +1,5 @@
 package ru.d2k.parkle.dao;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,6 +10,7 @@ import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.entity.cache.WebsiteTagCache;
 import ru.d2k.parkle.exception.entity.UserEntityNotFoundException;
 import ru.d2k.parkle.exception.entity.WebsiteEntityNotFoundException;
+import ru.d2k.parkle.exception.entity.WebsiteTagEntityNotFoundException;
 import ru.d2k.parkle.utils.mapper.WebsiteTagMapper;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +52,8 @@ public class WebsiteTagDao {
     public Optional<WebsiteTagCache> getById(UUID id) {
         WebsiteTagEntity entity = this.getByIdFromDatabase(id)
                 .orElseThrow(() ->
-                        new EntityNotFoundException(String.format("WebsiteTagEntity not found by ID '%s'!", id)));
+                        new WebsiteTagEntityNotFoundException(
+                                String.format("WebsiteTagEntity not found by ID '%s'!", id)));
 
         return Optional.ofNullable(mapper.toCache(entity));
     }
