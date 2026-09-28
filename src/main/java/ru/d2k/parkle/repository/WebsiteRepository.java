@@ -3,7 +3,6 @@ package ru.d2k.parkle.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.d2k.parkle.entity.WebsiteEntity;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -11,5 +10,6 @@ import java.util.UUID;
 public interface WebsiteRepository extends JpaRepository<WebsiteEntity, UUID> {
 
     List<WebsiteEntity> findByUserIdOrderByTitleAsc(UUID userId);
+
     boolean existsById(UUID id);
 }

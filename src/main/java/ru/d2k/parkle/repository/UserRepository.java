@@ -13,7 +13,10 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
 
     @Query("SELECT u FROM UserEntity u LEFT JOIN FETCH u.websites WHERE u.login = :login")
     Optional<UserEntity> findByLogin(@Param("login") String login);
+
     boolean existsById(UUID id);
+
     boolean existsByLogin(String login);
+
     void deleteByLogin(String login);
 }
