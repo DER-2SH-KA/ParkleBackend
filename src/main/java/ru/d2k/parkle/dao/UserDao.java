@@ -7,10 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dao.database.user.UserDatabase;
 import ru.d2k.parkle.dto.UserUpdateDto;
-import ru.d2k.parkle.entity.RoleEntity;
 import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.entity.cache.UserCache;
-import ru.d2k.parkle.exception.UserNotFoundException;
+import ru.d2k.parkle.exception.entity.UserEntityNotFoundException;
 import ru.d2k.parkle.utils.mapper.UserMapper;
 import java.util.List;
 import java.util.Optional;
@@ -83,11 +82,11 @@ public class UserDao {
     public UserCache updateByLogin(String login, UserUpdateDto updateUserDto) {
         UserEntity entity = this.getByLoginFromDatabase(login)
                 .orElseThrow(() ->
-                        new UserNotFoundException("Can't find user with login " + login + " for update user entity"));
+                        new UserEntityNotFoundException("Can't find user with login " + login + " for update user entity"));
 
         /*RoleEntity role = roleDao.getByNameFromDatabase(updateUserDto.getRoleName())
                 .orElseThrow(() ->
-                        new UserNotFoundException("Can't find role by name " + updateUserDto.getRoleName() +
+                        new UserEntityNotFoundException("Can't find role by name " + updateUserDto.getRoleName() +
                                 " for update user entity"));
 
         String newPasswordHashed = passwordEncoder.encode(updateUserDto.getPassword());

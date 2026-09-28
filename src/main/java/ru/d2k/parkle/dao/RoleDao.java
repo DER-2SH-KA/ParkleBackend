@@ -9,7 +9,7 @@ import ru.d2k.parkle.dto.RoleCreateDto;
 import ru.d2k.parkle.dto.RoleUpdateDto;
 import ru.d2k.parkle.entity.RoleEntity;
 import ru.d2k.parkle.entity.cache.RoleCache;
-import ru.d2k.parkle.exception.RoleNotFoundException;
+import ru.d2k.parkle.exception.entity.RoleEntityNotFoundException;
 import ru.d2k.parkle.utils.mapper.RoleMapper;
 import java.util.List;
 import java.util.Optional;
@@ -78,7 +78,7 @@ public class RoleDao {
 
     public RoleCache updateById(UUID id, RoleUpdateDto updateRoleDto) {
         RoleEntity entity = this.getByIdFromDatabase(id)
-                .orElseThrow(() -> new RoleNotFoundException("Role not found by id: " + id));
+                .orElseThrow(() -> new RoleEntityNotFoundException("Role not found by id: " + id));
 
         mapper.updateEntityByDto(entity, updateRoleDto);
 

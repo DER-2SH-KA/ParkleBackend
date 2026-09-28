@@ -9,7 +9,7 @@ import ru.d2k.parkle.entity.WebsiteEntity;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
 import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.entity.cache.WebsiteCache;
-import ru.d2k.parkle.exception.WebsiteNotFoundException;
+import ru.d2k.parkle.exception.entity.WebsiteEntityNotFoundException;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class WebsiteDao {
         Optional<WebsiteEntity> fromDatabase = this.getByIdFromDatabase(id);
 
         if (fromDatabase.isEmpty()) {
-            throw new WebsiteNotFoundException(String.format("WebsiteEntity not found by ID '%s'!", id));
+            throw new WebsiteEntityNotFoundException(String.format("WebsiteEntity not found by ID '%s'!", id));
         } else {
             WebsiteCache cache = mapper.toCache(fromDatabase.get());
 
@@ -81,7 +81,7 @@ public class WebsiteDao {
     public WebsiteCache updateById(UUID id, WebsiteUpdateDto updateWebsiteDto) {
         WebsiteEntity entity = this.getByIdFromDatabase(id)
                 .orElseThrow(() ->
-                        new WebsiteNotFoundException(String.format("WebsiteEntity not found by ID '%s'!", id)));
+                        new WebsiteEntityNotFoundException(String.format("WebsiteEntity not found by ID '%s'!", id)));
 
         log.debug("Entity and website is present");
 

@@ -8,18 +8,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.d2k.parkle.dto.ErrorResponseDto;
 import org.postgresql.util.PSQLException;
-import ru.d2k.parkle.exception.RoleNotFoundException;
-import ru.d2k.parkle.exception.UserNotFoundException;
+import ru.d2k.parkle.exception.entity.RoleEntityNotFoundException;
+import ru.d2k.parkle.exception.entity.UserEntityNotFoundException;
 import ru.d2k.parkle.exception.UserWrongPasswordException;
 import ru.d2k.parkle.exception.WebsiteIsExtremismSourceException;
-import ru.d2k.parkle.exception.WebsiteNotFoundException;
+import ru.d2k.parkle.exception.entity.WebsiteEntityNotFoundException;
 import java.sql.SQLException;
 
 @Slf4j
 @RestControllerAdvice
 public class EntityControllerAdvice {
 
-    @ExceptionHandler(RoleNotFoundException.class)
+    @ExceptionHandler(RoleEntityNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleRoleNotFoundException(RuntimeException ex) {
         log.error("RoleEntity entity not found! Message: {}", ex.getMessage());
 
@@ -28,7 +28,7 @@ public class EntityControllerAdvice {
                 .body(new ErrorResponseDto("Роль для пользователя не найдена!", ex.getMessage()));
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler(UserEntityNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleUserNotFoundException(RuntimeException ex) {
         log.error("UserEntity entity not found! Message: {}", ex.getMessage());
 
@@ -37,7 +37,7 @@ public class EntityControllerAdvice {
                 .body(new ErrorResponseDto("Пользователь не найден!", ex.getMessage()));
     }
 
-    @ExceptionHandler(WebsiteNotFoundException.class)
+    @ExceptionHandler(WebsiteEntityNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleWebsiteNotFoundException(RuntimeException ex) {
         log.error("WebsiteEntity entity not found! Message: {}", ex.getMessage());
 

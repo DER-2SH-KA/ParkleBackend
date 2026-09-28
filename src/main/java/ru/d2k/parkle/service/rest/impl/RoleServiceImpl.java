@@ -9,7 +9,7 @@ import ru.d2k.parkle.dto.RoleCreateDto;
 import ru.d2k.parkle.dto.RoleResponseDto;
 import ru.d2k.parkle.dto.RoleUpdateDto;
 import ru.d2k.parkle.entity.cache.RoleCache;
-import ru.d2k.parkle.exception.RoleNotFoundException;
+import ru.d2k.parkle.exception.entity.RoleEntityNotFoundException;
 import ru.d2k.parkle.service.rest.RoleService;
 import ru.d2k.parkle.utils.mapper.RoleMapper;
 import java.util.Set;
@@ -44,7 +44,7 @@ public class RoleServiceImpl implements RoleService {
         log.debug("Getting role by ID: {}...", id);
 
         RoleCache roleCache = dao.getById(id)
-                .orElseThrow(() -> new RoleNotFoundException("RoleEntity was not found with ID: " + id));
+                .orElseThrow(() -> new RoleEntityNotFoundException("RoleEntity was not found with ID: " + id));
 
         log.debug("RoleEntity with ID {} was founded", id);
 
@@ -57,7 +57,7 @@ public class RoleServiceImpl implements RoleService {
         log.debug("Getting roles by Name '{}'...", name);
 
         RoleCache roleCache = dao.getByName(name)
-                .orElseThrow(() -> new RoleNotFoundException("RoleEntity was not found with name: " + name));
+                .orElseThrow(() -> new RoleEntityNotFoundException("RoleEntity was not found with name: " + name));
 
         log.debug("RoleEntity with name '{}' was founded", name);
 

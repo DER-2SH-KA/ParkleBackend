@@ -15,13 +15,12 @@ import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.entity.WebsiteEntity;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
 import ru.d2k.parkle.entity.cache.WebsiteCache;
-import ru.d2k.parkle.exception.WebsiteNotFoundException;
+import ru.d2k.parkle.exception.entity.WebsiteEntityNotFoundException;
 import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.service.rest.WebsiteService;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,7 +41,7 @@ public class WebsiteServiceImpl implements WebsiteService {
         log.info("Getting website by ID: {}...", id);
 
         WebsiteCache website = dao.getById(id).orElseThrow(() ->
-                new WebsiteNotFoundException("WebsiteEntity was not found with ID: " + id));
+                new WebsiteEntityNotFoundException("WebsiteEntity was not found with ID: " + id));
 
         log.info("WebsiteEntity with ID '{}' was founded", id);
 

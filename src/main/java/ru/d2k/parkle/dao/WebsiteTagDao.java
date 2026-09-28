@@ -9,8 +9,8 @@ import ru.d2k.parkle.dto.WebsiteTagUpdateDto;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
 import ru.d2k.parkle.entity.cache.UserCache;
 import ru.d2k.parkle.entity.cache.WebsiteTagCache;
-import ru.d2k.parkle.exception.UserNotFoundException;
-import ru.d2k.parkle.exception.WebsiteNotFoundException;
+import ru.d2k.parkle.exception.entity.UserEntityNotFoundException;
+import ru.d2k.parkle.exception.entity.WebsiteEntityNotFoundException;
 import ru.d2k.parkle.utils.mapper.WebsiteTagMapper;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class WebsiteTagDao {
 
     public List<WebsiteTagCache> getAllByUserLogin(String login) {
         UserCache user = userDao.getByLogin(login)
-                .orElseThrow(() -> new UserNotFoundException("User entity not found by login: " + login));
+                .orElseThrow(() -> new UserEntityNotFoundException("User entity not found by login: " + login));
         List<WebsiteTagEntity> tags = database.getByUserIdSortedByTitleAsc(user.id());
 
         return tags.stream()
@@ -64,7 +64,7 @@ public class WebsiteTagDao {
     public WebsiteTagCache updateById(UUID id, WebsiteTagUpdateDto updateDto) {
         WebsiteTagEntity entity = this.getByIdFromDatabase(id)
                 .orElseThrow(() ->
-                        new WebsiteNotFoundException(String.format("WebsiteTagEntity not found by ID '%s'!", id)));
+                        new WebsiteEntityNotFoundException(String.format("WebsiteTagEntity not found by ID '%s'!", id)));
 
         log.debug("Entity and website is present");
 

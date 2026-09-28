@@ -12,7 +12,7 @@ import ru.d2k.parkle.dto.UserDtoInterface;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.cache.UserCache;
-import ru.d2k.parkle.exception.UserNotFoundException;
+import ru.d2k.parkle.exception.entity.UserEntityNotFoundException;
 import ru.d2k.parkle.model.CustomUserDetails;
 import ru.d2k.parkle.service.rest.AuthenticationService;
 import ru.d2k.parkle.service.security.authentication.CustomAuthenticationManagerService;
@@ -44,7 +44,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return userMapper.toResponseDto(userCache);
         }
 
-        throw new UserNotFoundException("Can't find user by UserAuthenticationDto: " + userAuthenticationDto.toString());
+        throw new UserEntityNotFoundException("Can't find user by UserAuthenticationDto: " + userAuthenticationDto.toString());
     }
 
     @Override
