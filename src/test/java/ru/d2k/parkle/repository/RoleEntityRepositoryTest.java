@@ -24,6 +24,7 @@ class RoleEntityRepositoryTest extends AbstractPostgresContainer {
     @Test
     void save_shouldReturnSavedEntity() {
         repository.save(ROLE_ENTITY);
+
         testEntityManager.flush();
         testEntityManager.clear();
 
@@ -100,6 +101,18 @@ class RoleEntityRepositoryTest extends AbstractPostgresContainer {
     void existsByName_shouldReturnFalseWhenNotSaved() {
         boolean isExist = repository.existsByName(ROLE_NAME);
 
+        assertFalse(isExist);
+    }
+
+    // deleteById.
+    @Test
+    void deleteById_shouldReturnFalseOnCheckExist() {
+        testEntityManager.persistAndFlush(ROLE_ENTITY);
+        testEntityManager.clear();
+
+        repository.deleteById(ROLE_ID);
+
+        boolean isExist = repository.existsById(ROLE_ID);
         assertFalse(isExist);
     }
 }

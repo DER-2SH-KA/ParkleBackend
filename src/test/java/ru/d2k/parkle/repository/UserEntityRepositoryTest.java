@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import ru.d2k.parkle.entity.UserEntity;
 import java.util.Optional;
 import static ru.d2k.parkle.test.consts.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +19,20 @@ class UserEntityRepositoryTest extends AbstractPostgresContainer {
 
     @Autowired
     private UserEntityRepository repository;
+
+    // save.
+    @Test
+    void save_shouldReturnSavedEntity() {
+        this.persistAndFlushRoleEntity();
+
+        repository.save(USER_ENTITY);
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        var saved = testEntityManager.find(UserEntity.class, USER_ID);
+        assertEquals(USER_ENTITY, saved);
+    }
 
     // findById.
     @Test
@@ -99,11 +114,24 @@ class UserEntityRepositoryTest extends AbstractPostgresContainer {
         assertFalse(isExist);
     }
 
-    // deleteByLogin.
+    // deleteById.
     @Test
-    void deleteByLogin() {
+    void deleteById_shouldReturnFalseOnCheckExist() {
         this.persistAndFlushRoleEntity();
 
+        testEntityManager.persistAndFlush(USER_ENTITY);
+        testEntityManager.clear();
+
+        repository.deleteById(USER_ID);
+
+        boolean isExist = repository.existsById(USER_ID);
+        assertFalse(isExist);
+    }
+
+    // deleteByLogin.
+    @Test
+    void deleteByLogin_shouldReturnFalseOnCheckExist() {
+        this.persistAndFlushRoleEntity();
         testEntityManager.persistAndFlush(USER_ENTITY);
         testEntityManager.clear();
 
