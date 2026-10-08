@@ -1,6 +1,5 @@
 package ru.d2k.parkle.dao.database.role;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import ru.d2k.parkle.entity.RoleEntity;
-import ru.d2k.parkle.repository.RoleRepository;
+import ru.d2k.parkle.repository.RoleEntityRepository;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.UUID;
 public class RoleEntityPostgresDatabaseTest {
 
     @Mock
-    private RoleRepository roleRepository;
+    private RoleEntityRepository roleEntityRepository;
 
     @InjectMocks
     private RolePostgresDatabase rolePostgresDatabase;
@@ -33,7 +32,7 @@ public class RoleEntityPostgresDatabaseTest {
     void save_shouldReturnRoleEntity() {
         RoleEntity entity = RoleEntity.create("USER");
 
-        when(roleRepository.save(entity)).thenReturn(entity);
+        when(roleEntityRepository.save(entity)).thenReturn(entity);
 
         RoleEntity savedEntity = rolePostgresDatabase.save(entity);
 
@@ -48,7 +47,7 @@ public class RoleEntityPostgresDatabaseTest {
                 RoleEntity.create("ADMIN")
         );
 
-        when(roleRepository.findAll())
+        when(roleEntityRepository.findAll())
                 .thenReturn(entities);
 
         List<RoleEntity> foundedEntity = rolePostgresDatabase.getAll();
@@ -66,7 +65,7 @@ public class RoleEntityPostgresDatabaseTest {
 
         UUID id = entity.getId();
 
-        when(roleRepository.findById(id)).thenReturn(Optional.of(entity));
+        when(roleEntityRepository.findById(id)).thenReturn(Optional.of(entity));
 
         Optional<RoleEntity> foundedEntity = rolePostgresDatabase.getById(id);
 
@@ -78,7 +77,7 @@ public class RoleEntityPostgresDatabaseTest {
     void getById_shouldReturnEmptyByIdWhenNotPresent() {
         UUID id = UuidGeneratorUtil.generateNewUuidV7();
 
-        when(roleRepository.findById(id)).thenReturn(Optional.empty());
+        when(roleEntityRepository.findById(id)).thenReturn(Optional.empty());
 
         Optional<RoleEntity> foundedEntity = rolePostgresDatabase.getById(id);
 
@@ -91,7 +90,7 @@ public class RoleEntityPostgresDatabaseTest {
         String name = "USER";
         RoleEntity entity = RoleEntity.create(name);
 
-        when(roleRepository.findByName(name)).thenReturn(Optional.of(entity));
+        when(roleEntityRepository.findByName(name)).thenReturn(Optional.of(entity));
 
         Optional<RoleEntity> foundedEntity = rolePostgresDatabase.getByName(name);
 
@@ -104,7 +103,7 @@ public class RoleEntityPostgresDatabaseTest {
     void getByName_shouldReturnEmptyByNameWhenNotPresent() {
         String name = "USER";
 
-        when(roleRepository.findByName(name)).thenReturn(Optional.empty());
+        when(roleEntityRepository.findByName(name)).thenReturn(Optional.empty());
 
         Optional<RoleEntity> foundedEntity = rolePostgresDatabase.getByName(name);
 
@@ -118,7 +117,7 @@ public class RoleEntityPostgresDatabaseTest {
 
         UUID id = entity.getId();
 
-        when(roleRepository.getReferenceById(id)).thenReturn(entity);
+        when(roleEntityRepository.getReferenceById(id)).thenReturn(entity);
 
         RoleEntity foundedEntity = rolePostgresDatabase.getReferenceById(id);
 
@@ -130,7 +129,7 @@ public class RoleEntityPostgresDatabaseTest {
     void getReferenceById_shouldReturnTrueWhenExistsById() {
         UUID id = UuidGeneratorUtil.generateNewUuidV7();
 
-        when(roleRepository.existsById(id)).thenReturn(true);
+        when(roleEntityRepository.existsById(id)).thenReturn(true);
 
         boolean isExist = rolePostgresDatabase.existsById(id);
 
@@ -142,7 +141,7 @@ public class RoleEntityPostgresDatabaseTest {
     void getReferenceById_shouldReturnFalseWhenNotExistById() {
         UUID id = UuidGeneratorUtil.generateNewUuidV7();
 
-        when(roleRepository.existsById(id)).thenReturn(false);
+        when(roleEntityRepository.existsById(id)).thenReturn(false);
 
         boolean isExist = rolePostgresDatabase.existsById(id);
 
@@ -154,7 +153,7 @@ public class RoleEntityPostgresDatabaseTest {
     void getReferenceByName_shouldReturnTrueWhenExistsById() {
         String name = "USER";
 
-        when(roleRepository.existsByName(name)).thenReturn(true);
+        when(roleEntityRepository.existsByName(name)).thenReturn(true);
 
         boolean isExist = rolePostgresDatabase.existsByName(name);
 
@@ -166,7 +165,7 @@ public class RoleEntityPostgresDatabaseTest {
     void getReferenceByName_shouldReturnFalseWhenNotExistById() {
         String name = "USER";
 
-        when(roleRepository.existsByName(name)).thenReturn(false);
+        when(roleEntityRepository.existsByName(name)).thenReturn(false);
 
         boolean isExist = rolePostgresDatabase.existsByName(name);
 

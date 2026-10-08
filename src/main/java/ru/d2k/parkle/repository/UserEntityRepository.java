@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, UUID> {
+public interface UserEntityRepository extends JpaRepository<UserEntity, UUID> {
 
     @Query("SELECT u FROM UserEntity u LEFT JOIN FETCH u.websites WHERE u.login = :login")
     Optional<UserEntity> findByLogin(@Param("login") String login);

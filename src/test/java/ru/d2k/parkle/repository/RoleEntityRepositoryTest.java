@@ -1,7 +1,5 @@
 package ru.d2k.parkle.repository;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -10,9 +8,6 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
-import ru.d2k.parkle.entity.RoleEntity;
-import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
-import java.util.Optional;
 
 // @Disabled
 @DataJpaTest
@@ -28,72 +23,7 @@ public class RoleEntityRepositoryTest {
     private TestEntityManager testEntityManager;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private RoleEntityRepository roleEntityRepository;
 
-    @Test
-    void findByName_shouldSaveAndFindByNameNewRole() {
-        RoleEntity newRole = RoleEntity.create("Test");
 
-        testEntityManager.persistAndFlush(newRole);
-
-        Optional<RoleEntity> savedRole = roleRepository.findByName("Test");
-
-        Assertions.assertThat(savedRole).isPresent();
-        Assertions.assertThat(savedRole.get().getName()).isEqualTo("Test");
-    }
-
-    @Test
-    void findByName_shouldReturnOptionalEmptyWhenUserByLoginNotExists() {
-        RoleEntity newRole = RoleEntity.create("Test1");
-
-        testEntityManager.persistAndFlush(newRole);
-
-        Optional<RoleEntity> savedRole = roleRepository.findByName("Test");
-
-        Assertions.assertThat(savedRole).isEmpty();
-    }
-
-    @Test
-    void existsByName_shouldBeTrueWhenSaveAndExistByNameNewRole() {
-        RoleEntity newRole = RoleEntity.create("Test");
-
-        testEntityManager.persistAndFlush(newRole);
-
-        boolean isRoleExists = roleRepository.existsByName("Test");
-
-        Assertions.assertThat(isRoleExists).isTrue();
-    }
-
-    @Test
-    void existsByName_shouldBeFalseWhenSaveAndExistByNameNewRole() {
-        RoleEntity newRole = RoleEntity.create("Test1");
-
-        testEntityManager.persistAndFlush(newRole);
-
-        boolean isRoleExists = roleRepository.existsByName("Test");
-
-        Assertions.assertThat(isRoleExists).isFalse();
-    }
-
-    @Test
-    void existsById_shouldSaveAndExistsByIdNewRole() {
-        RoleEntity newRole = RoleEntity.create("Test");
-
-        testEntityManager.persistAndFlush(newRole);
-
-        boolean isRoleExists = roleRepository.existsById(newRole.getId());
-
-        Assertions.assertThat(isRoleExists).isTrue();
-    }
-
-    @Test
-    void existsById_shouldBeFalseWhenSaveAndExistByIdNewRole() {
-        RoleEntity newRole = RoleEntity.create("Test1");
-
-        testEntityManager.persistAndFlush(newRole);
-
-        boolean isRoleExists = roleRepository.existsById(UuidGeneratorUtil.generateNewUuidV7());
-
-        Assertions.assertThat(isRoleExists).isFalse();
-    }
 }

@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.entity.RoleEntity;
-import ru.d2k.parkle.repository.RoleRepository;
+import ru.d2k.parkle.repository.RoleEntityRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public class RolePostgresDatabase implements RoleDatabase {
 
     @Autowired
-    private final RoleRepository repository;
+    private final RoleEntityRepository repository;
 
     @Override
     public RoleEntity save(RoleEntity entity) {

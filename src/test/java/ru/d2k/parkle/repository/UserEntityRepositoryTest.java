@@ -13,7 +13,6 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 import ru.d2k.parkle.entity.RoleEntity;
 import ru.d2k.parkle.entity.UserEntity;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,7 +35,7 @@ public class UserEntityRepositoryTest {
     private TestEntityManager testEntityManager;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserEntityRepository userEntityRepository;
 
     @Test
     void findByLogin_shouldFindUserByLogin() {
@@ -45,7 +44,7 @@ public class UserEntityRepositoryTest {
         testEntityManager.persistAndFlush(ROLE);
         testEntityManager.persistAndFlush(newUser);
 
-        Optional<UserEntity> savedUser = userRepository.findByLogin("Login");
+        Optional<UserEntity> savedUser = userEntityRepository.findByLogin("Login");
 
         Assertions.assertThat(savedUser).isPresent();
         Assertions.assertThat(savedUser.get().getLogin()).isEqualTo("Login");
@@ -58,7 +57,7 @@ public class UserEntityRepositoryTest {
         testEntityManager.persistAndFlush(ROLE);
         testEntityManager.persistAndFlush(newUser);
 
-        Optional<UserEntity> savedUser = userRepository.findByLogin("Login");
+        Optional<UserEntity> savedUser = userEntityRepository.findByLogin("Login");
 
         Assertions.assertThat(savedUser).isEmpty();
     }
@@ -70,7 +69,7 @@ public class UserEntityRepositoryTest {
         testEntityManager.persistAndFlush(ROLE);
         testEntityManager.persistAndFlush(newUser);
 
-        boolean isUserExists = userRepository.existsById(newUser.getId());
+        boolean isUserExists = userEntityRepository.existsById(newUser.getId());
 
         Assertions.assertThat(isUserExists).isTrue();
     }
@@ -82,7 +81,7 @@ public class UserEntityRepositoryTest {
         testEntityManager.persistAndFlush(ROLE);
         testEntityManager.persistAndFlush(newUser);
 
-        boolean isUserExists = userRepository.existsById(UuidGeneratorUtil.generateNewUuidV7());
+        boolean isUserExists = userEntityRepository.existsById(UuidGeneratorUtil.generateNewUuidV7());
 
         Assertions.assertThat(isUserExists).isFalse();
     }
@@ -94,7 +93,7 @@ public class UserEntityRepositoryTest {
         testEntityManager.persistAndFlush(ROLE);
         testEntityManager.persistAndFlush(newUser);
 
-        boolean isUserExists = userRepository.existsByLogin("Login");
+        boolean isUserExists = userEntityRepository.existsByLogin("Login");
 
         Assertions.assertThat(isUserExists).isTrue();
     }
@@ -106,7 +105,7 @@ public class UserEntityRepositoryTest {
         testEntityManager.persistAndFlush(ROLE);
         testEntityManager.persistAndFlush(newUser);
 
-        boolean isUserExists = userRepository.existsByLogin("Login");
+        boolean isUserExists = userEntityRepository.existsByLogin("Login");
 
         Assertions.assertThat(isUserExists).isFalse();
     }
@@ -118,8 +117,8 @@ public class UserEntityRepositoryTest {
         testEntityManager.persistAndFlush(ROLE);
         testEntityManager.persistAndFlush(newUser);
 
-        userRepository.deleteByLogin("Login");
+        userEntityRepository.deleteByLogin("Login");
 
-        Assertions.assertThat(userRepository.existsByLogin("Login")).isFalse();
+        Assertions.assertThat(userEntityRepository.existsByLogin("Login")).isFalse();
     }
 }

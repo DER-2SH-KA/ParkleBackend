@@ -39,7 +39,7 @@ public class WebsiteEntityRepositoryTest {
     private TestEntityManager testEntityManager;
 
     @Autowired
-    private WebsiteRepository websiteRepository;
+    private WebsiteEntityRepository websiteEntityRepository;
 
     @Test
     void findByUserIdOrderByTitleAsc_shouldReturnListSizeThreeOfWebsites() {
@@ -57,7 +57,7 @@ public class WebsiteEntityRepositoryTest {
         testEntityManager.persistAndFlush(website2);
         testEntityManager.persistAndFlush(website3);
 
-        List<WebsiteEntity> websites = websiteRepository.findByUserIdOrderByTitleAsc(USER.getId());
+        List<WebsiteEntity> websites = websiteEntityRepository.findByUserIdOrderByTitleAsc(USER.getId());
 
         Assertions.assertThat(websites.size()).isEqualTo(3);
     }
@@ -78,7 +78,7 @@ public class WebsiteEntityRepositoryTest {
         testEntityManager.persistAndFlush(website2);
         testEntityManager.persistAndFlush(website3);
 
-        List<WebsiteEntity> websites = websiteRepository.findByUserIdOrderByTitleAsc(UuidGeneratorUtil.generateNewUuidV7());
+        List<WebsiteEntity> websites = websiteEntityRepository.findByUserIdOrderByTitleAsc(UuidGeneratorUtil.generateNewUuidV7());
 
         Assertions.assertThat(websites.size()).isEqualTo(0);
     }
@@ -92,7 +92,7 @@ public class WebsiteEntityRepositoryTest {
         testEntityManager.persistAndFlush(USER);
         testEntityManager.persistAndFlush(website);
 
-        boolean isWebsiteExist = websiteRepository.existsById(website.getId());
+        boolean isWebsiteExist = websiteEntityRepository.existsById(website.getId());
 
         Assertions.assertThat(isWebsiteExist).isTrue();
     }
@@ -106,7 +106,7 @@ public class WebsiteEntityRepositoryTest {
         testEntityManager.persistAndFlush(USER);
         testEntityManager.persistAndFlush(website);
 
-        boolean isWebsiteExist = websiteRepository.existsById(UuidGeneratorUtil.generateNewUuidV7());
+        boolean isWebsiteExist = websiteEntityRepository.existsById(UuidGeneratorUtil.generateNewUuidV7());
 
         Assertions.assertThat(isWebsiteExist).isFalse();
     }

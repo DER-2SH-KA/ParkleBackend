@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.entity.WebsiteEntity;
-import ru.d2k.parkle.repository.WebsiteRepository;
+import ru.d2k.parkle.repository.WebsiteEntityRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public class WebsitePostgresDatabase implements WebsiteDatabase {
 
     @Autowired
-    private final WebsiteRepository repository;
+    private final WebsiteEntityRepository repository;
 
     @Override
     public WebsiteEntity save(WebsiteEntity entity) {

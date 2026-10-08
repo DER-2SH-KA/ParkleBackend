@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
-import ru.d2k.parkle.repository.WebsiteTagRepository;
+import ru.d2k.parkle.repository.WebsiteTagEntityRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Component
 public class WebsiteTagPostgresDatabase implements WebsiteTagDatabase {
 
-    private final WebsiteTagRepository repository;
+    private final WebsiteTagEntityRepository repository;
 
     @Override
     public List<WebsiteTagEntity> getByUserIdSortedByTitleAsc(UUID userId) {
