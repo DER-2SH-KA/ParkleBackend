@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import java.util.UUID;
 
-public class RoleEntityResponseDtoTest {
+public class RoleResponseDtoTest {
 
     private static UUID ROLE_UUID = UuidGeneratorUtil.generateNewUuidV7();
 

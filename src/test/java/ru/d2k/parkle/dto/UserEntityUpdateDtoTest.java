@@ -3,7 +3,6 @@ package ru.d2k.parkle.dto;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,6 +14,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
+import static ru.d2k.parkle.test.consts.TestConstants.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserEntityUpdateDtoTest {
 
@@ -31,8 +32,8 @@ public class UserEntityUpdateDtoTest {
         UserUpdateDto dto1 = new UserUpdateDto(ID, LOGIN, PASSWORD, ROLES);
         UserUpdateDto dto2 = new UserUpdateDto(ID, LOGIN, PASSWORD, ROLES);
 
-        Assertions.assertEquals(dto1.hashCode(), dto2.hashCode());
-        Assertions.assertEquals(dto1, dto2);
+        assertEquals(dto1.hashCode(), dto2.hashCode());
+        assertEquals(dto1, dto2);
     }
 
     @DisplayName("equals - return false with null")
@@ -40,7 +41,7 @@ public class UserEntityUpdateDtoTest {
     public void shouldBeFalseWhenEqualsWithNull() {
         UserUpdateDto dto = new UserUpdateDto(ID, LOGIN, PASSWORD, ROLES);
 
-        Assertions.assertFalse(dto.equals(null));
+        assertNotEquals(null, dto);
     }
 
     @DisplayName("equals - return false with object which has null fields")
@@ -48,7 +49,7 @@ public class UserEntityUpdateDtoTest {
     public void shouldBeFalseWhenEqualsWithObjectWhichFieldsAreNull() {
         UserUpdateDto dto = new UserUpdateDto(ID, LOGIN, PASSWORD, ROLES);
 
-        Assertions.assertNotEquals(dto, new RoleUpdateDto(null, null));
+        assertNotEquals(dto, new RoleUpdateDto(null, null));
     }
 
     @DisplayName("equals - return false with objects which has different fields")
@@ -57,35 +58,35 @@ public class UserEntityUpdateDtoTest {
     public void shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields(UserUpdateDto dto2) {
         UserUpdateDto dto1 = new UserUpdateDto(ID, LOGIN, PASSWORD, ROLES);
 
-        Assertions.assertNotEquals(dto1, dto2);
+        assertNotEquals(dto1, dto2);
     }
 
     @DisplayName("validate - return true with objects which has correct field's values")
     @ParameterizedTest
     @MethodSource
-    public void shouldBeTrueWhenValidationObjectsHasCorrectFieldsValues(UserUpdateDto dto, String description) {
+    public void shouldBeTrueWhenValidationObjectsHasCorrectFieldsValues(UserUpdateDto dto,
+                                                                        String description) {
         Set<ConstraintViolation<UserUpdateDto>> violations = validator.validate(dto);
 
-        Assertions.assertTrue(violations.isEmpty(), "Violation in scenario '" + description + "': " +
+        assertTrue(violations.isEmpty(), "Violation in scenario '" + description + "': " +
                 violations);
     }
 
     @DisplayName("validate - return false with objects which has wrong field's values")
     @ParameterizedTest
     @MethodSource
-    public void shouldBeFalseWhenValidationObjectsHasWrongFieldsValues(UserUpdateDto dto, String description) {
+    public void shouldBeFalseWhenValidationObjectsHasWrongFieldsValues(UserUpdateDto dto,
+                                                                       String description) {
         Set<ConstraintViolation<UserUpdateDto>> violations = validator.validate(dto);
 
-        Assertions.assertFalse(violations.isEmpty(), "Violation in scenario '" + description + "': " +
+        assertFalse(violations.isEmpty(), "Violation in scenario '" + description + "': " +
                 violations);
     }
 
     private static Stream<UserUpdateDto> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
         return Stream.of(
                 new UserUpdateDto(null, LOGIN, PASSWORD, ROLES),
-                new UserUpdateDto(ID, LOGIN, PASSWORD, ROLES),
-                new UserUpdateDto(ID, "login2", PASSWORD, ROLES),
-                new UserUpdateDto(ID, LOGIN, PASSWORD, ROLES));
+                new UserUpdateDto(ID, "login2", PASSWORD, ROLES));
     }
 
     private static Stream<Arguments> shouldBeTrueWhenValidationObjectsHasCorrectFieldsValues() {
@@ -102,10 +103,14 @@ public class UserEntityUpdateDtoTest {
         String maxPassword = new String(maxPasswordChars);
 
         return Stream.of(
-                Arguments.of(new UserUpdateDto(ID, lowMinLogin, PASSWORD, ROLES), "Valid lowMinLogin"),
-                Arguments.of(new UserUpdateDto(ID, maxLogin, PASSWORD, ROLES), "Valid maxLogin"),
-                Arguments.of(new UserUpdateDto(ID, LOGIN, "12345678", ROLES), "Valid lowMinPassword"),
-                Arguments.of(new UserUpdateDto(ID, LOGIN, maxPassword, ROLES), "Valid maxPassword"));
+                Arguments.of(new UserUpdateDto(ID, lowMinLogin, PASSWORD,
+                        USER_RESPONSE_DTO_ROLES), "Valid lowMinLogin"),
+                Arguments.of(new UserUpdateDto(ID, maxLogin, PASSWORD,
+                        USER_RESPONSE_DTO_ROLES), "Valid maxLogin"),
+                Arguments.of(new UserUpdateDto(ID, LOGIN, "12345678",
+                        USER_RESPONSE_DTO_ROLES), "Valid lowMinPassword"),
+                Arguments.of(new UserUpdateDto(ID, LOGIN, maxPassword,
+                        USER_RESPONSE_DTO_ROLES), "Valid maxPassword"));
     }
 
     private static Stream<Arguments> shouldBeFalseWhenValidationObjectsHasWrongFieldsValues() {
@@ -122,9 +127,13 @@ public class UserEntityUpdateDtoTest {
         String overMaxPassword = new String(overMaxPasswordChars);
 
         return Stream.of(
-                Arguments.of(new UserUpdateDto(ID, lowerMinLogin, PASSWORD, ROLES), "Valid lowerMinLogin"),
-                Arguments.of(new UserUpdateDto(ID, overMaxLogin, PASSWORD, ROLES), "Valid overMaxLogin"),
-                Arguments.of(new UserUpdateDto(ID, LOGIN, "1234567", ROLES), "Valid lowerMinRoleName"),
-                Arguments.of(new UserUpdateDto(ID, LOGIN, overMaxPassword, ROLES), "Valid overMaxPassword"));
+                Arguments.of(new UserUpdateDto(ID, lowerMinLogin, PASSWORD,
+                        USER_RESPONSE_DTO_ROLES), "Valid lowerMinLogin"),
+                Arguments.of(new UserUpdateDto(ID, overMaxLogin, PASSWORD,
+                        USER_RESPONSE_DTO_ROLES), "Valid overMaxLogin"),
+                Arguments.of(new UserUpdateDto(ID, LOGIN, "1234567",
+                        USER_RESPONSE_DTO_ROLES), "Valid lowerMinRoleName"),
+                Arguments.of(new UserUpdateDto(ID, LOGIN, overMaxPassword,
+                        USER_RESPONSE_DTO_ROLES), "Valid overMaxPassword"));
     }
 }

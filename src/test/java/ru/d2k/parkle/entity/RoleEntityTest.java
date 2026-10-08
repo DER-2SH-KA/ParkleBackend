@@ -1,76 +1,58 @@
 package ru.d2k.parkle.entity;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
-import java.util.UUID;
+import static ru.d2k.parkle.test.consts.TestConstants.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RoleEntityTest {
 
-    @DisplayName("hashCode -- hash codes of the same object are the same")
+    // hashCode.
     @Test
-    public void hashCode_sameObjectHashCodeEquals() {
-        RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP");
+    public void hashCode_shouldReturnEqualsHashCodeOfSameObject() {
+        RoleEntity role = new RoleEntity(ROLE_ID, ROLE_NAME);
 
-        Assertions.assertEquals(role.hashCode(), role.hashCode());
+        assertEquals(role.hashCode(), role.hashCode());
     }
 
-    @DisplayName("hashCode -- hash codes of objects with different non Id fields are equals")
     @Test
-    public void hashCode_twoObjectWithSameIdAreEquals() {
-        UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
-        RoleEntity role1 = new RoleEntity(uuid, "TEMP1");
-        RoleEntity role2 = new RoleEntity(uuid, "TEMP2");
+    public void hashCode_shouldReturnEqualsHashCodeOfIdenticalObjectsId() {
+        RoleEntity role1 = new RoleEntity(ROLE_ID, "NAME1");
+        RoleEntity role2 = new RoleEntity(ROLE_ID, "NAME2");
 
-        Assertions.assertEquals(role1.hashCode(), role2.hashCode());
+        assertEquals(role1.hashCode(), role2.hashCode());
     }
 
     /* TODO: Возвращает вместо 0 число 102. Вероятно, придётся переопределять методы equals и hashCode вручную.
     *   Вот статья на Хабр для Hibernate, хоть в ней и сомневаюсь:
     *   https://habr.com/ru/companies/haulmont/articles/836018/ */
-    @DisplayName("hashCode -- hash codes of null ID is null")
     @Test
-    public void hashCode_objectIdIsNull() {
-        RoleEntity role = new RoleEntity(null, "TEMP");
+    public void hashCode_shouldReturn102WhenIdIsNull() {
+        RoleEntity role = new RoleEntity(null, ROLE_NAME);
 
         // !! 102, а не 0, по каким-то причинам. !!
         // Я из будущего: Hibernate и Lombok не ладят.
-        Assertions.assertEquals(102, role.hashCode());
+        assertEquals(102, role.hashCode());
     }
 
-    @DisplayName("equals -- Same object are equals")
+    // equals.
     @Test
-    public void equals_sameObjectAreEquals() {
-        RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP");
-
-        Assertions.assertEquals(role, role);
+    public void equals_shouldBeNotEqualWhenObjectIsNull() {
+        assertNotEquals(null, ROLE_ENTITY);
     }
 
-    @DisplayName("equals -- Object equals with null is false")
     @Test
-    public void equals_withNullObject() {
-        RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP");
+    public void equals_shouldBeEqualsWhenObjectsIdAreIdentical() {
+        RoleEntity role1 = new RoleEntity(ROLE_ID, "TEMP1");
+        RoleEntity role2 = new RoleEntity(ROLE_ID, "TEMP2");
 
-        Assertions.assertFalse(role.equals(null));
+        assertEquals(role1, role2);
     }
 
-    @DisplayName("equals -- Objects with same ID are equals")
     @Test
-    public void equals_objectsWithSameIdAreEquals() {
-        UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
-        RoleEntity role1 = new RoleEntity(uuid, "TEMP1");
-        RoleEntity role2 = new RoleEntity(uuid, "TEMP2");
-
-        Assertions.assertEquals(role1, role2);
-    }
-
-    @DisplayName("equals -- equals with object which ID is null is false")
-    @Test
-    public void equals_withObjectIdNull() {
-        RoleEntity role1 = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP1");
+    public void equals_shouldBeNotEqualWhenOneOfObjectIdIsNull() {
+        RoleEntity role1 = new RoleEntity(ROLE_ID, "TEMP1");
         RoleEntity role2 = new RoleEntity(null, "TEMP2");
 
-        Assertions.assertFalse(role1.equals(role2));
+        assertNotEquals(role1, role2);
     }
 }

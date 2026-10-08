@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class UserEntityResponseDtoTest {
+public class UserResponseDtoTest {
 
     private static final UUID UUID = UuidGeneratorUtil.generateNewUuidV7();
     private static final String LOGIN = "login";
@@ -59,7 +59,6 @@ public class UserEntityResponseDtoTest {
     private static Stream<UserResponseDto> shouldBeFalseWhenEqualsWithObjectWhichHasDiffFields() {
         return Stream.of(
                 new UserResponseDto(UuidGeneratorUtil.generateNewUuidV7(), LOGIN, USER_ROLES),
-                new UserResponseDto(UUID, "login2", USER_ROLES),
-                new UserResponseDto(UUID, LOGIN, USER_ROLES));
+                new UserResponseDto(UUID, "login2", USER_ROLES));
     }
 }

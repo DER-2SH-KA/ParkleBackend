@@ -1,27 +1,18 @@
 package ru.d2k.parkle.repository;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.entity.WebsiteEntity;
-import ru.d2k.parkle.entity.WebsiteTagEntity;
-
 import java.util.List;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.d2k.parkle.test.consts.TestConstants.ROLE_ENTITY;
-import static ru.d2k.parkle.test.consts.TestConstants.ROLE_ID;
-import static ru.d2k.parkle.test.consts.TestConstants.USER_ENTITY;
-import static ru.d2k.parkle.test.consts.TestConstants.USER_ID;
-import static ru.d2k.parkle.test.consts.TestConstants.WEBSITE_ENTITY;
-import static ru.d2k.parkle.test.consts.TestConstants.WEBSITE_ID;
-import static ru.d2k.parkle.test.consts.TestConstants.WEBSITE_TAG_ENTITY;
-import static ru.d2k.parkle.test.consts.TestConstants.WEBSITE_TAG_ID;
+import static ru.d2k.parkle.test.consts.TestConstants.*;
 
+// @Disabled
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class WebsiteEntityRepositoryTest extends AbstractPostgresContainer {

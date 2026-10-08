@@ -1,5 +1,6 @@
 package ru.d2k.parkle.repository;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import static ru.d2k.parkle.test.consts.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+// @Disabled
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class RoleEntityRepositoryTest extends AbstractPostgresContainer {

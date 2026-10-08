@@ -1,95 +1,68 @@
 package ru.d2k.parkle.entity;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import static ru.d2k.parkle.test.consts.TestConstants.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WebsiteEntityTest {
 
-    private final RoleEntity role = new RoleEntity(UuidGeneratorUtil.generateNewUuidV7(), "TEMP");
-    private final Set<RoleEntity> ROLES = Set.of(role);
-    private final UserEntity user = new UserEntity(UuidGeneratorUtil.generateNewUuidV7(), "login",
-            "password", ROLES);
-    private final Set<WebsiteTagEntity> TAGS = new HashSet<>();
-
-    @DisplayName("hashCode -- hash codes of the same object are the same")
+    // hashCode.
     @Test
-    public void hashCode_sameObjectHashCodeEquals() {
-        WebsiteEntity website = new WebsiteEntity(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title",
-                "description", "https://example.com", TAGS);
+    public void hashCode_shouldReturnEqualsHashCodeOfSameObject() {
+        WebsiteEntity website = new WebsiteEntity(WEBSITE_ID, USER_ENTITY, HEX_COLOR,
+                WEBSITE_TITLE, WEBSITE_DESCRIPTION, WEBSITE_URL, WEBSITE_TAGS);
 
-        Assertions.assertEquals(website.hashCode(), website.hashCode());
+        assertEquals(website.hashCode(), website.hashCode());
     }
 
-    @DisplayName("hashCode -- hash codes of objects with different non Id fields are equals")
     @Test
-    public void hashCode_twoObjectWithSameIdAreEquals() {
-        UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
+    public void hashCode_shouldReturnEqualsHashCodeOfIdenticalObjectsId() {
+        WebsiteEntity website1 = new WebsiteEntity(WEBSITE_ID, USER_ENTITY,
+                HEX_COLOR, "title1", "description1", WEBSITE_URL,
+                WEBSITE_TAGS);
+        WebsiteEntity website2 = new WebsiteEntity(WEBSITE_ID, USER_ENTITY,
+                HEX_COLOR, "title2", "description3", WEBSITE_URL,
+                WEBSITE_TAGS);
 
-        WebsiteEntity website1 = new WebsiteEntity(uuid, user, "#fff", "title1", "description1",
-                "https://example.com1", TAGS);
-        WebsiteEntity website2 = new WebsiteEntity(uuid, user, "#fff", "title2", "description2",
-                "https://example.com2", TAGS);
-
-        Assertions.assertEquals(website1.hashCode(), website2.hashCode());
+        assertEquals(website1.hashCode(), website2.hashCode());
     }
 
     /* TODO: Возвращает вместо 0 число 102. Вероятно, придётся переопределять методы equals и hashCode вручную.
      *   Вот статья на Хабр для Hibernate, хоть в ней и сомневаюсь:
      *   https://habr.com/ru/companies/haulmont/articles/836018/ */
-    @DisplayName("hashCode -- hash codes of null ID is null")
     @Test
-    public void hashCode_objectIdIsNull() {
-        WebsiteEntity website = new WebsiteEntity(null, user, "#fff", "title", "description",
-                "https://example.com", TAGS);
+    public void hashCode_shouldReturn102WhenIdIsNull() {
+        WebsiteEntity website = new WebsiteEntity(null, USER_ENTITY, HEX_COLOR,
+                WEBSITE_TITLE, WEBSITE_DESCRIPTION, WEBSITE_URL, WEBSITE_TAGS);
 
-        Assertions.assertEquals(102, website.hashCode());
+        assertEquals(102, website.hashCode());
     }
 
-    @DisplayName("equals -- Same object are equals")
+    // equals.
     @Test
-    public void equals_sameObjectAreEquals() {
-        UserEntity user = new UserEntity(UuidGeneratorUtil.generateNewUuidV7(), "login",
-                "password", ROLES);
-
-        Assertions.assertEquals(user, user);
+    public void equals_shouldBeNotEqualWhenObjectIsNull() {
+        assertNotEquals(null, WEBSITE_ENTITY);
     }
 
-    @DisplayName("equals -- Object equals with null is false")
     @Test
-    public void equals_withNullObject() {
-        WebsiteEntity website = new WebsiteEntity(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title",
-                "description", "https://example.com", TAGS);
+    public void equals_shouldBeEqualsWhenObjectsIdAreIdentical() {
+        WebsiteEntity website1 = new WebsiteEntity(WEBSITE_ID, USER_ENTITY, HEX_COLOR,
+                "title1", "description1", "https://example.com1",
+                WEBSITE_TAGS);
+        WebsiteEntity website2 = new WebsiteEntity(WEBSITE_ID, USER_ENTITY, HEX_COLOR,
+                "title2", "description2", "https://example.com3",
+                WEBSITE_TAGS);
 
-        Assertions.assertFalse(website.equals(null));
+        assertEquals(website1, website2);
     }
 
-    @DisplayName("equals -- Objects with same ID are equals")
     @Test
-    public void equals_objectsWithSameIdAreEquals() {
-        UUID uuid = UuidGeneratorUtil.generateNewUuidV7();
+    public void equals_shouldBeNotEqualWhenOneOfObjectIdIsNull() {
+        WebsiteEntity website1 = new WebsiteEntity(WEBSITE_ID, USER_ENTITY, HEX_COLOR,
+                WEBSITE_TITLE, WEBSITE_DESCRIPTION, WEBSITE_URL, WEBSITE_TAGS);
+        WebsiteEntity website2 = new WebsiteEntity(null, USER_ENTITY, HEX_COLOR,
+                WEBSITE_TITLE, WEBSITE_DESCRIPTION, WEBSITE_URL, WEBSITE_TAGS);
 
-        WebsiteEntity website1 = new WebsiteEntity(uuid, user, "#fff", "title1", "description1",
-                "https://example.com1", TAGS);
-        WebsiteEntity website2 = new WebsiteEntity(uuid, user, "#fff", "title2", "description2",
-                "https://example.com2", TAGS);
-
-        Assertions.assertEquals(website1, website2);
-    }
-
-    @DisplayName("equals -- equals with object which ID is null is false")
-    @Test
-    public void equals_withObjectIdNull() {
-        WebsiteEntity website1 = new WebsiteEntity(UuidGeneratorUtil.generateNewUuidV7(), user, "#fff", "title1",
-                "description1", "https://example.com1", TAGS);
-        WebsiteEntity website2 = new WebsiteEntity(null, user, "#fff", "title2", "description2",
-                "https://example.com2", TAGS);
-
-        Assertions.assertFalse(website1.equals(website2));
+        assertNotEquals(website1, website2);
     }
 }
