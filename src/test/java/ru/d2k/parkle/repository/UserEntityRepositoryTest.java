@@ -1,124 +1,120 @@
 package ru.d2k.parkle.repository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.postgresql.PostgreSQLContainer;
-import ru.d2k.parkle.entity.RoleEntity;
-import ru.d2k.parkle.entity.UserEntity;
-
 import java.util.Optional;
-import java.util.Set;
+import static ru.d2k.parkle.test.consts.TestConstants.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
-
-// @Disabled
 @DataJpaTest
-@Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class UserEntityRepositoryTest {
-
-    private static final RoleEntity ROLE = RoleEntity.create("Test");
-    private static final Set<RoleEntity> ROLES = Set.of(ROLE);
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:16.9");
+class UserEntityRepositoryTest extends AbstractPostgresContainer {
 
     @Autowired
     private TestEntityManager testEntityManager;
 
     @Autowired
-    private UserEntityRepository userEntityRepository;
+    private UserEntityRepository repository;
 
+    // findById.
     @Test
-    void findByLogin_shouldFindUserByLogin() {
-        UserEntity newUser = UserEntity.create("Login", "Password", ROLES);
+    void findById_shouldReturnSavedUserEntity() {
+        this.persistAndFlushRoleEntity();
 
-        testEntityManager.persistAndFlush(ROLE);
-        testEntityManager.persistAndFlush(newUser);
+        testEntityManager.persistAndFlush(USER_ENTITY);
+        testEntityManager.clear();
 
-        Optional<UserEntity> savedUser = userEntityRepository.findByLogin("Login");
+        var savedEntity = repository.findById(USER_ID);
 
-        Assertions.assertThat(savedUser).isPresent();
-        Assertions.assertThat(savedUser.get().getLogin()).isEqualTo("Login");
+        assertEquals(Optional.of(USER_ENTITY), savedEntity);
     }
 
     @Test
-    void findByLogin_shouldReturnEmptyWhenFindUserByLogin() {
-        UserEntity newUser = UserEntity.create("Login1", "Password", ROLES);
+    void findById_shouldReturnEmptyWhenNotPersist() {
+        var savedEntity = repository.findById(USER_ID);
 
-        testEntityManager.persistAndFlush(ROLE);
-        testEntityManager.persistAndFlush(newUser);
+        assertFalse(savedEntity.isPresent());
+    }
 
-        Optional<UserEntity> savedUser = userEntityRepository.findByLogin("Login");
+    // findByLogin.
+    @Test
+    void findByLogin_shouldReturnSavedUserEntity() {
+        this.persistAndFlushRoleEntity();
 
-        Assertions.assertThat(savedUser).isEmpty();
+        testEntityManager.persistAndFlush(USER_ENTITY);
+        testEntityManager.clear();
+
+        var savedEntity = repository.findByLogin(USER_LOGIN);
+
+        assertEquals(Optional.of(USER_ENTITY), savedEntity);
     }
 
     @Test
-    void existsById_shouldReturnTrueWhenUserExistById() {
-        UserEntity newUser = UserEntity.create("Login", "Password", ROLES);
+    void findByLogin_shouldReturnEmptyWhenNotPersist() {
+        var savedEntity = repository.findByLogin(USER_LOGIN);
 
-        testEntityManager.persistAndFlush(ROLE);
-        testEntityManager.persistAndFlush(newUser);
+        assertFalse(savedEntity.isPresent());
+    }
 
-        boolean isUserExists = userEntityRepository.existsById(newUser.getId());
+    // existsById.
+    @Test
+    void existsById_shouldReturnTrue() {
+        this.persistAndFlushRoleEntity();
 
-        Assertions.assertThat(isUserExists).isTrue();
+        testEntityManager.persistAndFlush(USER_ENTITY);
+        testEntityManager.clear();
+
+        boolean isExist = repository.existsById(USER_ID);
+
+        assertTrue(isExist);
     }
 
     @Test
-    void existsById_shouldReturnFalseWhenUserNotExistById() {
-        UserEntity newUser = UserEntity.create("Login", "Password", ROLES);
+    void existsById_shouldReturnFalseWhenNotPersist() {
+        boolean isExist = repository.existsById(USER_ID);
 
-        testEntityManager.persistAndFlush(ROLE);
-        testEntityManager.persistAndFlush(newUser);
+        assertFalse(isExist);
+    }
 
-        boolean isUserExists = userEntityRepository.existsById(UuidGeneratorUtil.generateNewUuidV7());
+    // existsByLogin.
+    @Test
+    void existsByLogin_shouldReturnTrue() {
+        this.persistAndFlushRoleEntity();
 
-        Assertions.assertThat(isUserExists).isFalse();
+        testEntityManager.persistAndFlush(USER_ENTITY);
+        testEntityManager.clear();
+
+        boolean isExist = repository.existsByLogin(USER_LOGIN);
+
+        assertTrue(isExist);
     }
 
     @Test
-    void existsByLogin_shouldReturnTrueWhenUserExistByLogin() {
-        UserEntity newUser = UserEntity.create("Login", "Password", ROLES);
+    void existsByLogin_shouldReturnFalseWhenNotPersist() {
+        boolean isExist = repository.existsByLogin(USER_LOGIN);
 
-        testEntityManager.persistAndFlush(ROLE);
-        testEntityManager.persistAndFlush(newUser);
-
-        boolean isUserExists = userEntityRepository.existsByLogin("Login");
-
-        Assertions.assertThat(isUserExists).isTrue();
+        assertFalse(isExist);
     }
 
+    // deleteByLogin.
     @Test
-    void existsByLogin_shouldReturnFalseWhenUserNotExistByLogin() {
-        UserEntity newUser = UserEntity.create("Login1", "Password", ROLES);
+    void deleteByLogin() {
+        this.persistAndFlushRoleEntity();
 
-        testEntityManager.persistAndFlush(ROLE);
-        testEntityManager.persistAndFlush(newUser);
+        testEntityManager.persistAndFlush(USER_ENTITY);
+        testEntityManager.clear();
 
-        boolean isUserExists = userEntityRepository.existsByLogin("Login");
+        repository.deleteByLogin(USER_LOGIN);
 
-        Assertions.assertThat(isUserExists).isFalse();
+        boolean isExist = repository.existsByLogin(USER_LOGIN);
+
+        assertFalse(isExist);
     }
 
-    @Test
-    void deleteByLogin_shouldSaveAndExistsByLoginNewUser() {
-        UserEntity newUser = UserEntity.create("Login", "Password", ROLES);
-
-        testEntityManager.persistAndFlush(ROLE);
-        testEntityManager.persistAndFlush(newUser);
-
-        userEntityRepository.deleteByLogin("Login");
-
-        Assertions.assertThat(userEntityRepository.existsByLogin("Login")).isFalse();
+    private void persistAndFlushRoleEntity() {
+        testEntityManager.persistAndFlush(ROLE_ENTITY);
     }
 }
