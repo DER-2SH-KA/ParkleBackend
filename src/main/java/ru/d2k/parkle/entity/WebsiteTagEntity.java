@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -46,9 +46,9 @@ public class WebsiteTagEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "website_and_tags", joinColumns = @JoinColumn(name = "website_tag_id"),
             inverseJoinColumns = @JoinColumn(name = "website_id"))
-    private Set<WebsiteEntity> websites = new HashSet<>();
+    private List<WebsiteEntity> websites = new ArrayList<>();
 
-    private WebsiteTagEntity(UserEntity user, String title, String hex, Set<WebsiteEntity> websites) {
+    private WebsiteTagEntity(UserEntity user, String title, String hex, List<WebsiteEntity> websites) {
         this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.user = user;
         this.title = title;
@@ -56,7 +56,7 @@ public class WebsiteTagEntity {
         this.websites = websites;
     }
 
-    WebsiteTagEntity(UUID id, UserEntity user, String title, String hex, Set<WebsiteEntity> websites) {
+    WebsiteTagEntity(UUID id, UserEntity user, String title, String hex, List<WebsiteEntity> websites) {
         this.id = id;
         this.user = user;
         this.title = title;
@@ -65,6 +65,6 @@ public class WebsiteTagEntity {
     }
 
     public static WebsiteTagEntity create(UserEntity user, String title, String hex) {
-        return new WebsiteTagEntity(user, title, hex, new HashSet<>());
+        return new WebsiteTagEntity(user, title, hex, new ArrayList<>());
     }
 }

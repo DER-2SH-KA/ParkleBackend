@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.d2k.parkle.dao.UserDao;
-import ru.d2k.parkle.entity.cache.UserCache;
-import ru.d2k.parkle.model.CustomUserDetails;
+import ru.d2k.parkle.model.domain.User;
+import ru.d2k.parkle.model.security.CustomUserDetails;
 import java.util.Optional;
 
 @Service
@@ -20,7 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserCache> userCache = dao.getByLogin(username);
+        Optional<User> userCache = dao.getByLogin(username);
 
         if (userCache.isPresent()) {
             return new CustomUserDetails(userCache.get());

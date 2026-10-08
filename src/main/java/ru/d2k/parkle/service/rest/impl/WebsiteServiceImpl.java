@@ -14,9 +14,9 @@ import ru.d2k.parkle.dto.WebsiteUpdateDto;
 import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.entity.WebsiteEntity;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
-import ru.d2k.parkle.entity.cache.WebsiteCache;
+import ru.d2k.parkle.model.domain.Website;
 import ru.d2k.parkle.exception.entity.WebsiteEntityNotFoundException;
-import ru.d2k.parkle.model.CustomUserDetails;
+import ru.d2k.parkle.model.security.CustomUserDetails;
 import ru.d2k.parkle.service.rest.WebsiteService;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
 import java.util.List;
@@ -40,7 +40,7 @@ public class WebsiteServiceImpl implements WebsiteService {
     public WebsiteResponseDto findById(UUID id) {
         log.info("Getting website by ID: {}...", id);
 
-        WebsiteCache website = dao.getById(id).orElseThrow(() ->
+        Website website = dao.getById(id).orElseThrow(() ->
                 new WebsiteEntityNotFoundException("WebsiteEntity was not found with ID: " + id));
 
         log.info("WebsiteEntity with ID '{}' was founded", id);
@@ -56,7 +56,7 @@ public class WebsiteServiceImpl implements WebsiteService {
 
         log.info("Getting websites by user login: {}...", userDetails.getUsername());
 
-        List<WebsiteCache> websites = dao.getAllByUserLogin(userDetails.getCache());
+        List<Website> websites = dao.getAllByUserLogin(userDetails.getCache());
 
         log.info("Websites was found: {}", websites.size());
 
@@ -72,13 +72,13 @@ public class WebsiteServiceImpl implements WebsiteService {
                 .getAuthentication().getPrincipal();
 
         UserEntity userEntity = userDao.getReferenceById(userDetails.getCache().id());
-        Set<WebsiteTagEntity> tagEntities = createWebsiteDto.tags().stream()
+        List<WebsiteTagEntity> tagEntities = createWebsiteDto.tags().stream()
                 .map(dto -> websiteTagDao.getReferenceById(dto.id()))
-                .collect(Collectors.toSet());
+                .toList();
 
         WebsiteEntity website = WebsiteEntity.create(userEntity, createWebsiteDto.hexColor(), createWebsiteDto.title(),
                 createWebsiteDto.description(), createWebsiteDto.url(), tagEntities);
-        WebsiteCache savedWebsite = dao.create(website);
+        Website savedWebsite = dao.create(website);
 
         log.info("WebsiteEntity was created: {}", savedWebsite);
 
@@ -90,10 +90,7 @@ public class WebsiteServiceImpl implements WebsiteService {
     public WebsiteResponseDto updateById(WebsiteUpdateDto updateWebsiteDto) {
         log.info("Updating website by ID '{}'...", updateWebsiteDto.id());
 
-        String userLogin = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal()).getUsername();
-
-        WebsiteCache updatedWebsite = dao.updateById(updateWebsiteDto.id(), updateWebsiteDto);
+        Website updatedWebsite = dao.updateById(updateWebsiteDto.id(), updateWebsiteDto);
 
         log.info("WebsiteEntity with ID '{}' was updated", updateWebsiteDto.id());
 

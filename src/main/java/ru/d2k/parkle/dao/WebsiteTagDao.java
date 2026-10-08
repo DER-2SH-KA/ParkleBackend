@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dao.database.websitetag.WebsiteTagDatabase;
 import ru.d2k.parkle.dto.WebsiteTagUpdateDto;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
-import ru.d2k.parkle.entity.cache.UserCache;
-import ru.d2k.parkle.entity.cache.WebsiteTagCache;
+import ru.d2k.parkle.model.domain.User;
+import ru.d2k.parkle.model.domain.WebsiteTag;
 import ru.d2k.parkle.exception.entity.UserEntityNotFoundException;
 import ru.d2k.parkle.exception.entity.WebsiteEntityNotFoundException;
 import ru.d2k.parkle.exception.entity.WebsiteTagEntityNotFoundException;
@@ -22,47 +22,50 @@ import java.util.UUID;
 public class WebsiteTagDao {
 
     private final WebsiteTagDatabase database;
+
     private final WebsiteTagMapper mapper;
+
     private final UserDao userDao;
 
-    public WebsiteTagCache create(WebsiteTagEntity entity) {
+    public WebsiteTag create(WebsiteTagEntity entity) {
         WebsiteTagEntity createdEntity = this.saveToDatabase(entity);
 
-        return mapper.toCache(createdEntity);
+        return mapper.toDomain(createdEntity);
     }
 
-    public List<WebsiteTagCache> getAll() {
+    public List<WebsiteTag> getAll() {
         log.debug("Website tags was taken from database!");
 
         return database.getAll().stream()
-                .map(mapper::toCache)
+                .map(mapper::toDomain)
                 .toList();
     }
 
-    public List<WebsiteTagCache> getAllByUserLogin(String login) {
-        UserCache user = userDao.getByLogin(login)
+    public List<WebsiteTag> getAllByUserLogin(String login) {
+        User user = userDao.getByLogin(login)
                 .orElseThrow(() -> new UserEntityNotFoundException("User entity not found by login: " + login));
         List<WebsiteTagEntity> tags = database.getByUserIdSortedByTitleAsc(user.id());
 
         return tags.stream()
-                .map(mapper::toCache)
+                .map(mapper::toDomain)
                 .toList();
     }
 
-    public Optional<WebsiteTagCache> getById(UUID id) {
+    public Optional<WebsiteTag> getById(UUID id) {
         WebsiteTagEntity entity = this.getByIdFromDatabase(id)
                 .orElseThrow(() ->
                         new WebsiteTagEntityNotFoundException(
                                 String.format("WebsiteTagEntity not found by ID '%s'!", id)));
 
-        return Optional.ofNullable(mapper.toCache(entity));
+        return Optional.ofNullable(mapper.toDomain(entity));
     }
 
     public WebsiteTagEntity getReferenceById(UUID id) {
         return database.getReferenceById(id);
     }
 
-    public WebsiteTagCache updateById(UUID id, WebsiteTagUpdateDto updateDto) {
+    // TODO: Преобразовать в Application/Domain-сущность вместо DTO.
+    public WebsiteTag updateById(UUID id, WebsiteTagUpdateDto updateDto) {
         WebsiteTagEntity entity = this.getByIdFromDatabase(id)
                 .orElseThrow(() ->
                         new WebsiteEntityNotFoundException(String.format("WebsiteTagEntity not found by ID '%s'!", id)));
@@ -73,7 +76,7 @@ public class WebsiteTagDao {
         entity.setHex(updateDto.hex());
 
         WebsiteTagEntity updatedEntity = this.saveToDatabase(entity);
-        WebsiteTagCache cache = mapper.toCache(updatedEntity);
+        WebsiteTag cache = mapper.toDomain(updatedEntity);
 
         log.debug("WebsiteTagEntity with id {} was updated", id);
 

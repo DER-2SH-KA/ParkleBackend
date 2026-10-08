@@ -3,12 +3,11 @@ package ru.d2k.parkle.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dao.database.user.UserDatabase;
 import ru.d2k.parkle.dto.UserUpdateDto;
 import ru.d2k.parkle.entity.UserEntity;
-import ru.d2k.parkle.entity.cache.UserCache;
+import ru.d2k.parkle.model.domain.User;
 import ru.d2k.parkle.exception.entity.UserEntityNotFoundException;
 import ru.d2k.parkle.utils.mapper.UserMapper;
 import java.util.List;
@@ -28,43 +27,39 @@ public class UserDao {
     @Autowired
     private final UserMapper mapper;
 
-    @Autowired
-    private final RoleDao roleDao;
+    public User create(UserEntity entity) {
+        UserEntity savedEntity = this.saveToDatabase(entity);
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    public UserCache create(UserEntity entity) {
-        return mapper.toCache(this.saveToDatabase(entity));
+        return mapper.toDomain(savedEntity);
     }
 
-    public Set<UserCache> getAll() {
+    public Set<User> getAll() {
         List<UserEntity> entities = this.getAllFromDatabase();
 
         log.debug("Users was taken from database!");
 
         return entities.stream()
-                .map(mapper::toCache)
+                .map(mapper::toDomain)
                 .collect(Collectors.toSet());
     }
 
-    public Optional<UserCache> getById(UUID id) {
+    public Optional<User> getById(UUID id) {
         Optional<UserEntity> entityFromDb = this.getByIdFromDatabase(id);
 
         if (entityFromDb.isPresent()) {
             log.debug("UserEntity by id {} was taken from database!", id);
 
-            return Optional.of(mapper.toCache(entityFromDb.get()));
+            return Optional.of(mapper.toDomain(entityFromDb.get()));
         }
 
         return Optional.empty();
     }
 
-    public Optional<UserCache> getByLogin(String login) {
+    public Optional<User> getByLogin(String login) {
         Optional<UserEntity> entityFromDb = this.getByLoginFromDatabase(login);
 
         if (entityFromDb.isPresent()) {
-            UserCache cacheFromEntity = mapper.toCache(entityFromDb.get());
+            User cacheFromEntity = mapper.toDomain(entityFromDb.get());
 
             log.debug("UserEntity with login '{}' taken from database!", login);
 
@@ -78,8 +73,9 @@ public class UserDao {
         return database.getReferenceById(id);
     }
 
+    // TODO: Преобразовать в Application/Domain-сущность вместо DTO.
     // TODO: Пока забей. Всё равно нет обновления сущности пользователя.
-    public UserCache updateByLogin(String login, UserUpdateDto updateUserDto) {
+    public User updateByLogin(String login, UserUpdateDto updateUserDto) {
         UserEntity entity = this.getByLoginFromDatabase(login)
                 .orElseThrow(() ->
                         new UserEntityNotFoundException("Can't find user with login " + login + " for update user entity"));
@@ -97,7 +93,7 @@ public class UserDao {
 
         log.warn("Updating user entity is not implemented in UserDao!");
 
-        return mapper.toCache(entity);
+        return mapper.toDomain(entity);
     }
 
     public boolean deleteByLogin(String login) {

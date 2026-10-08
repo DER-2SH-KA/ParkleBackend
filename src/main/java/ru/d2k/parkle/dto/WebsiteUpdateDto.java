@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 public record WebsiteUpdateDto(
@@ -35,5 +35,5 @@ public record WebsiteUpdateDto(
 
         @JsonProperty("tags")
         @NotNull(message = "WebsiteUpdateDto tags cannot be null")
-        Set<WebsiteTagResponseDto> tags
+        List<WebsiteTagResponseDto> tags
 ) { }

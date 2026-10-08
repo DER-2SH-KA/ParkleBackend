@@ -7,8 +7,8 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.d2k.parkle.entity.cache.UserCache;
-import ru.d2k.parkle.model.CustomUserDetails;
+import ru.d2k.parkle.model.domain.User;
+import ru.d2k.parkle.model.security.CustomUserDetails;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -25,10 +25,10 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    public String generateTokenByUserCache(UserCache userCache) {
+    public String generateTokenByUserCache(User user) {
         Map<String, Object> claims = new HashMap<>();
 
-        return this.createToken(claims, userCache.login());
+        return this.createToken(claims, user.login());
     }
 
     public String getSubject(String jwt) {

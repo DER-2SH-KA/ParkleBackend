@@ -40,7 +40,7 @@ public class UserUpdateDto implements UserDtoInterface {
     private String password;
 
     @JsonProperty("roles")
-    @NotNull(message = "UserCreateDto roles cannot be null")
-    @NotEmpty(message = "UserCreateDto roles cannot be null")
+    @NotNull(message = "UserUpdateDto roles cannot be null")
+    @NotEmpty(message = "UserUpdateDto roles cannot be null")
     private Set<RoleResponseDto> roles;
 }

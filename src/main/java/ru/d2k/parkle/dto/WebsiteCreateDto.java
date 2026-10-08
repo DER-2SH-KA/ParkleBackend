@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.util.Set;
+import java.util.List;
 
 public record WebsiteCreateDto(
 
@@ -34,5 +34,5 @@ public record WebsiteCreateDto(
 
         @JsonProperty("tags")
         @NotNull(message = "WebsiteCreateDto tags cannot be null")
-        Set<WebsiteTagResponseDto> tags
+        List<WebsiteTagResponseDto> tags
 ) { }

@@ -7,17 +7,16 @@ import ru.d2k.parkle.dao.database.website.WebsiteDatabase;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
 import ru.d2k.parkle.entity.WebsiteEntity;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
-import ru.d2k.parkle.entity.cache.UserCache;
-import ru.d2k.parkle.entity.cache.WebsiteCache;
+import ru.d2k.parkle.model.domain.User;
+import ru.d2k.parkle.model.domain.Website;
 import ru.d2k.parkle.exception.entity.WebsiteEntityNotFoundException;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+// TODO: Пересмотреть сигнатуры методов (они не должны ничего знать про DTO-объекты).
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -27,25 +26,25 @@ public class WebsiteDao {
     private final WebsiteMapper mapper;
     private final WebsiteTagDao websiteTagDao;
 
-    public WebsiteCache create(WebsiteEntity entity) {
+    public Website create(WebsiteEntity entity) {
         WebsiteEntity createdEntity = this.saveToDatabase(entity);
 
-        return mapper.toCache(createdEntity);
+        return mapper.toDomain(createdEntity);
     }
 
-    public List<WebsiteCache> getAll() {
+    public List<Website> getAll() {
         log.debug("Websites was taken from database!");
 
         return database.getAll().stream()
-                .map(mapper::toCache)
+                .map(mapper::toDomain)
                 .toList();
     }
 
-    public List<WebsiteCache> getAllByUserLogin(UserCache userCache) {
-        List<WebsiteCache> websiteCaches = new ArrayList<>();
+    public List<Website> getAllByUserLogin(User user) {
+        List<Website> websiteCaches = new ArrayList<>();
 
-        List<UUID> websiteIds = userCache.websiteIds();
-        Optional<WebsiteCache> cache = Optional.empty();
+        List<UUID> websiteIds = user.websiteIds();
+        Optional<Website> cache = Optional.empty();
 
         for (UUID websiteId : websiteIds) {
             cache = this.getById(websiteId);
@@ -60,13 +59,13 @@ public class WebsiteDao {
         return websiteCaches;
     }
 
-    public Optional<WebsiteCache> getById(UUID id) {
+    public Optional<Website> getById(UUID id) {
         Optional<WebsiteEntity> fromDatabase = this.getByIdFromDatabase(id);
 
         if (fromDatabase.isEmpty()) {
             throw new WebsiteEntityNotFoundException(String.format("WebsiteEntity not found by ID '%s'!", id));
         } else {
-            WebsiteCache cache = mapper.toCache(fromDatabase.get());
+            Website cache = mapper.toDomain(fromDatabase.get());
 
             log.debug("WebsiteEntity by id '{}' was taken from database!", id);
 
@@ -78,16 +77,17 @@ public class WebsiteDao {
         return database.getReferenceById(id);
     }
 
-    public WebsiteCache updateById(UUID id, WebsiteUpdateDto updateWebsiteDto) {
+    // TODO: Преобразовать в Application/Domain-сущность вместо DTO.
+    public Website updateById(UUID id, WebsiteUpdateDto updateWebsiteDto) {
         WebsiteEntity entity = this.getByIdFromDatabase(id)
                 .orElseThrow(() ->
                         new WebsiteEntityNotFoundException(String.format("WebsiteEntity not found by ID '%s'!", id)));
 
         log.debug("Entity and website is present");
 
-        Set<WebsiteTagEntity> tagEntities = updateWebsiteDto.tags().stream()
+        List<WebsiteTagEntity> tagEntities = updateWebsiteDto.tags().stream()
                 .map(dto -> websiteTagDao.getReferenceById(dto.id()))
-                .collect(Collectors.toSet());
+                .toList();
 
         entity.setTitle(updateWebsiteDto.title());
         entity.setDescription(updateWebsiteDto.description());
@@ -96,7 +96,7 @@ public class WebsiteDao {
         entity.setTags(tagEntities);
 
         WebsiteEntity updatedEntity = this.saveToDatabase(entity);
-        WebsiteCache cache = mapper.toCache(updatedEntity);
+        Website cache = mapper.toDomain(updatedEntity);
 
         log.debug("WebsiteEntity with id {} was updated", id);
 

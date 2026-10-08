@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.d2k.parkle.dao.UserDao;
 import ru.d2k.parkle.dto.UserUpdateDto;
-import ru.d2k.parkle.entity.cache.UserCache;
+import ru.d2k.parkle.model.domain.User;
 import ru.d2k.parkle.service.rest.UserService;
 
 @Slf4j
@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserCache updateByLogin(String login, UserUpdateDto updateUserDto) {
+    public User updateByLogin(String login, UserUpdateDto updateUserDto) {
         return dao.updateByLogin(login, updateUserDto);
     }
 

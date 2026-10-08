@@ -15,7 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.d2k.parkle.model.CustomUserDetails;
+import ru.d2k.parkle.model.security.CustomUserDetails;
 import ru.d2k.parkle.service.security.cookie.CookieNames;
 import ru.d2k.parkle.service.security.cookie.CustomCookieService;
 import ru.d2k.parkle.service.security.cookie.JwtCookieService;

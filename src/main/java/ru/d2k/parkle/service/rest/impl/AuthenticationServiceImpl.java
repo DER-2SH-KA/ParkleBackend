@@ -11,9 +11,9 @@ import ru.d2k.parkle.dto.UserAuthenticationDto;
 import ru.d2k.parkle.dto.UserDtoInterface;
 import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.dto.UserUpdateDto;
-import ru.d2k.parkle.entity.cache.UserCache;
+import ru.d2k.parkle.model.domain.User;
 import ru.d2k.parkle.exception.entity.UserEntityNotFoundException;
-import ru.d2k.parkle.model.CustomUserDetails;
+import ru.d2k.parkle.model.security.CustomUserDetails;
 import ru.d2k.parkle.service.rest.AuthenticationService;
 import ru.d2k.parkle.service.security.authentication.CustomAuthenticationManagerService;
 import ru.d2k.parkle.service.security.cookie.JwtCookieService;
@@ -35,13 +35,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional(readOnly = true)
     public UserResponseDto authenticate(UserAuthenticationDto userAuthenticationDto, HttpServletResponse response) {
-        UserCache userCache = this.getUserCacheByUserDtoImplements(userAuthenticationDto);
+        User user = this.getUserCacheByUserDtoImplements(userAuthenticationDto);
 
-        if (userCache != null) {
+        if (user != null) {
             String jwt = this.generateJwtByUserDtoImplements(userAuthenticationDto);
             jwtCookieService.setCookieWithJwtInResponse(jwt, response);
 
-            return userMapper.toResponseDto(userCache);
+            return userMapper.toResponseDto(user);
         }
 
         throw new UserEntityNotFoundException("Can't find user by UserAuthenticationDto: " +
@@ -52,12 +52,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public UserResponseDto updateByLoginAndUpdateJwt(String login, UserUpdateDto userUpdateDto,
                                                      HttpServletResponse response) {
-        UserCache updatedUserCache = userService.updateByLogin(login, userUpdateDto);
+        User updatedUser = userService.updateByLogin(login, userUpdateDto);
 
-        String jwt = jwtService.generateTokenByUserCache(updatedUserCache);
+        String jwt = jwtService.generateTokenByUserCache(updatedUser);
         jwtCookieService.setCookieWithJwtInResponse(jwt, response);
 
-        return userMapper.toResponseDto(updatedUserCache);
+        return userMapper.toResponseDto(updatedUser);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return jwtService.generateTokenByUserCache(customUserDetails.getCache());
     }
 
-    private UserCache getUserCacheByUserDtoImplements(UserDtoInterface userDto) {
+    private User getUserCacheByUserDtoImplements(UserDtoInterface userDto) {
         CustomUserDetails customUserDetails = this.getCustomUserDetailsByUserDtoImplements(userDto);
 
         return customUserDetails.getCache();

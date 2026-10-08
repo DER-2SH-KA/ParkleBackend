@@ -1,11 +1,12 @@
-package ru.d2k.parkle.model;
+package ru.d2k.parkle.model.security;
 
 import lombok.Getter;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.d2k.parkle.entity.cache.UserCache;
+import ru.d2k.parkle.model.domain.User;
+
 import java.util.Collection;
 import java.util.Set;
 import java.util.HashSet;
@@ -20,9 +21,9 @@ public class CustomUserDetails implements UserDetails, CredentialsContainer {
     private Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 
     @Getter
-    private final UserCache cache;
+    private final User cache;
 
-    public CustomUserDetails(UserCache cache) {
+    public CustomUserDetails(User cache) {
         this.cache = cache;
         this.username = cache.login();
         this.password = cache.hashedPassword();

@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -53,10 +53,10 @@ public class WebsiteEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "website_and_tags", joinColumns = @JoinColumn(name = "website_id"),
             inverseJoinColumns = @JoinColumn(name = "website_tag_id"))
-    private Set<WebsiteTagEntity> tags = new HashSet<>();
+    private List<WebsiteTagEntity> tags = new ArrayList<>();
 
     private WebsiteEntity(UserEntity user, String hexColor, String title, String description, String url,
-                          Set<WebsiteTagEntity> tags) {
+                          List<WebsiteTagEntity> tags) {
         this.id = UuidGeneratorUtil.generateNewUuidV7();
         this.user = user;
         this.hexColor = hexColor;
@@ -67,7 +67,7 @@ public class WebsiteEntity {
     }
 
     WebsiteEntity(UUID id, UserEntity user, String hexColor, String title, String description, String url,
-                  Set<WebsiteTagEntity> tags) {
+                  List<WebsiteTagEntity> tags) {
         this.id = id;
         this.user = user;
         this.hexColor = hexColor;
@@ -78,7 +78,7 @@ public class WebsiteEntity {
     }
 
     public static WebsiteEntity create(UserEntity user, String hexColor, String title, String description, String url,
-                                       Set<WebsiteTagEntity> tags) {
+                                       List<WebsiteTagEntity> tags) {
         return new WebsiteEntity(user, hexColor, title, description, url, tags);
     }
 }

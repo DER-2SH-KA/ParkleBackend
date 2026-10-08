@@ -8,7 +8,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.d2k.parkle.dto.RoleUpdateDto;
 import ru.d2k.parkle.dto.RoleResponseDto;
 import ru.d2k.parkle.entity.RoleEntity;
-import ru.d2k.parkle.entity.cache.RoleCache;
+import ru.d2k.parkle.model.domain.Role;
 
 @Mapper(componentModel = "spring")
 public interface RoleMapper {
@@ -17,6 +17,6 @@ public interface RoleMapper {
     @Mapping(target = "id", ignore = true)
     void updateEntityByDto(@MappingTarget RoleEntity role, RoleUpdateDto dto);
 
-    RoleResponseDto toResponseDto(RoleCache cache);
-    RoleCache toCache(RoleEntity entity);
+    RoleResponseDto toResponseDto(Role cache);
+    Role toDomain(RoleEntity entity);
 }

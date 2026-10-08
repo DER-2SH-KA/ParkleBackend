@@ -11,8 +11,8 @@ import ru.d2k.parkle.dto.WebsiteTagResponseDto;
 import ru.d2k.parkle.dto.WebsiteTagUpdateDto;
 import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
-import ru.d2k.parkle.entity.cache.WebsiteTagCache;
-import ru.d2k.parkle.model.CustomUserDetails;
+import ru.d2k.parkle.model.domain.WebsiteTag;
+import ru.d2k.parkle.model.security.CustomUserDetails;
 import ru.d2k.parkle.service.rest.WebsiteTagService;
 import ru.d2k.parkle.utils.mapper.WebsiteTagMapper;
 import java.util.List;
@@ -50,7 +50,7 @@ public class WebsiteTagServiceImpl implements WebsiteTagService {
     @Override
     @Transactional
     public WebsiteTagResponseDto updateById(WebsiteTagUpdateDto updateDto) {
-        WebsiteTagCache updatedTagCache = dao.updateById(updateDto.id(), updateDto);
+        WebsiteTag updatedTagCache = dao.updateById(updateDto.id(), updateDto);
 
         return mapper.toResponseDto(updatedTagCache);
     }

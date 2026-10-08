@@ -10,8 +10,8 @@ import ru.d2k.parkle.dto.UserResponseDto;
 import ru.d2k.parkle.entity.RoleEntity;
 import ru.d2k.parkle.entity.UserEntity;
 import ru.d2k.parkle.entity.WebsiteEntity;
-import ru.d2k.parkle.entity.cache.RoleCache;
-import ru.d2k.parkle.entity.cache.UserCache;
+import ru.d2k.parkle.model.domain.Role;
+import ru.d2k.parkle.model.domain.User;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -25,21 +25,21 @@ public abstract class UserMapper {
     private RoleMapper roleMapper;
 
     @Mapping(target = "roles", source = "roles", qualifiedByName = "getRoleDtosByCaches")
-    public abstract UserResponseDto toResponseDto(UserCache userCache);
+    public abstract UserResponseDto toResponseDto(User user);
 
     @Mapping(target = "roles", source = "roles", qualifiedByName = "getRoleCachesByEntities")
     @Mapping(target = "hashedPassword", source = "password")
     @Mapping(target = "websiteIds", source = "websites", qualifiedByName = "getWebsiteIds")
-    public abstract UserCache toCache(UserEntity entity);
+    public abstract User toDomain(UserEntity entity);
 
     @Named("getRoleDtosByCaches")
-    Set<RoleResponseDto> getRoleDtosByCaches(Set<RoleCache> caches) {
+    Set<RoleResponseDto> getRoleDtosByCaches(Set<Role> caches) {
         return caches.stream().map(roleMapper::toResponseDto).collect(Collectors.toSet());
     }
 
     @Named("getRoleCachesByEntities")
-    Set<RoleCache> getRoleCachesByEntities(Set<RoleEntity> entities) {
-        return entities.stream().map(roleMapper::toCache).collect(Collectors.toSet());
+    Set<Role> getRoleCachesByEntities(Set<RoleEntity> entities) {
+        return entities.stream().map(roleMapper::toDomain).collect(Collectors.toSet());
     }
 
     @Named("getWebsiteIds")

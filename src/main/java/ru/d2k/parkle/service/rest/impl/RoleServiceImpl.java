@@ -8,7 +8,7 @@ import ru.d2k.parkle.dao.RoleDao;
 import ru.d2k.parkle.dto.RoleCreateDto;
 import ru.d2k.parkle.dto.RoleResponseDto;
 import ru.d2k.parkle.dto.RoleUpdateDto;
-import ru.d2k.parkle.entity.cache.RoleCache;
+import ru.d2k.parkle.model.domain.Role;
 import ru.d2k.parkle.exception.entity.RoleEntityNotFoundException;
 import ru.d2k.parkle.service.rest.RoleService;
 import ru.d2k.parkle.utils.mapper.RoleMapper;
@@ -29,7 +29,7 @@ public class RoleServiceImpl implements RoleService {
     public Set<RoleResponseDto> findAll() {
         log.debug("Getting all roles...");
 
-        Set<RoleCache> roleCaches = dao.getAll();
+        Set<Role> roleCaches = dao.getAll();
 
         log.debug("Roles was founded: {}", roleCaches.size());
 
@@ -43,12 +43,12 @@ public class RoleServiceImpl implements RoleService {
     public RoleResponseDto findById(UUID id) {
         log.debug("Getting role by ID: {}...", id);
 
-        RoleCache roleCache = dao.getById(id)
+        Role role = dao.getById(id)
                 .orElseThrow(() -> new RoleEntityNotFoundException("RoleEntity was not found with ID: " + id));
 
         log.debug("RoleEntity with ID {} was founded", id);
 
-        return mapper.toResponseDto(roleCache);
+        return mapper.toResponseDto(role);
     }
 
     @Override
@@ -56,12 +56,12 @@ public class RoleServiceImpl implements RoleService {
     public RoleResponseDto findByName(String name) {
         log.debug("Getting roles by Name '{}'...", name);
 
-        RoleCache roleCache = dao.getByName(name)
+        Role role = dao.getByName(name)
                 .orElseThrow(() -> new RoleEntityNotFoundException("RoleEntity was not found with name: " + name));
 
         log.debug("RoleEntity with name '{}' was founded", name);
 
-        return mapper.toResponseDto(roleCache);
+        return mapper.toResponseDto(role);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class RoleServiceImpl implements RoleService {
             throw new IllegalArgumentException("RoleEntity with this name is already exists");
         }
 
-        RoleCache role = dao.create(createRoleDto);
+        Role role = dao.create(createRoleDto);
 
         log.debug("RoleEntity '{}' was created", role.name());
 
@@ -85,7 +85,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleResponseDto updateById(RoleUpdateDto updateRoleDto) {
         log.debug("Updating role by id '{}'...", updateRoleDto.id());
 
-        RoleCache updatedRole = dao.updateById(updateRoleDto.id(), updateRoleDto);
+        Role updatedRole = dao.updateById(updateRoleDto.id(), updateRoleDto);
 
         log.debug("RoleEntity with id {} was updated to {}", updateRoleDto.id(), updatedRole);
 

@@ -8,31 +8,30 @@ import ru.d2k.parkle.dto.WebsiteResponseDto;
 import ru.d2k.parkle.dto.WebsiteTagResponseDto;
 import ru.d2k.parkle.entity.WebsiteEntity;
 import ru.d2k.parkle.entity.WebsiteTagEntity;
-import ru.d2k.parkle.entity.cache.WebsiteCache;
-import ru.d2k.parkle.entity.cache.WebsiteTagCache;
-import java.util.Set;
-import java.util.stream.Collectors;
+import ru.d2k.parkle.model.domain.Website;
+import ru.d2k.parkle.model.domain.WebsiteTag;
+import java.util.List;
 
 @Component
 @Mapper(componentModel = "spring")
 public abstract class WebsiteMapper {
 
     @Mapping(target = "tags", source = "tags", qualifiedByName = "getWebsiteTagDtosByCaches")
-    public abstract WebsiteResponseDto toResponseDto(WebsiteCache cache);
+    public abstract WebsiteResponseDto toResponseDto(Website cache);
 
     @Mapping(target = "tags", source = "tags", qualifiedByName = "getWebsiteTagCachesByEntities")
-    public abstract WebsiteCache toCache(WebsiteEntity entity);
+    public abstract Website toDomain(WebsiteEntity entity);
 
     @Named("getWebsiteTagCachesByEntities")
-    Set<WebsiteTagCache> getWebsiteTagCachesByEntities(Set<WebsiteTagEntity> entities) {
+    List<WebsiteTag> getWebsiteTagCachesByEntities(List<WebsiteTagEntity> entities) {
         return entities.stream().map(entity ->
-                new WebsiteTagCache(entity.getId(), entity.getTitle(), entity.getHex())).collect(Collectors.toSet());
+                new WebsiteTag(entity.getId(), entity.getTitle(), entity.getHex())).toList();
     }
 
     @Named("getWebsiteTagDtosByCaches")
-    Set<WebsiteTagResponseDto> getWebsiteTagDtosByCaches(Set<WebsiteTagCache> caches) {
+    List<WebsiteTagResponseDto> getWebsiteTagDtosByCaches(List<WebsiteTag> caches) {
         return caches.stream().map(cache ->
                 new WebsiteTagResponseDto(cache.id(), cache.title(), cache.hex())
-        ).collect(Collectors.toSet());
+        ).toList();
     }
 }

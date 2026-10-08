@@ -1,7 +1,7 @@
 package ru.d2k.parkle.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 public record WebsiteResponseDto(
@@ -22,5 +22,5 @@ public record WebsiteResponseDto(
         String url,
 
         @JsonProperty("tags")
-        Set<WebsiteTagResponseDto> tags
+        List<WebsiteTagResponseDto> tags
 ) { }
