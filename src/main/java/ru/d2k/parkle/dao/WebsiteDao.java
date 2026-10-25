@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 // TODO: Пересмотреть сигнатуры методов (они не должны ничего знать про DTO-объекты).
 @Slf4j
@@ -87,7 +88,7 @@ public class WebsiteDao {
 
         List<WebsiteTagEntity> tagEntities = updateWebsiteDto.tags().stream()
                 .map(dto -> websiteTagDao.getReferenceById(dto.id()))
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
 
         entity.setTitle(updateWebsiteDto.title());
         entity.setDescription(updateWebsiteDto.description());
