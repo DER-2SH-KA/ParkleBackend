@@ -25,7 +25,7 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    public String generateTokenByUserCache(User user) {
+    public String generateTokenByUser(User user) {
         Map<String, Object> claims = new HashMap<>();
 
         return this.createToken(claims, user.login());
@@ -35,7 +35,7 @@ public class JwtService {
         return this.getSubjectFromClaims(this.getClaims(jwt));
     }
 
-    public boolean isTokenValid(String jwt, CustomUserDetails customUserDetails) {
+    public boolean isTokenValidUsingUserDetails(String jwt, CustomUserDetails customUserDetails) {
         Claims claims = this.getClaims(jwt);
 
         return this.getSubjectFromClaims(claims).equals(customUserDetails.getUsername()) &&

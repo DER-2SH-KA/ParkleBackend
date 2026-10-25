@@ -54,7 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                                      HttpServletResponse response) {
         User updatedUser = userService.updateByLogin(login, userUpdateDto);
 
-        String jwt = jwtService.generateTokenByUserCache(updatedUser);
+        String jwt = jwtService.generateTokenByUser(updatedUser);
         jwtCookieService.setCookieWithJwtInResponse(jwt, response);
 
         return userMapper.toResponseDto(updatedUser);
@@ -93,7 +93,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private String generateJwtByUserDtoImplements(UserDtoInterface userDto) {
         CustomUserDetails customUserDetails = this.getCustomUserDetailsByUserDtoImplements(userDto);
 
-        return jwtService.generateTokenByUserCache(customUserDetails.getCache());
+        return jwtService.generateTokenByUser(customUserDetails.getCache());
     }
 
     private User getUserCacheByUserDtoImplements(UserDtoInterface userDto) {
