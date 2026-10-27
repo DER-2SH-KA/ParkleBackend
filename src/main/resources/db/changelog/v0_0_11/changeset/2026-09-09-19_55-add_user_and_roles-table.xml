@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <changeSet id="2026-09-09-19_55-add_user_and_roles-table" author="DER-2SH-KA">
+        <createTable tableName="user_and_roles">
+            <column name="user_id" type="uuid">
+                <constraints nullable="false" unique="false" />
+            </column>
+
+            <column name="role_id" type="uuid">
+                <constraints nullable="false" unique="false" />
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="user_and_roles" columnNames="user_id, role_id" constraintName="PK__user_and_roles" />
+
+        <addForeignKeyConstraint
+                baseTableName="user_and_roles"
+                baseColumnNames="user_id"
+                constraintName="FK__user_and_roles__user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE" />
+
+        <addForeignKeyConstraint
+                baseTableName="user_and_roles"
+                baseColumnNames="role_id"
+                constraintName="FK__user_and_roles__role_id"
+                referencedTableName="roles"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE" />
+
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="user_and_roles" constraintName="FK__user_and_roles__role_id" />
+            <dropForeignKeyConstraint baseTableName="user_and_roles" constraintName="FK__user_and_roles__user_id" />
+
+            <dropPrimaryKey tableName="user_and_roles" constraintName="PK__user_and_roles" />
+
+            <dropTable tableName="user_and_roles" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

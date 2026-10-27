@@ -7,4 +7,5 @@ public interface ApiRoutes {
     String USER_API = "/users";
     String WEBSITE_API = "/websites";
     String AUTH_API = "/auth";
+    String WEBSITE_TAG_API = WEBSITE_API + "/tags";
 }

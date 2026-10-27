@@ -7,8 +7,9 @@ import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dao.database.role.RoleDatabase;
 import ru.d2k.parkle.dto.RoleCreateDto;
 import ru.d2k.parkle.dto.RoleUpdateDto;
-import ru.d2k.parkle.entity.Role;
-import ru.d2k.parkle.entity.cache.RoleCache;
+import ru.d2k.parkle.entity.RoleEntity;
+import ru.d2k.parkle.model.domain.Role;
+import ru.d2k.parkle.exception.entity.RoleEntityNotFoundException;
 import ru.d2k.parkle.utils.mapper.RoleMapper;
 import java.util.List;
 import java.util.Optional;
@@ -27,43 +28,44 @@ public class RoleDao {
     @Autowired
     private final RoleMapper mapper;
 
-    public RoleCache create(RoleCreateDto createRoleDto) {
-        Role entityToCreate = Role.create(createRoleDto.name(), createRoleDto.priority());
+    // TODO: Преобразовать в Application/Domain-сущность вместо DTO.
+    public Role create(RoleCreateDto createRoleDto) {
+        RoleEntity entityToCreate = RoleEntity.create(createRoleDto.name());
 
-        Role createdEntity = this.saveToDatabase(entityToCreate);
+        RoleEntity createdEntity = this.saveToDatabase(entityToCreate);
 
-        return mapper.toCache(createdEntity);
+        return mapper.toDomain(createdEntity);
     }
 
     // TODO: Придумать и реализовать поиск списка ролей (возможно, по срезу ключей).
-    public Set<RoleCache> getAll() {
-        List<Role> entities = this.getAllFromDatabase();
+    public Set<Role> getAll() {
+        List<RoleEntity> entities = this.getAllFromDatabase();
 
         return entities.stream()
-                .map(mapper::toCache)
+                .map(mapper::toDomain)
                 .collect(Collectors.toSet());
     }
 
     // TODO: сделать поиск по ID (нюанс в том, что ключ состоит из Name).
-    public Optional<RoleCache> getById(UUID id) {
-        Optional<Role> entityFromDb = this.getByIdFromDatabase(id);
+    public Optional<Role> getById(UUID id) {
+        Optional<RoleEntity> entityFromDb = this.getByIdFromDatabase(id);
 
         if (entityFromDb.isPresent()) {
-            log.debug("Role with id '{}' taken from database!", id);
+            log.debug("RoleEntity with id '{}' taken from database!", id);
 
-            return Optional.of(mapper.toCache(entityFromDb.get()));
+            return Optional.of(mapper.toDomain(entityFromDb.get()));
         }
 
         return Optional.empty();
     }
 
-    public Optional<RoleCache> getByName(String name) {
-        Optional<Role> entityFromDb = this.getByNameFromDatabase(name);
+    public Optional<Role> getByName(String name) {
+        Optional<RoleEntity> entityFromDb = this.getByNameFromDatabase(name);
 
         if (entityFromDb.isPresent()) {
-            RoleCache cacheFromEntity = mapper.toCache(entityFromDb.get());
+            Role cacheFromEntity = mapper.toDomain(entityFromDb.get());
 
-            log.debug("Role with name '{}' taken from database!", name);
+            log.debug("RoleEntity with name '{}' taken from database!", name);
 
             return Optional.of(cacheFromEntity);
         }
@@ -71,27 +73,24 @@ public class RoleDao {
         return Optional.empty();
     }
 
-    public Role getReferenceById(UUID id) {
+    public RoleEntity getReferenceById(UUID id) {
         return database.getReferenceById(id);
     }
 
-    public Optional<RoleCache> updateById(UUID id, RoleUpdateDto updateRoleDto) {
-        Optional<Role> entity = this.getByIdFromDatabase(id);
+    // TODO: Преобразовать в Application/Domain-сущность вместо DTO.
+    public Role updateById(UUID id, RoleUpdateDto updateRoleDto) {
+        RoleEntity entity = this.getByIdFromDatabase(id)
+                .orElseThrow(() -> new RoleEntityNotFoundException("Role not found by id: " + id));
 
-        if (entity.isPresent()) {
-            mapper.updateEntityByDto(entity.get(), updateRoleDto);
+        mapper.updateEntityByDto(entity, updateRoleDto);
 
-            Role updatedEntity = this.saveToDatabase(entity.get());
-            RoleCache cache = mapper.toCache(updatedEntity);
+        RoleEntity updatedEntity = this.saveToDatabase(entity);
 
-            return Optional.of(cache);
-        }
-
-        return Optional.empty();
+        return mapper.toDomain(updatedEntity);
     }
 
     public boolean deleteById(UUID id) {
-        Optional<Role> entityToDelete = this.getByIdFromDatabase(id);
+        Optional<RoleEntity> entityToDelete = this.getByIdFromDatabase(id);
 
         if (entityToDelete.isPresent()) {
             this.deleteByIdFromDatabase(id);
@@ -99,13 +98,13 @@ public class RoleDao {
             return !this.existsByIdInDatabase(id);
         }
 
-        log.error("Role to delete with id '{}' not exist!", id);
+        log.error("RoleEntity to delete with id '{}' not exist!", id);
 
         return true;
     }
 
     public boolean existsById(UUID id) {
-        Optional<RoleCache> entityFromCache = this.getById(id);
+        Optional<Role> entityFromCache = this.getById(id);
 
         if (entityFromCache.isPresent()) return true;
 
@@ -116,19 +115,19 @@ public class RoleDao {
         return database.existsByName(name);
     }
 
-    private Role saveToDatabase(Role entity) {
+    private RoleEntity saveToDatabase(RoleEntity entity) {
         return database.save(entity);
     }
 
-    private List<Role> getAllFromDatabase() {
+    private List<RoleEntity> getAllFromDatabase() {
         return database.getAll();
     }
 
-    private Optional<Role> getByIdFromDatabase(UUID id) {
+    private Optional<RoleEntity> getByIdFromDatabase(UUID id) {
         return database.getById(id);
     }
 
-    public Optional<Role> getByNameFromDatabase(String name) {
+    public Optional<RoleEntity> getByNameFromDatabase(String name) {
         return database.getByName(name);
     }
 

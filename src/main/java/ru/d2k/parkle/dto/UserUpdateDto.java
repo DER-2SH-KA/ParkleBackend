@@ -1,6 +1,7 @@
 package ru.d2k.parkle.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -10,8 +11,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import java.util.Set;
 import java.util.UUID;
 
+// TODO: пока забил, не пользуюсь
 @Getter
 @Setter
 @ToString(exclude = "password")
@@ -20,23 +23,24 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserUpdateDto implements UserDtoInterface {
 
+    @JsonProperty("id")
     @NotNull(message = "UserUpdateDto id can't be null")
     private UUID id;
 
-    @NotBlank(message = "UserUpdateDto roleName can't be null or blank!")
-    @Size(max = 32, message = "UserUpdateDto roleName must be not grater than 32 symbols")
-    private String roleName;
-
+    // Should not to updating in database and system. It's normal.
+    @JsonProperty("login")
     @Size(min = 3, max = 50, message = "UserUpdateDto login size must be between 3 and 50 symbols")
     @Pattern(regexp = "^[a-zA-Z0-9_-]{3,50}$", message = "UserUpdateDto login isn't allowed by regexp pattern")
     private String login;
 
-    @Size(max = 320, message = "UserUpdateDto email size must be lower then 320 symbols")
-    @Pattern(regexp = "^(\\S+@\\S+\\.\\S+){1,320}$", message = "UserUpdateDto email isn't allowed by regexp pattern")
-    private String email;
-
+    @JsonProperty("password")
     @Size(min = 8, max = 72, message = "UserUpdateDto password length must be between 8 and 72")
     @Pattern(regexp = "^[a-zA-Z0-9`=!@#$%^&*()_+№;:?\\-\\\\/|]{8,72}$",
             message = "UserCreateDto password isn't allowed by regexp pattern")
     private String password;
+
+    @JsonProperty("roles")
+    @NotNull(message = "UserUpdateDto roles cannot be null")
+    @NotEmpty(message = "UserUpdateDto roles cannot be null")
+    private Set<RoleResponseDto> roles;
 }

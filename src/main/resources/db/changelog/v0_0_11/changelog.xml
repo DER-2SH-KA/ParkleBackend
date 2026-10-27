@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.33.xsd">
+
+    <include file="changeset/2026-09-11-17_40-remove-email-is_blocked-and-role_id-in-users-table.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2026-09-09-19_55-add_user_and_roles-table.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2026-09-09-20_24-add-website-tags-table.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2026-09-11-17_57-add-website_and_tags-table.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2026-09-11-20_01-add-database-tag-v0_0_11.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2026-09-11-20_51-remove-priority-in-roles-table.xml" relativeToChangelogFile="true" />
+    <include file="changeset/2026-09-11-20_54-add-database-tag-v0_0_11.1.xml" relativeToChangelogFile="true" />
+
+</databaseChangeLog>

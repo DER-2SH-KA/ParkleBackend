@@ -1,174 +1,163 @@
 package ru.d2k.parkle.dao.database.role;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-import ru.d2k.parkle.entity.Role;
-import ru.d2k.parkle.repository.RoleRepository;
-import ru.d2k.parkle.utils.generator.UuidGeneratorUtil;
-import java.util.Arrays;
+import ru.d2k.parkle.entity.RoleEntity;
+import ru.d2k.parkle.repository.RoleEntityRepository;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import static ru.d2k.parkle.test.consts.TestConstants.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RolePostgresDatabaseTest {
+class RolePostgresDatabaseTest {
+
+    private final List<RoleEntity> ROLES = List.of(ROLE_ENTITY);
 
     @Mock
-    private RoleRepository roleRepository;
+    private RoleEntityRepository repository;
 
     @InjectMocks
-    private RolePostgresDatabase rolePostgresDatabase;
+    private RolePostgresDatabase database;
 
+    // save.
     @Test
-    @DisplayName("save(Role entity) - Should return saved Role entity")
-    void save_shouldReturnRoleEntity() {
-        Role entity = Role.create("USER", 10);
+    void save_shouldReturnSavedEntity() {
+        when(repository.save(ROLE_ENTITY)).thenReturn(ROLE_ENTITY);
 
-        when(roleRepository.save(entity)).thenReturn(entity);
+        var saved = database.save(ROLE_ENTITY);
 
-        Role savedEntity = rolePostgresDatabase.save(entity);
+        verify(repository).save(ROLE_ENTITY);
+        assertEquals(ROLE_ENTITY, saved);
+    }
 
-        assertEquals(entity, savedEntity);
+    // getAll.
+    @Test
+    void getAll_shouldReturnAllEntities() {
+        when(repository.findAll()).thenReturn(ROLES);
+
+        var entities = database.getAll();
+
+        verify(repository).findAll();
+        assertArrayEquals(ROLES.toArray(), entities.toArray());
     }
 
     @Test
-    @DisplayName("getAll() - Should return list of Role entities")
-    void getAll_shouldReturnListOfRoleEntities() {
-        List<Role> entities = List.of(
-                Role.create("USER", 10),
-                Role.create("ADMIN", 1)
-        );
+    void getAll_shouldReturnEmptyListWhenEntitiesNotPersisted() {
+        when(repository.findAll()).thenReturn(List.of());
 
-        when(roleRepository.findAll())
-                .thenReturn(entities);
+        var entities = database.getAll();
 
-        List<Role> foundedEntity = rolePostgresDatabase.getAll();
+        verify(repository).findAll();
+        assertArrayEquals(new RoleEntity[] { }, entities.toArray());
+    }
 
-        assertTrue(Arrays.deepEquals(
-                entities.toArray(),
-                foundedEntity.toArray()
-        ));
+    // getById.
+    @Test
+    void getById_shouldReturnEntityById() {
+        when(repository.findById(ROLE_ID)).thenReturn(Optional.of(ROLE_ENTITY));
+
+        var entity = database.getById(ROLE_ID);
+
+        verify(repository).findById(ROLE_ID);
+        assertEquals(Optional.of(ROLE_ENTITY), entity);
     }
 
     @Test
-    @DisplayName("getById(UUID id) - Should return Role entity by Id")
-    void getById_shouldReturnRoleEntityById() {
-        Role entity = Role.create("USER", 10);
+    void getById_shouldReturnEmptyOptionalByIdWhenEntityNotPersist() {
+        when(repository.findById(ROLE_ID)).thenReturn(Optional.empty());
 
-        UUID id = entity.getId();
+        var entity = database.getById(ROLE_ID);
 
-        when(roleRepository.findById(id)).thenReturn(Optional.of(entity));
+        verify(repository).findById(ROLE_ID);
+        assertEquals(Optional.empty(), entity);
+    }
 
-        Optional<Role> foundedEntity = rolePostgresDatabase.getById(id);
+    // getByName.
+    @Test
+    void getByName_shouldReturnEntityByName() {
+        when(repository.findByName(ROLE_NAME)).thenReturn(Optional.of(ROLE_ENTITY));
 
-        assertEquals(entity, foundedEntity.get());
+        var entity = database.getByName(ROLE_NAME);
+
+        verify(repository).findByName(ROLE_NAME);
+        assertEquals(Optional.of(ROLE_ENTITY), entity);
     }
 
     @Test
-    @DisplayName("getById(UUID id) - Should return Optional.empty() by Id")
-    void getById_shouldReturnEmptyByIdWhenNotPresent() {
-        UUID id = UuidGeneratorUtil.generateNewUuidV7();
+    void getByName_shouldReturnEmptyOptionalByNameWhenEntityNotPersist() {
+        when(repository.findByName(ROLE_NAME)).thenReturn(Optional.empty());
 
-        when(roleRepository.findById(id)).thenReturn(Optional.empty());
+        var entity = database.getByName(ROLE_NAME);
 
-        Optional<Role> foundedEntity = rolePostgresDatabase.getById(id);
-
-        assertEquals(Optional.empty(), foundedEntity);
+        verify(repository).findByName(ROLE_NAME);
+        assertEquals(Optional.empty(), entity);
     }
 
+    // getReferenceById.
     @Test
-    @DisplayName("getByName(String name) - Should return Role entity by name")
-    void getByName_shouldReturnRoleEntityByName() {
-        String name = "USER";
-        Role entity = Role.create(name, 10);
+    void getReferenceById_shouldReturnEntityReferenceById() {
+        when(repository.getReferenceById(ROLE_ID)).thenReturn(ROLE_ENTITY);
 
-        when(roleRepository.findByName(name)).thenReturn(Optional.of(entity));
+        var entity = database.getReferenceById(ROLE_ID);
 
-        Optional<Role> foundedEntity = rolePostgresDatabase.getByName(name);
-
-        assertFalse(foundedEntity.isEmpty());
-        assertEquals(entity, foundedEntity.get());
+        verify(repository).getReferenceById(ROLE_ID);
+        assertEquals(ROLE_ENTITY, entity);
     }
 
+    // deleteById.
     @Test
-    @DisplayName("getById(UUID id) - Should return Optional.empty() by name")
-    void getByName_shouldReturnEmptyByNameWhenNotPresent() {
-        String name = "USER";
+    void deleteById_shouldVerifyThatDeleteByIdWacExecutedOnce() {
+        doNothing().when(repository).deleteById(ROLE_ID);
 
-        when(roleRepository.findByName(name)).thenReturn(Optional.empty());
+        database.deleteById(ROLE_ID);
 
-        Optional<Role> foundedEntity = rolePostgresDatabase.getByName(name);
-
-        assertEquals(Optional.empty(), foundedEntity);
+        verify(repository).deleteById(ROLE_ID);
     }
 
+    // existsById.
     @Test
-    @DisplayName("getReferenceById(String name) - Should return Role entity reference by Id")
-    void getReferenceById_shouldReturnRoleReferenceById() {
-        Role entity = Role.create("USER", 10);
+    void existsById_shouldReturnTrueWhenEntityExistsById() {
+        when(repository.existsById(ROLE_ID)).thenReturn(true);
 
-        UUID id = entity.getId();
+        boolean isExist = database.existsById(ROLE_ID);
 
-        when(roleRepository.getReferenceById(id)).thenReturn(entity);
-
-        Role foundedEntity = rolePostgresDatabase.getReferenceById(id);
-
-        assertEquals(entity, foundedEntity);
-    }
-
-    @Test
-    @DisplayName("existsById(UUID id) - Should return true if entity exist by Id")
-    void getReferenceById_shouldReturnTrueWhenExistsById() {
-        UUID id = UuidGeneratorUtil.generateNewUuidV7();
-
-        when(roleRepository.existsById(id)).thenReturn(true);
-
-        boolean isExist = rolePostgresDatabase.existsById(id);
-
+        verify(repository).existsById(ROLE_ID);
         assertTrue(isExist);
     }
 
     @Test
-    @DisplayName("existsById(UUID id) - Should return false if entity not exist by Id")
-    void getReferenceById_shouldReturnFalseWhenNotExistById() {
-        UUID id = UuidGeneratorUtil.generateNewUuidV7();
+    void existsById_shouldReturnFalseWhenEntityNotExistById() {
+        when(repository.existsById(ROLE_ID)).thenReturn(false);
 
-        when(roleRepository.existsById(id)).thenReturn(false);
+        boolean isExist = database.existsById(ROLE_ID);
 
-        boolean isExist = rolePostgresDatabase.existsById(id);
-
+        verify(repository).existsById(ROLE_ID);
         assertFalse(isExist);
     }
 
+    // existsByName.
     @Test
-    @DisplayName("existsByName(String name) - Should return true if entity exists by name")
-    void getReferenceByName_shouldReturnTrueWhenExistsById() {
-        String name = "USER";
+    void existsByName_shouldReturnTrueWhenEntityExistsByName() {
+        when(repository.existsByName(ROLE_NAME)).thenReturn(true);
 
-        when(roleRepository.existsByName(name)).thenReturn(true);
+        boolean isExist = database.existsByName(ROLE_NAME);
 
-        boolean isExist = rolePostgresDatabase.existsByName(name);
-
+        verify(repository).existsByName(ROLE_NAME);
         assertTrue(isExist);
     }
 
     @Test
-    @DisplayName("existsByName(String name) - Should return false if entity not exist by name")
-    void getReferenceByName_shouldReturnFalseWhenNotExistById() {
-        String name = "USER";
+    void existsByName_shouldReturnFalseWhenEntityNotExistByName() {
+        when(repository.existsByName(ROLE_NAME)).thenReturn(false);
 
-        when(roleRepository.existsByName(name)).thenReturn(false);
+        boolean isExist = database.existsByName(ROLE_NAME);
 
-        boolean isExist = rolePostgresDatabase.existsByName(name);
-
+        verify(repository).existsByName(ROLE_NAME);
         assertFalse(isExist);
     }
 }

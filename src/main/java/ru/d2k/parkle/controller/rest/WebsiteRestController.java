@@ -43,17 +43,16 @@ public class WebsiteRestController {
         return ResponseEntity.ok(service.create(createWebsiteDto));
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<WebsiteResponseDto> updateById(@PathVariable("id") UUID id,
-                                                         @Valid @RequestBody WebsiteUpdateDto updateWebsiteDto) {
-        return ResponseEntity.ok(service.updateById(id, updateWebsiteDto));
+    @PatchMapping("/update")
+    public ResponseEntity<WebsiteResponseDto> updateById(@Valid @RequestBody WebsiteUpdateDto updateWebsiteDto) {
+        return ResponseEntity.ok(service.updateById(updateWebsiteDto));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteById(@PathVariable("id") UUID id) {
-        boolean result = service.deleteById(id);
+        service.deleteById(id);
 
-        return result ? ResponseEntity.ok().build() : ResponseEntity.internalServerError()
-                .body("Website was not deleted or not exists!");
+        return !service.existsById(id) ? ResponseEntity.ok().build() : ResponseEntity.internalServerError()
+                .body("WebsiteEntity was not deleted or not exists!");
     }
 }

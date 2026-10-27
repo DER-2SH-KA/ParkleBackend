@@ -54,7 +54,7 @@ public class AuthenticationRestController {
         boolean result = service.deleteByLoginAndUnauthorizeUser(login, response);
 
         return result ? ResponseEntity.ok().build() : (ResponseEntity.internalServerError()
-                .body("User was not deleted!"));
+                .body("UserEntity was not deleted!"));
     }
 
     @GetMapping("/isAuthed")
@@ -63,7 +63,7 @@ public class AuthenticationRestController {
 
         return userResponseDto.isPresent() ? ResponseEntity.ok(userResponseDto.get()) :
                     new ResponseEntity<>(new ErrorResponseDto("Пользователь не авторизован в системе",
-                    "User not exists in system by jwt in request"), HttpStatus.UNAUTHORIZED);
+                    "UserEntity not exists in system by jwt in request"), HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("/logout")

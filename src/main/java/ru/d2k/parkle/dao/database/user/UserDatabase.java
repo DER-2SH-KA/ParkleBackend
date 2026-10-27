@@ -1,17 +1,13 @@
 package ru.d2k.parkle.dao.database.user;
 
-import ru.d2k.parkle.entity.User;
-import java.util.List;
+import ru.d2k.parkle.dao.database.BasicCrudDatabase;
+import ru.d2k.parkle.entity.UserEntity;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserDatabase {
+public interface UserDatabase extends BasicCrudDatabase<UserEntity, UUID> {
 
-    User save(User entity);
-    List<User> getAll();
-    Optional<User> getById(UUID id);
-    Optional<User> getByLogin(String login);
-    User getReferenceById(UUID id);
+    Optional<UserEntity> getByLogin(String login);
     void deleteByLogin(String login);
     boolean existsByLogin(String login);
 }

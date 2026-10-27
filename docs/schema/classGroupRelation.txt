@@ -1,0 +1,87 @@
+@startuml
+' Установка стилей для компонентов
+skinparam component {
+    BorderColor black
+    ArrowColor black
+}
+
+' =================================================================
+' 1. ПАКЕТ: Persistence (Доступ к данным)
+' =================================================================
+package "Persistence Layer" #red {
+    component Entity #lightblue {
+        ' Сущности данных
+    }
+    component Repository #lightgreen {
+        ' Абстракция доступа к данным
+    }
+    component DAO #lightgreen {
+        ' Объекты доступа к данным
+    }
+}
+
+' =================================================================
+' 2. ПАКЕТ: Presentation (Пользовательский интерфейс и передача данных)
+' =================================================================
+package "Presentation Layer" #lime {
+    component Controller {
+        ' Точка входа, обработка запросов
+    }
+    component DTO {
+        ' Объекты для передачи данных
+    }
+    component Frontend {
+        ' Вызовы со стороны клиента
+    }
+    component ObjectMapper {
+        ' Jackson преобразование в JSON
+    }
+}
+
+' =================================================================
+' 3. ПАКЕТ: Domain_Application (Бизнес-логика и генерация)
+' =================================================================
+package "Domain Layer" #darkgray {
+    component Service #lightblue {
+        ' Бизнес-логика
+    }
+    component Mapper #lightblue {
+        ' Маппинг данных
+    }
+    component UuidGenerator #lightpink {
+        ' Генерация уникальных идентификаторов
+    }
+}
+
+
+' =================================================================
+' Определение зависимостей (Стрелки)
+' =================================================================
+
+' 1. Entity -> Persistence (Entity использует DAO, Mapper, Repository)
+Entity --> Mapper
+Entity --> DAO
+Entity --> Repository
+
+' 2. Domain_Application -> Persistence (Service использует DAO и Mapper)
+Service <-> DAO
+Service <-> Mapper
+
+' 3. Persistence -> Persistence (Repository использует DAO)
+Repository <-> DAO
+
+' 4. Domain_Application -> Presentation (Service вызывает Controller)
+Service <-> Controller
+
+' 5. DTO -> Domain_Application (DTO используется для операций)
+DTO --> Service
+DTO --> Controller
+
+' 6. Presentation -> Presentation (Frontend взаимодействует с Controller)
+Frontend <-> Controller
+Frontend <-> ObjectMapper
+
+' 7. ObjectMapper
+ObjectMapper <-> DTO
+
+@enduml

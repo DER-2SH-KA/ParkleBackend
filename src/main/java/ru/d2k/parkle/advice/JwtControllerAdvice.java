@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.d2k.parkle.dto.ErrorResponseDto;
-import ru.d2k.parkle.exception.JwtNotExistInRequestException;
-import ru.d2k.parkle.exception.JwtNotIncludeUserLoginException;
+import ru.d2k.parkle.exception.jwt.JwtNotExistInRequestException;
+import ru.d2k.parkle.exception.jwt.JwtNotIncludeUserLoginException;
 
 @Slf4j
 @RestControllerAdvice

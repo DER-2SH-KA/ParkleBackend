@@ -2,55 +2,50 @@ package ru.d2k.parkle.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.d2k.parkle.dao.database.website.WebsiteDatabase;
 import ru.d2k.parkle.dto.WebsiteUpdateDto;
-import ru.d2k.parkle.entity.User;
-import ru.d2k.parkle.entity.Website;
-import ru.d2k.parkle.entity.cache.UserCache;
-import ru.d2k.parkle.entity.cache.WebsiteCache;
-import ru.d2k.parkle.exception.UserNotFoundException;
-import ru.d2k.parkle.exception.WebsiteNotFoundException;
+import ru.d2k.parkle.entity.WebsiteEntity;
+import ru.d2k.parkle.entity.WebsiteTagEntity;
+import ru.d2k.parkle.model.domain.User;
+import ru.d2k.parkle.model.domain.Website;
+import ru.d2k.parkle.exception.entity.WebsiteEntityNotFoundException;
 import ru.d2k.parkle.utils.mapper.WebsiteMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+// TODO: Пересмотреть сигнатуры методов (они не должны ничего знать про DTO-объекты).
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class WebsiteDao {
 
-    @Autowired
     private final WebsiteDatabase database;
-
-    @Autowired
     private final WebsiteMapper mapper;
+    private final WebsiteTagDao websiteTagDao;
 
-    @Autowired
-    private final UserDao userDao;
+    public Website create(WebsiteEntity entity) {
+        WebsiteEntity createdEntity = this.saveToDatabase(entity);
 
-    public WebsiteCache create(Website entity) {
-        Website createdEntity = this.saveToDatabase(entity);
-
-        return mapper.toCache(createdEntity);
+        return mapper.toDomain(createdEntity);
     }
 
-    public List<WebsiteCache> getAll() {
+    public List<Website> getAll() {
         log.debug("Websites was taken from database!");
 
         return database.getAll().stream()
-                .map(mapper::toCache)
+                .map(mapper::toDomain)
                 .toList();
     }
 
-    public List<WebsiteCache> getAllByUserLogin(UserCache userCache) {
-        List<WebsiteCache> websiteCaches = new ArrayList<>();
+    public List<Website> getAllByUserLogin(User user) {
+        List<Website> websiteCaches = new ArrayList<>();
 
-        List<UUID> websiteIds = userCache.websiteIds();
-        Optional<WebsiteCache> cache = Optional.empty();
+        List<UUID> websiteIds = user.websiteIds();
+        Optional<Website> cache = Optional.empty();
 
         for (UUID websiteId : websiteIds) {
             cache = this.getById(websiteId);
@@ -58,62 +53,55 @@ public class WebsiteDao {
             if (cache.isPresent()) {
                 websiteCaches.add(cache.get());
             } else {
-                log.error("Website not found by ID {}!", websiteId);
+                log.error("WebsiteEntity not found by ID {}!", websiteId);
             }
         }
 
         return websiteCaches;
     }
 
-    public Optional<WebsiteCache> getById(UUID id) {
-        Optional<Website> fromDatabase = this.getByIdFromDatabase(id);
+    public Optional<Website> getById(UUID id) {
+        Optional<WebsiteEntity> fromDatabase = this.getByIdFromDatabase(id);
 
         if (fromDatabase.isEmpty()) {
-            throw new WebsiteNotFoundException(String.format("Website not found by ID '%s'!", id));
+            throw new WebsiteEntityNotFoundException(String.format("WebsiteEntity not found by ID '%s'!", id));
         } else {
-            WebsiteCache cache = mapper.toCache(fromDatabase.get());
+            Website cache = mapper.toDomain(fromDatabase.get());
 
-            log.debug("Website by id '{}' was taken from database!", id);
+            log.debug("WebsiteEntity by id '{}' was taken from database!", id);
 
             return Optional.ofNullable(cache);
         }
     }
 
-    public Website getReferenceById(UUID id) {
+    public WebsiteEntity getReferenceById(UUID id) {
         return database.getReferenceById(id);
     }
 
-    public Optional<WebsiteCache> updateById(UUID id, WebsiteUpdateDto updateWebsiteDto, String userLogin) {
-        Optional<Website> entity = this.getByIdFromDatabase(id);
-        Optional<User> userEntity = userDao.getByLoginFromDatabase(userLogin); // TODO: переделать в будущем без публичного login метода.
+    // TODO: Преобразовать в Application/Domain-сущность вместо DTO.
+    public Website updateById(UUID id, WebsiteUpdateDto updateWebsiteDto) {
+        WebsiteEntity entity = this.getByIdFromDatabase(id)
+                .orElseThrow(() ->
+                        new WebsiteEntityNotFoundException(String.format("WebsiteEntity not found by ID '%s'!", id)));
 
+        log.debug("Entity and website is present");
 
-        if (entity.isPresent() && userEntity.isPresent()) {
-            log.debug("Entity and website is present");
+        List<WebsiteTagEntity> tagEntities = updateWebsiteDto.tags().stream()
+                .map(dto -> websiteTagDao.getReferenceById(dto.id()))
+                .collect(Collectors.toCollection(ArrayList::new));
 
-            mapper.updateEntityByDto(entity.get(), updateWebsiteDto, userEntity.get());
+        entity.setTitle(updateWebsiteDto.title());
+        entity.setDescription(updateWebsiteDto.description());
+        entity.setUrl(updateWebsiteDto.url());
+        entity.setHexColor(updateWebsiteDto.hexColor());
+        entity.setTags(tagEntities);
 
-            Website updatedEntity = this.saveToDatabase(entity.get());
-            WebsiteCache cache = mapper.toCache(updatedEntity);
+        WebsiteEntity updatedEntity = this.saveToDatabase(entity);
+        Website cache = mapper.toDomain(updatedEntity);
 
-            log.debug("Website with id {} was updated", id);
+        log.debug("WebsiteEntity with id {} was updated", id);
 
-            return Optional.of(cache);
-        } else {
-            if (entity.isEmpty()) {
-                log.error("Website not found with ID: {}", id);
-
-                throw new WebsiteNotFoundException(String.format("Website not found by ID '%s'!", id));
-            } else if (userEntity.isEmpty()) {
-                log.error("User not found with login: {}", userLogin);
-
-                throw new UserNotFoundException(String.format("User not found by login '%s'!", updateWebsiteDto.userLogin()));
-            }
-        }
-
-        log.error("Website with id {} wasn't updated", id);
-
-        return Optional.empty();
+        return cache;
     }
 
     public boolean deleteById(UUID id) {
@@ -126,11 +114,11 @@ public class WebsiteDao {
         return this.existsByIdInDatabase(id);
     }
 
-    private Website saveToDatabase(Website entity) {
+    private WebsiteEntity saveToDatabase(WebsiteEntity entity) {
         return database.save(entity);
     }
 
-    private Optional<Website> getByIdFromDatabase(UUID id) {
+    private Optional<WebsiteEntity> getByIdFromDatabase(UUID id) {
         return database.getById(id);
     }
 
